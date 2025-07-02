@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
 import {
   Table,
   TableBody,
@@ -39,43 +40,11 @@ import {
 
 type Payment = {
   id: string;
+  name: string;
   amount: number;
   status: 'pending' | 'processing' | 'success' | 'failed';
   email: string;
 };
-
-const data: Payment[] = [
-  {
-    id: 'm5gr84i9',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '3u1reuv4',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: 'derv1ws0',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '5kma53ae',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: 'bhqecj4p',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-];
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -98,6 +67,16 @@ export const columns: ColumnDef<Payment>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: 'name',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Name
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('name') as string}</div>,
   },
   {
     accessorKey: 'status',
@@ -158,6 +137,13 @@ export const columns: ColumnDef<Payment>[] = [
 ];
 
 export default function DataTable() {
+  const [data, setData] = useState<Payment[]>([]);
+
+  React.useEffect(() => {
+    fetch('/data/simulations.json')
+      .then((res) => res.json())
+      .then((json) => setData(json));
+  }, []);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -173,7 +159,22 @@ export default function DataTable() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: (updater) => {
+      // Compute the next rowSelection state
+      const nextRowSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
+      // Limit selection to 5 rows
+      const selectedIds = Object.keys(nextRowSelection).filter((id) => nextRowSelection[id]);
+      if (selectedIds.length > 5) {
+        // Keep only the first 5 selected
+        const limitedSelection = { ...nextRowSelection };
+        selectedIds.slice(5).forEach((id) => {
+          limitedSelection[id] = false;
+        });
+        setRowSelection(limitedSelection);
+      } else {
+        setRowSelection(nextRowSelection);
+      }
+    },
     state: {
       sorting,
       columnFilters,
@@ -185,6 +186,42 @@ export default function DataTable() {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => {
+            const selectedRowIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+            // TODO: Do something with selectedRowIds, e.g., setSelectedForCompare or navigate
+          }}
+          disabled={Object.values(rowSelection).filter(Boolean).length === 0}
+        >
+          Compare
+        </Button>
+        <div className="ml-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} / 5 selected
+          </span>
+          {table.getFilteredSelectedRowModel().rows.map((row) => (
+            <span
+              key={row.id}
+              className="flex items-center rounded bg-muted px-2 py-1 text-xs font-medium text-muted-foreground"
+            >
+              {row.original.name}
+              <button
+                type="button"
+                className="ml-1 text-muted-foreground hover:text-destructive focus:outline-none"
+                aria-label={`Remove ${row.original.name}`}
+                onClick={() => {
+                  // Remove this row from selection
+                  table.getRow(row.id)?.toggleSelected(false);
+                }}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
