@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -38,26 +38,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-type Payment = {
-  id: string;
-  name: string;
-  amount: number;
-  status: 'pending' | 'processing' | 'success' | 'failed';
-  email: string;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Simulation>[] = [
   {
     id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
+    header: () => null,
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
@@ -136,14 +120,11 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export default function DataTable() {
-  const [data, setData] = useState<Payment[]>([]);
+type DataTableProps = {
+  data: Simulation[];
+};
 
-  React.useEffect(() => {
-    fetch('/data/simulations.json')
-      .then((res) => res.json())
-      .then((json) => setData(json));
-  }, []);
+export const DataTable = ({ data }: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -186,17 +167,19 @@ export default function DataTable() {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Button
-          variant="default"
-          size="sm"
-          onClick={() => {
-            const selectedRowIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
-            // TODO: Do something with selectedRowIds, e.g., setSelectedForCompare or navigate
-          }}
-          disabled={Object.values(rowSelection).filter(Boolean).length === 0}
-        >
-          Compare
-        </Button>
+        <div>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => {
+              const selectedRowIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+              // TODO: Do something with selectedRowIds, e.g., setSelectedForCompare or navigate
+            }}
+            disabled={Object.values(rowSelection).filter(Boolean).length === 0}
+          >
+            Compare
+          </Button>
+        </div>
         <div className="ml-4 flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} / 5 selected
@@ -307,4 +290,4 @@ export default function DataTable() {
       </div>
     </div>
   );
-}
+};
