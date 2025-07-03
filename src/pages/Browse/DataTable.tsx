@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import type {
   ColumnDef,
@@ -37,88 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
-export const columns: ColumnDef<Simulation>[] = [
-  {
-    id: 'select',
-    header: () => null,
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'name',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Name
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('name') as string}</div>,
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('status') as string}</div>,
-  },
-  {
-    accessorKey: 'email',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Email
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue('email') as string}</div>,
-  },
-  {
-    accessorKey: 'amount',
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount') as string);
-
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
+import { Simulation } from '@/App';
 
 type DataTableProps = {
   data: Simulation[];
@@ -141,20 +58,8 @@ export const DataTable = ({ data }: DataTableProps) => {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: (updater) => {
-      // Compute the next rowSelection state
       const nextRowSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
-      // Limit selection to 5 rows
-      const selectedIds = Object.keys(nextRowSelection).filter((id) => nextRowSelection[id]);
-      if (selectedIds.length > 5) {
-        // Keep only the first 5 selected
-        const limitedSelection = { ...nextRowSelection };
-        selectedIds.slice(5).forEach((id) => {
-          limitedSelection[id] = false;
-        });
-        setRowSelection(limitedSelection);
-      } else {
-        setRowSelection(nextRowSelection);
-      }
+      setRowSelection(limitRowSelection(nextRowSelection, 5));
     },
     state: {
       sorting,
@@ -290,4 +195,109 @@ export const DataTable = ({ data }: DataTableProps) => {
       </div>
     </div>
   );
+};
+
+export default DataTable;
+
+const columns: ColumnDef<Simulation>[] = [
+  {
+    id: 'select',
+    header: () => null,
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'name',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Name
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('name') as string}</div>,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => <div className="capitalize">{row.getValue('status') as string}</div>,
+  },
+  {
+    accessorKey: 'email',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Email
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div className="lowercase">{row.getValue('email') as string}</div>,
+  },
+  {
+    accessorKey: 'amount',
+    header: () => <div className="text-right">Amount</div>,
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue('amount') as string);
+
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(amount);
+
+      return <div className="text-right font-medium">{formatted}</div>;
+    },
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      const payment = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
+              Copy payment ID
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View customer</DropdownMenuItem>
+            <DropdownMenuItem>View payment details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];
+
+/**
+ * Limits the row selection to a maximum number of rows.
+ * @param selection The current row selection object.
+ * @param max The maximum number of rows that can be selected.
+ * @returns A new selection object limited to the specified max.
+ */
+const limitRowSelection = (
+  selection: Record<string, boolean>,
+  max: number,
+): Record<string, boolean> => {
+  const selectedIds = Object.keys(selection).filter((id) => selection[id]);
+  if (selectedIds.length <= max) return selection;
+
+  const limitedSelection = { ...selection };
+  selectedIds.slice(max).forEach((id) => {
+    limitedSelection[id] = false;
+  });
+
+  return limitedSelection;
 };

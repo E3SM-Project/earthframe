@@ -1,11 +1,11 @@
-import { FilterState } from '@/pages/Browse/Browse';
+import type { FilterState } from '@/pages/Browse/Browse';
 
-type FilterPanelProps = {
+interface FilterPanelProps {
   filters: FilterState;
   onChange: (next: FilterState) => void;
-};
+}
 
-export const FiltersPanel = ({ filters, onChange }: FilterPanelProps) => {
+const FiltersPanel = ({ filters, onChange }: FilterPanelProps) => {
   return (
     <aside className="w-72 bg-background border-r p-6 flex flex-col gap-6 min-h-screen">
       <div>
