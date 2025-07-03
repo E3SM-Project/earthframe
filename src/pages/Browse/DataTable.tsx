@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
 } from '@tanstack/react-table';
@@ -36,31 +37,82 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Simulation } from '@/App';
+import { useNavigate } from 'react-router-dom';
 
-type DataTableProps = {
+interface DataTableProps {
   data: Simulation[];
-};
+  selectedDataIds: string[] | null;
+  setSelectedDataIds: (ids: string[]) => void;
+}
 
-export const DataTable = ({ data }: DataTableProps) => {
+export const DataTable = ({ data, selectedDataIds, setSelectedDataIds }: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
+
+  const navigate = useNavigate();
+  const handleCompare = () => {
+    navigate('/compare');
+  };
+
+  // Convert selectedDataIds to rowSelection object for react-table
+  const rowSelection: Record<string, boolean> = {};
+  if (selectedDataIds) {
+    selectedDataIds.forEach((id) => {
+      rowSelection[id] = true;
+    });
+  }
+  // Max selection limit
+  const MAX_SELECTION = 5;
+
+  // Helper to render the select checkbox with max selection logic
+  function renderSelectCheckbox(row: Row<Simulation>) {
+    const isSelected = row.getIsSelected();
+    const isDisabled =
+      !isSelected && Object.values(rowSelection).filter(Boolean).length >= MAX_SELECTION;
+
+    return (
+      <Checkbox
+        checked={isSelected}
+        disabled={isDisabled}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    );
+  }
+
+  // Memoize columns with select checkbox logic injected
+  const tableColumns = columns.map((col: ColumnDef<Simulation>) =>
+    col.id === 'select'
+      ? {
+          ...col,
+          cell: ({ row }) => renderSelectCheckbox(row),
+        }
+      : col,
+  ) as ColumnDef<Simulation>[];
+
+  // Handle row selection change with max selection limit
+  function handleRowSelectionChange(
+    updater: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>),
+  ) {
+    const nextRowSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
+    const limitedSelection = limitRowSelection(nextRowSelection, MAX_SELECTION);
+    const selectedIds = Object.keys(limitedSelection).filter((id) => limitedSelection[id]);
+    setSelectedDataIds(selectedIds);
+  }
 
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: (updater) => {
-      const nextRowSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
-      setRowSelection(limitRowSelection(nextRowSelection, 5));
-    },
+    onRowSelectionChange: handleRowSelectionChange,
     state: {
       sorting,
       columnFilters,
@@ -76,18 +128,21 @@ export const DataTable = ({ data }: DataTableProps) => {
           <Button
             variant="default"
             size="sm"
-            onClick={() => {
-              const selectedRowIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
-              // TODO: Do something with selectedRowIds, e.g., setSelectedForCompare or navigate
-            }}
-            disabled={Object.values(rowSelection).filter(Boolean).length === 0}
+            onClick={() => handleCompare()}
+            disabled={Object.values(rowSelection).filter(Boolean).length < 2}
           >
             Compare
           </Button>
         </div>
         <div className="ml-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} / 5 selected
+          <span
+            className={`text-xs ${
+              table.getFilteredSelectedRowModel().rows.length === MAX_SELECTION
+                ? 'text-warning font-bold'
+                : 'text-muted-foreground'
+            }`}
+          >
+            {table.getFilteredSelectedRowModel().rows.length} / {MAX_SELECTION} selected
           </span>
           {table.getFilteredSelectedRowModel().rows.map((row) => (
             <span

@@ -1,3 +1,4 @@
+import { Simulation } from '@/App';
 import { DataTable } from '@/pages/Browse/DataTable';
 import FiltersPanel from '@/pages/Browse/FiltersPanel';
 import { useState, useMemo } from 'react';
@@ -9,10 +10,12 @@ export interface FilterState {
 }
 
 interface BrowseProps {
-  data: Array<{ name: string; status: string; email: string }>;
+  data: Simulation[];
+  selectedDataIds: string[] | null;
+  setSelectedDataIds: (ids: string[]) => void;
 }
 
-const Browse = ({ data }: BrowseProps) => {
+const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   const [filters, setFilters] = useState<FilterState>({ name: '', status: '', email: '' });
 
   const filteredData = useMemo(() => {
@@ -32,7 +35,11 @@ const Browse = ({ data }: BrowseProps) => {
           <FiltersPanel filters={filters} onChange={setFilters} />
         </div>
         <div className="flex-1">
-          <DataTable data={filteredData} />
+          <DataTable
+            data={filteredData}
+            selectedDataIds={selectedDataIds}
+            setSelectedDataIds={setSelectedDataIds}
+          />
         </div>
       </div>
     </div>

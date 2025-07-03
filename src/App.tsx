@@ -1,7 +1,7 @@
 import { BrowserRouter } from 'react-router-dom';
 import { AppRoutes } from '@/routes/routes';
 import NavBar from '@/components/layout/NavBar';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface Simulation {
   id: string;
@@ -12,7 +12,14 @@ export interface Simulation {
 }
 
 export default function App() {
-  const [data, setData] = useState<Simulation[]>([]);
+  const [data, setData] = useState<Simulation[]>([]); // data
+  const [selectedDataIds, setSelectedDataIds] = useState<string[]>([]);
+
+  // TODO: Pass selectedData to AppRoutes to use in child components.
+  const selectedData = useMemo(
+    () => data.filter((item) => selectedDataIds.includes(item.id)),
+    [data, selectedDataIds],
+  );
 
   useEffect(() => {
     fetch('/data/simulations.json')
@@ -23,7 +30,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <NavBar />
-      <AppRoutes data={data} />
+      <AppRoutes
+        data={data}
+        selectedDataIds={selectedDataIds}
+        setSelectedDataIds={setSelectedDataIds}
+      />
     </BrowserRouter>
   );
 }
