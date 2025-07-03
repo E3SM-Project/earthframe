@@ -39,13 +39,22 @@ import {
 import { Simulation } from '@/App';
 import { useNavigate } from 'react-router-dom';
 
+// Max number of rows that can be selected at once.
+const MAX_SELECTION = 5;
+
 interface DataTableProps {
   data: Simulation[];
-  selectedDataIds: string[] | null;
+  filteredData: Simulation[];
+  selectedDataIds: string[];
   setSelectedDataIds: (ids: string[]) => void;
 }
 
-export const DataTable = ({ data, selectedDataIds, setSelectedDataIds }: DataTableProps) => {
+export const DataTable = ({
+  data,
+  filteredData,
+  selectedDataIds,
+  setSelectedDataIds,
+}: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -55,18 +64,11 @@ export const DataTable = ({ data, selectedDataIds, setSelectedDataIds }: DataTab
     navigate('/compare');
   };
 
-  // Convert selectedDataIds to rowSelection object for react-table
-  const rowSelection: Record<string, boolean> = {};
-  if (selectedDataIds) {
-    selectedDataIds.forEach((id) => {
-      rowSelection[id] = true;
-    });
-  }
-  // Max selection limit
-  const MAX_SELECTION = 5;
+  // Convert selectedDataIds to rowSelection object for react-table.
+  const rowSelection = idsToRowSelection(selectedDataIds);
 
-  // Helper to render the select checkbox with max selection logic
-  function renderSelectCheckbox(row: Row<Simulation>) {
+  // Helper to render the select checkbox with max selection logic.
+  const renderSelectCheckbox = (row: Row<Simulation>) => {
     const isSelected = row.getIsSelected();
     const isDisabled =
       !isSelected && Object.values(rowSelection).filter(Boolean).length >= MAX_SELECTION;
@@ -79,9 +81,9 @@ export const DataTable = ({ data, selectedDataIds, setSelectedDataIds }: DataTab
         aria-label="Select row"
       />
     );
-  }
+  };
 
-  // Memoize columns with select checkbox logic injected
+  // Memoize columns with select checkbox logic injected.
   const tableColumns = columns.map((col: ColumnDef<Simulation>) =>
     col.id === 'select'
       ? {
@@ -91,18 +93,19 @@ export const DataTable = ({ data, selectedDataIds, setSelectedDataIds }: DataTab
       : col,
   ) as ColumnDef<Simulation>[];
 
-  // Handle row selection change with max selection limit
-  function handleRowSelectionChange(
+  // Handle row selection change with max selection limit.
+  const handleRowSelectionChange = (
     updater: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>),
-  ) {
+  ) => {
     const nextRowSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
     const limitedSelection = limitRowSelection(nextRowSelection, MAX_SELECTION);
     const selectedIds = Object.keys(limitedSelection).filter((id) => limitedSelection[id]);
+
     setSelectedDataIds(selectedIds);
-  }
+  };
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns: tableColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -137,32 +140,36 @@ export const DataTable = ({ data, selectedDataIds, setSelectedDataIds }: DataTab
         <div className="ml-4 flex flex-wrap items-center gap-2">
           <span
             className={`text-xs ${
-              table.getFilteredSelectedRowModel().rows.length === MAX_SELECTION
+              (selectedDataIds?.length ?? 0) === MAX_SELECTION
                 ? 'text-warning font-bold'
                 : 'text-muted-foreground'
             }`}
           >
-            {table.getFilteredSelectedRowModel().rows.length} / {MAX_SELECTION} selected
+            {selectedDataIds?.length ?? 0} / {MAX_SELECTION} selected
           </span>
-          {table.getFilteredSelectedRowModel().rows.map((row) => (
-            <span
-              key={row.id}
-              className="flex items-center rounded bg-muted px-2 py-1 text-xs font-medium text-muted-foreground"
-            >
-              {row.original.name}
-              <button
-                type="button"
-                className="ml-1 text-muted-foreground hover:text-destructive focus:outline-none"
-                aria-label={`Remove ${row.original.name}`}
-                onClick={() => {
-                  // Remove this row from selection
-                  table.getRow(row.id)?.toggleSelected(false);
-                }}
+          {(selectedDataIds ?? []).map((id) => {
+            // Always find the row in the full data set (not just filtered)
+            const row = data.find((r) => r.id === id);
+            if (!row) return null;
+            return (
+              <span
+                key={id}
+                className="flex items-center rounded bg-muted px-2 py-1 text-xs font-medium text-muted-foreground"
               >
-                ×
-              </button>
-            </span>
-          ))}
+                {row.name}
+                <button
+                  type="button"
+                  className="ml-1 text-muted-foreground hover:text-destructive focus:outline-none"
+                  aria-label={`Remove ${row.name}`}
+                  onClick={() => {
+                    setSelectedDataIds(selectedDataIds.filter((rowId) => rowId !== id));
+                  }}
+                >
+                  ×
+                </button>
+              </span>
+            );
+          })}
         </div>
 
         <DropdownMenu>
@@ -252,8 +259,6 @@ export const DataTable = ({ data, selectedDataIds, setSelectedDataIds }: DataTab
   );
 };
 
-export default DataTable;
-
 const columns: ColumnDef<Simulation>[] = [
   {
     id: 'select',
@@ -336,6 +341,14 @@ const columns: ColumnDef<Simulation>[] = [
   },
 ];
 
+// Converts an array of IDs into a row selection object.
+// Each ID becomes a key with a value of true, indicating selection.
+//
+// @param ids - Array of row IDs to select
+// @returns An object mapping each ID to true
+const idsToRowSelection = (ids: string[]): Record<string, boolean> =>
+  Object.fromEntries(ids.map((id) => [id, true]));
+
 /**
  * Limits the row selection to a maximum number of rows.
  * @param selection The current row selection object.
@@ -356,3 +369,5 @@ const limitRowSelection = (
 
   return limitedSelection;
 };
+
+export default DataTable;

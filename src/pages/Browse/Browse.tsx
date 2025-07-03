@@ -11,7 +11,7 @@ export interface FilterState {
 
 interface BrowseProps {
   data: Simulation[];
-  selectedDataIds: string[] | null;
+  selectedDataIds: string[];
   setSelectedDataIds: (ids: string[]) => void;
 }
 
@@ -36,7 +36,8 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
         </div>
         <div className="flex-1">
           <DataTable
-            data={filteredData}
+            data={data}
+            filteredData={filteredData}
             selectedDataIds={selectedDataIds}
             setSelectedDataIds={setSelectedDataIds}
           />
