@@ -79,6 +79,7 @@ export const DataTable = ({
         disabled={isDisabled}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
+        onClick={(e) => e.stopPropagation()}
       />
     );
   };
@@ -123,6 +124,29 @@ export const DataTable = ({
       rowSelection,
     },
   });
+
+  // Allow row click to select/deselect, except when clicking on interactive elements (like the checkbox or actions)
+  const handleRowClick = (row: Row<Simulation>, event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const tag = target.tagName;
+
+    // Ignore clicks on interactive elements
+    if (
+      tag === 'BUTTON' ||
+      tag === 'INPUT' ||
+      tag === 'A' ||
+      target.closest('button, input, a, [role="menu"]')
+    ) {
+      return;
+    }
+
+    const isSelected = row.getIsSelected();
+    const selectedCount = Object.values(rowSelection).filter(Boolean).length;
+    if (!isSelected && selectedCount >= MAX_SELECTION) {
+      return;
+    }
+    row.toggleSelected();
+  };
 
   return (
     <div className="w-full">
@@ -170,6 +194,16 @@ export const DataTable = ({
               </span>
             );
           })}
+          {selectedDataIds.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="ml-2 text-xs"
+              onClick={() => setSelectedDataIds([])}
+            >
+              Deselect all
+            </Button>
+          )}
         </div>
 
         <DropdownMenu>
@@ -213,7 +247,12 @@ export const DataTable = ({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  onClick={(e) => handleRowClick(row, e)}
+                  style={{ cursor: 'pointer' }}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

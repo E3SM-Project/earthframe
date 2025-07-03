@@ -7,7 +7,8 @@ interface FilterPanelProps {
 
 const FiltersPanel = ({ filters, onChange }: FilterPanelProps) => {
   return (
-    <aside className="w-72 bg-background border-r p-6 flex flex-col gap-6 min-h-screen">
+    <aside className="w-72 max-w-full bg-background border-r md:border-r p-6 flex flex-col gap-6 min-h-screen md:w-72 w-full md:min-h-screen min-h-0">
+      <h2 className="text-lg font-semibold mb-4">Filters</h2>
       <div>
         <label className="block text-sm font-medium mb-2" htmlFor="name-filter">
           Name
