@@ -31,7 +31,7 @@
   },
   {
     "id": "sim-d",
-    "name": "Labore quis et elu",
+    "name": "Sim D",
     "startDate": "2024-06-02",
     "tag": "Master",
     "campaign": "Ullamco anim comm",
@@ -41,7 +41,7 @@
   },
   {
     "id": "sim-e",
-    "name": "Sit excepteur ad u",
+    "name": "Sim E",
     "startDate": "2021-11-17",
     "tag": "v3.0.0",
     "campaign": "Magna pariatur non",
@@ -51,7 +51,7 @@
   },
   {
     "id": "sim-f",
-    "name": "Quis esse exercit",
+    "name": "Sim F",
     "startDate": "2022-05-12",
     "tag": "v2.0.0",
     "campaign": "Consectetur sint co",
@@ -61,7 +61,7 @@
   },
   {
     "id": "sim-g",
-    "name": "Dolor do eiusmod",
+    "name": "Sim G",
     "startDate": "2022-07-05",
     "tag": "v1.0.0",
     "campaign": "Officia commodo id",
@@ -71,12 +71,92 @@
   },
   {
     "id": "sim-h",
-    "name": "Voluptate deseru",
+    "name": "Sim H",
     "startDate": "2021-09-16",
     "tag": "Master",
     "campaign": "Cupidatat sit mollit u",
     "compset": "Occaecat eu con",
     "resolution": "Nulla amet conse",
     "machine": "Dolor adipis"
+  },
+  {
+    "id": "sim-i",
+    "name": "Sim I",
+    "startDate": "2023-01-10",
+    "tag": "v1.1.0",
+    "campaign": "Exercitation ullamco",
+    "compset": "Sint laborum",
+    "resolution": "Pariatur fugiat",
+    "machine": "Commodo velit"
+  },
+  {
+    "id": "sim-j",
+    "name": "Sim J",
+    "startDate": "2022-03-22",
+    "tag": "v2.1.0",
+    "campaign": "Aliquip excepteur",
+    "compset": "Deserunt magna",
+    "resolution": "Voluptate enim",
+    "machine": "Minim aliqua"
+  },
+  {
+    "id": "sim-k",
+    "name": "Sim K",
+    "startDate": "2023-08-14",
+    "tag": "v3.1.0",
+    "campaign": "Dolore reprehenderit",
+    "compset": "Adipisicing elit",
+    "resolution": "Tempor officia",
+    "machine": "Excepteur sint"
+  },
+  {
+    "id": "sim-l",
+    "name": "Sim L",
+    "startDate": "2024-02-28",
+    "tag": "v1.2.0",
+    "campaign": "Fugiat nulla",
+    "compset": "Culpa cupidatat",
+    "resolution": "Aute laborum",
+    "machine": "Laborum fugiat"
+  },
+  {
+    "id": "sim-m",
+    "name": "Sim M",
+    "startDate": "2021-12-05",
+    "tag": "v2.2.0",
+    "campaign": "Incididunt velit",
+    "compset": "Quis nostrud",
+    "resolution": "Sint occaecat",
+    "machine": "Voluptate esse"
+  },
+  {
+    "id": "sim-n",
+    "name": "Sim N",
+    "startDate": "2023-05-19",
+    "tag": "v3.2.0",
+    "campaign": "Ut enim ad",
+    "compset": "Exercitation dolor",
+    "resolution": "Aliqua magna",
+    "machine": "Tempor nisi"
+  },
+  {
+    "id": "sim-o",
+    "name": "Sim O",
+    "startDate": "2022-10-30",
+    "tag": "Master",
+    "campaign": "Reprehenderit amet",
+    "compset": "Laboris nisi",
+    "resolution": "Duis aute",
+    "machine": "Adipisicing proident"
+  },
+  {
+    "id": "sim-p",
+    "name": "Sim P",
+    "startDate": "2024-04-11",
+    "tag": "v1.3.0",
+    "campaign": "Commodo consequat",
+    "compset": "Magna aliqua",
+    "resolution": "Exercitation enim",
+    "machine": "Sint deserunt"
   }
 ]

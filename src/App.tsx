@@ -16,9 +16,20 @@ export interface Simulation {
 
 export default function App() {
   const [data, setData] = useState<Simulation[]>([]); // data
-  const [selectedDataIds, setSelectedDataIds] = useState<string[]>([]);
 
-  // TODO: Pass selectedData to AppRoutes to use in child components.
+  const LOCAL_STORAGE_KEY = 'selectedDataIds';
+
+  const [selectedDataIds, setSelectedDataIds] = useState<string[]>(() => {
+    // Initialize from localStorage
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Save to localStorage whenever selectedDataIds changes
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedDataIds));
+  }, [selectedDataIds]);
+
   const selectedData = useMemo(
     () => data.filter((item) => selectedDataIds.includes(item.id)),
     [data, selectedDataIds],
@@ -37,6 +48,7 @@ export default function App() {
         data={data}
         selectedDataIds={selectedDataIds}
         setSelectedDataIds={setSelectedDataIds}
+        selectedData={selectedData}
       />
     </BrowserRouter>
   );

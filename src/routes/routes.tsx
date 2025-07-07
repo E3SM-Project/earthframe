@@ -11,14 +11,16 @@ import { Simulation } from '@/App';
 
 interface RoutesProps {
   data: Simulation[];
-  selectedDataIds: string[] | null;
+  selectedDataIds: string[];
   setSelectedDataIds: (ids: string[]) => void;
+  selectedData: Simulation[];
 }
 
 const createRoutes = ({
   data,
   selectedDataIds,
   setSelectedDataIds,
+  selectedData,
 }: RoutesProps): RouteObject[] => {
   return [
     {
@@ -37,7 +39,13 @@ const createRoutes = ({
     },
     {
       path: '/compare',
-      element: <Compare />,
+      element: (
+        <Compare
+          selectedDataIds={selectedDataIds}
+          setSelectedDataIds={setSelectedDataIds}
+          selectedData={selectedData}
+        />
+      ),
     },
     {
       path: '/submit',
@@ -54,8 +62,13 @@ const createRoutes = ({
   ];
 };
 
-export const AppRoutes = ({ data, selectedDataIds, setSelectedDataIds }: RoutesProps) => {
-  const routes = createRoutes({ data, selectedDataIds, setSelectedDataIds });
+export const AppRoutes = ({
+  data,
+  selectedDataIds,
+  setSelectedDataIds,
+  selectedData,
+}: RoutesProps) => {
+  const routes = createRoutes({ data, selectedDataIds, setSelectedDataIds, selectedData });
   const routing = useRoutes(routes);
 
   return routing;

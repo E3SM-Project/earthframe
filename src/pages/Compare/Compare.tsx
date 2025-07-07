@@ -5,28 +5,111 @@ import {
   AccordionContent,
 } from '@/components/ui/accordion';
 import './Compare.css';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Simulation } from '@/App';
 
-const metrics = {
-  configuration: [
-    {
-      label: 'Simulation Date',
-      values: ['2024-01-01', '2024-02-15', '2024-03-10', '2024-04-05', '2024-05-20'],
-    },
-    { label: 'Model Version', values: ['v2.0', 'v2.1', 'v2.2', 'v2.3', 'v2.4'] },
-    { label: 'Compset', values: ['A', 'B', 'C', 'D', 'E'] },
-  ],
-  knownIssues: [{ label: 'Known Bug 1', values: ['✅', '❌', '✅', '❌', '✅'] }],
-};
+interface CompareSimulationsProps {
+  selectedDataIds: string[];
+  setSelectedDataIds: (ids: string[]) => void;
+  selectedData: Simulation[];
+}
 
-const simHeaders = ['Sim A', 'Sim B', 'Sim C', 'Sim D', 'Sim E'];
+const CompareSimulations = ({
+  selectedDataIds,
+  setSelectedDataIds,
+  selectedData,
+}: CompareSimulationsProps) => {
+  // Persist hidden state in localStorage by a key unique to this page/component
+  const HIDDEN_KEY = 'compare_hidden_cols';
 
-export default function CompareSimulations() {
-  const [order, setOrder] = useState(simHeaders.map((_, i) => i));
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  // Dynamically generate headers from selectedDataIds and selectedData
+  const simHeaders = selectedDataIds.map((id) => {
+    const sim = selectedData.find((s) => s.id === id);
+    return sim?.name || id;
+  });
+
+  // Build metrics from Simulation attributes
+  const metrics = {
+    configuration: [
+      {
+        label: 'Simulation Date',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.startDate || '',
+        ),
+      },
+      {
+        label: 'Model Version',
+        values: selectedDataIds.map((id) => selectedData.find((sim) => sim.id === id)?.tag || ''),
+      },
+      {
+        label: 'Campaign',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.campaign || '',
+        ),
+      },
+      {
+        label: 'Compset',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.compset || '',
+        ),
+      },
+      {
+        label: 'Resolution',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.resolution || '',
+        ),
+      },
+      {
+        label: 'Machine',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.machine || '',
+        ),
+      },
+    ],
+    knownIssues: [
+      {
+        label: 'Known Bug 1',
+        values: selectedDataIds.map((_, i) => (i % 2 === 0 ? '✅' : '❌')),
+      },
+    ],
+  };
+
+  const [order, setOrder] = useState(selectedDataIds.map((_, i) => i));
   const [headers, setHeaders] = useState(simHeaders);
-  const [hidden, setHidden] = useState<number[]>([]);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+
+  // Load hidden state from localStorage on mount
+  const [hidden, setHidden] = useState<string[]>(() => {
+    const stored = localStorage.getItem(HIDDEN_KEY);
+    try {
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
   const dragCol = useRef<number | null>(null);
+
+  useEffect(() => {
+    setHidden((prev) => prev.filter((id) => selectedDataIds.includes(id)));
+  }, [selectedDataIds]);
+
+  // Save hidden state to localStorage whenever it changes
+  React.useEffect(() => {
+    localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
+  }, [hidden]);
+
+  // Keep headers in sync with selectedDataIds and selectedData
+  React.useEffect(() => {
+    setHeaders(
+      selectedDataIds.map((id) => {
+        const sim = selectedData.find((s) => s.id === id);
+        return sim?.name || id;
+      }),
+    );
+    setOrder(selectedDataIds.map((_, i) => i));
+  }, [selectedDataIds, selectedData]);
 
   const handleDragStart = (idx: number) => {
     dragCol.current = idx;
@@ -38,7 +121,7 @@ export default function CompareSimulations() {
     setDragOverIdx(idx);
   };
 
-  const handleDragLeave = (e: React.DragEvent, idx: number) => {
+  const handleDragLeave = (idx: number) => {
     if (dragOverIdx === idx) setDragOverIdx(null);
   };
 
@@ -58,24 +141,39 @@ export default function CompareSimulations() {
     );
     if (!confirmed) return;
     // Remove from headers and update order
-    const newHeaders = headers.filter((_, i) => i !== order[idx]);
-    // Remove the idx from order and re-map order to new indices
     const removedIdx = order[idx];
+    const removedId = selectedDataIds[removedIdx];
+    const newHeaders = headers.filter((_, i) => i !== removedIdx);
     const newOrder = order.filter((i) => i !== removedIdx).map((i) => (i > removedIdx ? i - 1 : i));
     setHeaders(newHeaders);
     setOrder(newOrder);
-    setHidden((prev) =>
-      prev.filter((i) => i !== removedIdx).map((i) => (i > removedIdx ? i - 1 : i)),
-    );
+    setHidden((prev) => prev.filter((id) => id !== removedId));
+    // Update selectedDataIds to remove the corresponding id
+    setSelectedDataIds(selectedDataIds.filter((_, i) => i !== removedIdx));
   };
 
   const handleHide = (idx: number) => {
-    setHidden((prev) => [...prev, order[idx]]);
+    const simId = selectedDataIds[order[idx]];
+    setHidden((prev) => [...prev, simId]);
   };
 
-  const handleShow = (idx: number) => {
-    setHidden((prev) => prev.filter((i) => i !== idx));
+  const handleShow = (simId: string) => {
+    setHidden((prev) => prev.filter((id) => id !== simId));
   };
+
+  if (selectedDataIds.length === 0) {
+    return (
+      <div className="max-w-screen-2xl mx-auto p-8 text-center text-gray-600">
+        <p className="text-lg mb-4">No simulations selected for comparison.</p>
+        <a
+          href="/browse"
+          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Go to Browse Page
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-screen-2xl mx-auto p-4 overflow-x-auto">
@@ -87,13 +185,14 @@ export default function CompareSimulations() {
         {hidden.length > 0 && (
           <>
             <span className="text-sm text-gray-600">Hidden:</span>
-            {hidden.map((hiddenIdx) => {
-              const headerName = headers[hiddenIdx];
+            {hidden.map((hiddenId) => {
+              const idx = selectedDataIds.indexOf(hiddenId);
+              const headerName = headers[idx] ?? hiddenId;
               return (
                 <button
-                  key={hiddenIdx}
+                  key={hiddenId}
                   className="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-blue-200 transition"
-                  onClick={() => handleShow(hiddenIdx)}
+                  onClick={() => handleShow(hiddenId)}
                   type="button"
                 >
                   {headerName} <span className="ml-1 text-blue-600 font-bold">+</span>
@@ -119,7 +218,7 @@ export default function CompareSimulations() {
         <div className="sticky-col shrink-0 w-48 px-4 py-2 border-r">Metric</div>
         <div className="flex flex-1" style={{ minWidth: '60rem' }}>
           {order
-            .filter((colIdx) => !hidden.includes(colIdx))
+            .filter((colIdx) => !hidden.includes(selectedDataIds[colIdx]))
             .map((colIdx) => (
               <div
                 key={colIdx}
@@ -127,7 +226,7 @@ export default function CompareSimulations() {
                 draggable
                 onDragStart={() => handleDragStart(colIdx)}
                 onDragOver={(e) => handleDragOver(e, colIdx)}
-                onDragLeave={(e) => handleDragLeave(e, colIdx)}
+                onDragLeave={() => handleDragLeave(colIdx)}
                 onDrop={() => handleDrop(colIdx)}
                 style={{
                   opacity: dragCol.current === colIdx ? 0.5 : 1,
@@ -205,7 +304,7 @@ export default function CompareSimulations() {
                     </div>
                     <div className="flex flex-1" style={{ minWidth: '60rem' }}>
                       {order
-                        .filter((colIdx) => !hidden.includes(colIdx))
+                        .filter((colIdx) => !hidden.includes(selectedDataIds[colIdx]))
                         .map((colIdx) => (
                           <div
                             key={colIdx}
@@ -224,4 +323,6 @@ export default function CompareSimulations() {
       </Accordion>
     </div>
   );
-}
+};
+
+export default CompareSimulations;
