@@ -6,9 +6,12 @@ import { useEffect, useMemo, useState } from 'react';
 export interface Simulation {
   id: string;
   name: string;
-  amount: number;
-  status: 'pending' | 'processing' | 'success' | 'failed';
-  email: string;
+  startDate: string;
+  tag: string;
+  campaign: string;
+  compset: string;
+  resolution: string;
+  machine: string;
 }
 
 export default function App() {

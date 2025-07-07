@@ -323,40 +323,45 @@ const columns: ColumnDef<Simulation>[] = [
     cell: ({ row }) => <div>{row.getValue('name') as string}</div>,
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('status') as string}</div>,
-  },
-  {
-    accessorKey: 'email',
+    accessorKey: 'startDate',
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Email
+        Start Date
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue('email') as string}</div>,
+    cell: ({ row }) => <div>{row.getValue('startDate') as string}</div>,
   },
   {
-    accessorKey: 'amount',
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount') as string);
-
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
+    accessorKey: 'tag',
+    header: 'Tag',
+    cell: ({ row }) => <div>{row.getValue('tag') as string}</div>,
+  },
+  {
+    accessorKey: 'campaign',
+    header: 'Campaign',
+    cell: ({ row }) => <div>{row.getValue('campaign') as string}</div>,
+  },
+  {
+    accessorKey: 'compset',
+    header: 'Compset',
+    cell: ({ row }) => <div>{row.getValue('compset') as string}</div>,
+  },
+  {
+    accessorKey: 'resolution',
+    header: 'Resolution',
+    cell: ({ row }) => <div>{row.getValue('resolution') as string}</div>,
+  },
+  {
+    accessorKey: 'machine',
+    header: 'Machine',
+    cell: ({ row }) => <div>{row.getValue('machine') as string}</div>,
   },
   {
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
-
+      const simulation = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -367,12 +372,11 @@ const columns: ColumnDef<Simulation>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
-              Copy payment ID
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(simulation.id)}>
+              Copy simulation ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

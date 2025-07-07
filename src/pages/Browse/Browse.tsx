@@ -4,9 +4,14 @@ import FiltersPanel from '@/pages/Browse/FiltersPanel';
 import { useState, useMemo } from 'react';
 
 export interface FilterState {
+  id: string;
   name: string;
-  status: string;
-  email: string;
+  startDate: string;
+  tag: string;
+  campaign: string;
+  compset: string;
+  resolution: string;
+  machine: string;
 }
 
 interface BrowseProps {
@@ -16,14 +21,28 @@ interface BrowseProps {
 }
 
 const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
-  const [filters, setFilters] = useState<FilterState>({ name: '', status: '', email: '' });
+  const [filters, setFilters] = useState<FilterState>({
+    id: '',
+    name: '',
+    startDate: '',
+    tag: '',
+    campaign: '',
+    compset: '',
+    resolution: '',
+    machine: '',
+  });
 
   const filteredData = useMemo(() => {
     return data.filter((record) => {
       return (
-        (!filters.status || record.status === filters.status) &&
+        (!filters.id || record.id === filters.id) &&
         (!filters.name || record.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.email || record.email.toLowerCase().includes(filters.email.toLowerCase()))
+        (!filters.startDate || record.startDate === filters.startDate) &&
+        (!filters.tag || record.tag === filters.tag) &&
+        (!filters.campaign || record.campaign === filters.campaign) &&
+        (!filters.compset || record.compset === filters.compset) &&
+        (!filters.resolution || record.resolution === filters.resolution) &&
+        (!filters.machine || record.machine === filters.machine)
       );
     });
   }, [data, filters]);

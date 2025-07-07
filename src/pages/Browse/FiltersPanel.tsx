@@ -6,87 +6,27 @@ interface FilterPanelProps {
 }
 
 const FiltersPanel = ({ filters, onChange }: FilterPanelProps) => {
+  // Get all filter keys except functions
+  const filterKeys = Object.keys(filters) as (keyof FilterState)[];
+
   return (
     <aside className="w-72 max-w-full bg-background border-r md:border-r p-6 flex flex-col gap-6 min-h-screen md:w-72 w-full md:min-h-screen min-h-0">
       <h2 className="text-lg font-semibold mb-4">Filters</h2>
-      <div>
-        <label className="block text-sm font-medium mb-2" htmlFor="name-filter">
-          Name
-        </label>
-        <input
-          id="name-filter"
-          type="text"
-          placeholder="Search name"
-          value={filters.name}
-          onChange={(e) => onChange({ ...filters, name: e.target.value })}
-          className="shadcn-input w-full"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-2" htmlFor="status-filter">
-          Status
-        </label>
-        <div id="status-filter" className="flex flex-col gap-2">
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="status"
-              value=""
-              checked={filters.status === ''}
-              onChange={() => onChange({ ...filters, status: '' })}
-              className="shadcn-radio"
-            />
-            <span className="ml-2">All Statuses</span>
+      {filterKeys.map((key) => (
+        <div key={String(key)}>
+          <label className="block text-sm font-medium mb-2" htmlFor={`${key}-filter`}>
+            {key.charAt(0).toUpperCase() + key.slice(1)}
           </label>
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="status"
-              value="success"
-              checked={filters.status === 'success'}
-              onChange={() => onChange({ ...filters, status: 'success' })}
-              className="shadcn-radio"
-            />
-            <span className="ml-2">Success</span>
-          </label>
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="status"
-              value="processing"
-              checked={filters.status === 'processing'}
-              onChange={() => onChange({ ...filters, status: 'processing' })}
-              className="shadcn-radio"
-            />
-            <span className="ml-2">Processing</span>
-          </label>
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="status"
-              value="failed"
-              checked={filters.status === 'failed'}
-              onChange={() => onChange({ ...filters, status: 'failed' })}
-              className="shadcn-radio"
-            />
-            <span className="ml-2">Failed</span>
-          </label>
+          <input
+            id={`${key}-filter`}
+            type="text"
+            placeholder={`Search ${key}`}
+            value={filters[key] as string}
+            onChange={(e) => onChange({ ...filters, [key]: e.target.value })}
+            className="shadcn-input w-full"
+          />
         </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-2" htmlFor="email-filter">
-          Email
-        </label>
-        {/* Replace this with shadcn/ui MultiSelect when available */}
-        <input
-          id="email-filter"
-          type="text"
-          placeholder="Search email"
-          value={filters.email}
-          onChange={(e) => onChange({ ...filters, email: e.target.value })}
-          className="shadcn-input w-full"
-        />
-      </div>
+      ))}
     </aside>
   );
 };
