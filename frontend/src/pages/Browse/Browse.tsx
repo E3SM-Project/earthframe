@@ -12,6 +12,7 @@ export interface FilterState {
   compset: string;
   resolution: string;
   machine: string;
+  notes?: string;
 }
 
 interface BrowseProps {
@@ -42,7 +43,9 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
         (!filters.campaign || record.campaign === filters.campaign) &&
         (!filters.compset || record.compset === filters.compset) &&
         (!filters.resolution || record.resolution === filters.resolution) &&
-        (!filters.machine || record.machine === filters.machine)
+        (!filters.machine || record.machine === filters.machine) &&
+        (!filters.notes ||
+          (record.notes && record.notes.toLowerCase().includes(filters.notes.toLowerCase())))
       );
     });
   }, [data, filters]);

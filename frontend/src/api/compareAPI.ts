@@ -1,0 +1,11 @@
+import { Simulation } from '@/App';
+import axios from 'axios';
+
+const BASE_URL = 'http://localhost:8000/api';
+
+export const fetchAISimAnalysis = async (simulations: Simulation[]): Promise<string> => {
+  const response = await axios.post(`${BASE_URL}/analyze-simulations`, {
+    simulations,
+  });
+  return response.data.summary;
+};

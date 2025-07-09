@@ -7,6 +7,7 @@ import {
 import './Compare.css';
 import React, { useState, useRef, useEffect } from 'react';
 import { Simulation } from '@/App';
+import { ComparisonAI } from './ComparisonAI';
 
 interface CompareSimulationsProps {
   selectedDataIds: string[];
@@ -70,6 +71,12 @@ const CompareSimulations = ({
       {
         label: 'Known Bug 1',
         values: selectedDataIds.map((_, i) => (i % 2 === 0 ? '✅' : '❌')),
+      },
+    ],
+    notes: [
+      {
+        label: 'Notes',
+        values: selectedDataIds.map((id) => selectedData.find((sim) => sim.id === id)?.notes || ''),
       },
     ],
   };
@@ -177,6 +184,11 @@ const CompareSimulations = ({
 
   return (
     <div className="max-w-screen-2xl mx-auto p-4 overflow-x-auto">
+      {/* ComparisonAI section */}
+      <ComparisonAI
+        selectedSimulations={selectedData.filter((sim) => selectedDataIds.includes(sim.id))}
+      />
+
       <section
         aria-label="Show hidden simulations"
         className={`mb-2 flex gap-2 items-center min-h-[2.25rem]${hidden.length === 0 ? ' invisible' : ''}`}

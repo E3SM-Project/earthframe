@@ -12,6 +12,7 @@ export interface Simulation {
   compset: string;
   resolution: string;
   machine: string;
+  notes?: string;
 }
 
 export default function App() {

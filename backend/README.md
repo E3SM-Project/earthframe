@@ -34,7 +34,7 @@ poetry shell
 You can start the FastAPI server using [uvicorn](https://www.uvicorn.org/):
 
 ```bash
-poetry run uvicorn main:app --reload
+poetry run uvicorn app.main:app --reload
 ```
 
 - Replace `main:app` with the actual module and app name if different.
