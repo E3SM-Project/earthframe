@@ -315,67 +315,123 @@ const columns: ColumnDef<Simulation>[] = [
   {
     accessorKey: 'name',
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
         Name
         <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => <div>{row.getValue('name')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'modelStartDate',
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
         Model Start Date
         <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => <div>{row.getValue('modelStartDate')}</div>,
+    enableSorting: true,
   },
   {
-    accessorKey: 'runDate',
+    accessorKey: 'runStartDate',
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
         Run Start Date
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('runDate')}</div>,
+    cell: ({ row }) => <div>{row.getValue('runStartDate')}</div>,
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'repo',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Repo
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('repo')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'branch',
-    header: 'Branch',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Branch
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div>{row.getValue('branch')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'tag',
-    header: 'Tag',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Tag
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div>{row.getValue('tag')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'campaign',
-    header: 'Campaign',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Campaign
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div>{row.getValue('campaign')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'compset',
-    header: 'Compset',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Compset
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div>{row.getValue('compset')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'gridName',
-    header: 'Grid Name',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Grid Name
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div>{row.getValue('gridName')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'machine',
-    header: 'Machine',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Machine
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div>{row.getValue('machine')}</div>,
+    enableSorting: true,
   },
   {
     accessorKey: 'compiler',
-    header: 'Compiler',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Compiler
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => <div>{row.getValue('compiler')}</div>,
+    enableSorting: true,
   },
   {
     id: 'actions',
@@ -401,6 +457,7 @@ const columns: ColumnDef<Simulation>[] = [
         </DropdownMenu>
       );
     },
+    enableSorting: false,
   },
 ];
 

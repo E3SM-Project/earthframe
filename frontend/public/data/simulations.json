@@ -15,11 +15,17 @@
     "notes": "High resolution BGC simulation for DECK. Initial test run showed stable performance.",
     "keyFeatures": "High resolution, BGC compset, DECK campaign.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-a"],
-    "outputLocation": ["https://dummy.url/output-a"],
-    "archiveLocation": ["https://dummy.url/archive-a"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-a"],
-    "paceLinks": ["https://dummy.url/pace-a"]
+    "runScripts": [
+      { "label": "Run Script", "url": "https://dummy.url/run-script-a" },
+      { "label": "Alternate Run Script", "url": "https://dummy.url/run-script-a-alt" }
+    ],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-a" }],
+    "archiveLocation": [
+      { "label": "Archive", "url": "https://dummy.url/archive-a" },
+      { "label": "NERSC Archive", "url": "https://dummy.url/archive-a-nersc" }
+    ],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-a" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-a" }]
   },
   {
     "id": "sim-b",
@@ -37,11 +43,17 @@
     "notes": "AMIP run using v2.0. Output validated against observational SSTs.",
     "keyFeatures": "AMIP compset, validated output.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-b"],
-    "outputLocation": ["https://dummy.url/output-b"],
-    "archiveLocation": ["https://dummy.url/archive-b"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-b"],
-    "paceLinks": ["https://dummy.url/pace-b"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-b" }],
+    "outputLocation": [
+      { "label": "Output", "url": "https://dummy.url/output-b" },
+      { "label": "Secondary Output", "url": "https://dummy.url/output-b2" }
+    ],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-b" }],
+    "diagnosticLinks": [
+      { "label": "Diagnostics", "url": "https://dummy.url/diagnostics-b" },
+      { "label": "Extra Diagnostics", "url": "https://dummy.url/diagnostics-b-extra" }
+    ],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-b" }]
   },
   {
     "id": "sim-c",
@@ -59,11 +71,14 @@
     "notes": "Historical simulation for CMIP6. Includes updated forcing datasets.",
     "keyFeatures": "Updated forcing datasets, historical run.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-c"],
-    "outputLocation": ["https://dummy.url/output-c"],
-    "archiveLocation": ["https://dummy.url/archive-c"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-c"],
-    "paceLinks": ["https://dummy.url/pace-c"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-c" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-c" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-c" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-c" }],
+    "paceLinks": [
+      { "label": "PACE", "url": "https://dummy.url/pace-c" },
+      { "label": "PACE Secondary", "url": "https://dummy.url/pace-c2" }
+    ]
   },
   {
     "id": "sim-d",
@@ -81,11 +96,11 @@
     "notes": "Pre-industrial control run. Used for baseline comparison.",
     "keyFeatures": "Pre-industrial control, baseline comparison.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-d"],
-    "outputLocation": ["https://dummy.url/output-d"],
-    "archiveLocation": ["https://dummy.url/archive-d"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-d"],
-    "paceLinks": ["https://dummy.url/pace-d"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-d" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-d" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-d" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-d" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-d" }]
   },
   {
     "id": "sim-e",
@@ -103,11 +118,11 @@
     "notes": "CO2 increases at 1% per year. Run completed successfully.",
     "keyFeatures": "1% CO2 increase scenario.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-e"],
-    "outputLocation": ["https://dummy.url/output-e"],
-    "archiveLocation": ["https://dummy.url/archive-e"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-e"],
-    "paceLinks": ["https://dummy.url/pace-e"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-e" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-e" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-e" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-e" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-e" }]
   },
   {
     "id": "sim-f",
@@ -125,11 +140,11 @@
     "notes": "AMIP simulation for DECK. Used for model tuning.",
     "keyFeatures": "AMIP compset, model tuning.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-f"],
-    "outputLocation": ["https://dummy.url/output-f"],
-    "archiveLocation": ["https://dummy.url/archive-f"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-f"],
-    "paceLinks": ["https://dummy.url/pace-f"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-f" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-f" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-f" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-f" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-f" }]
   },
   {
     "id": "sim-g",
@@ -147,11 +162,11 @@
     "notes": "ScenarioMIP SSP370 pathway. Includes updated land use.",
     "keyFeatures": "SSP370 scenario, updated land use.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-g"],
-    "outputLocation": ["https://dummy.url/output-g"],
-    "archiveLocation": ["https://dummy.url/archive-g"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-g"],
-    "paceLinks": ["https://dummy.url/pace-g"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-g" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-g" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-g" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-g" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-g" }]
   },
   {
     "id": "sim-h",
@@ -169,11 +184,11 @@
     "notes": "Abrupt 4xCO2 experiment. Used for climate sensitivity analysis.",
     "keyFeatures": "Abrupt 4xCO2, climate sensitivity.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-h"],
-    "outputLocation": ["https://dummy.url/output-h"],
-    "archiveLocation": ["https://dummy.url/archive-h"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-h"],
-    "paceLinks": ["https://dummy.url/pace-h"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-h" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-h" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-h" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-h" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-h" }]
   },
   {
     "id": "sim-i",
@@ -191,11 +206,11 @@
     "notes": "Pre-industrial control for v2.0. No major issues reported.",
     "keyFeatures": "Pre-industrial control, v2.0.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-i"],
-    "outputLocation": ["https://dummy.url/output-i"],
-    "archiveLocation": ["https://dummy.url/archive-i"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-i"],
-    "paceLinks": ["https://dummy.url/pace-i"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-i" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-i" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-i" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-i" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-i" }]
   },
   {
     "id": "sim-j",
@@ -213,11 +228,11 @@
     "notes": "Historical run for CMIP6. Data archived on NERSC.",
     "keyFeatures": "Historical run, CMIP6.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-j"],
-    "outputLocation": ["https://dummy.url/output-j"],
-    "archiveLocation": ["https://dummy.url/archive-j"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-j"],
-    "paceLinks": ["https://dummy.url/pace-j"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-j" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-j" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-j" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-j" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-j" }]
   },
   {
     "id": "sim-k",
@@ -235,11 +250,14 @@
     "notes": "AMIP simulation with v2.1. Used for atmospheric diagnostics.",
     "keyFeatures": "AMIP compset, atmospheric diagnostics.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-k"],
-    "outputLocation": ["https://dummy.url/output-k"],
-    "archiveLocation": ["https://dummy.url/archive-k"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-k"],
-    "paceLinks": ["https://dummy.url/pace-k"]
+    "runScripts": [
+      { "label": "Run Script", "url": "https://dummy.url/run-script-k" },
+      { "label": "Alternate Run Script", "url": "https://dummy.url/run-script-k-alt" }
+    ],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-k" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-k" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-k" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-k" }]
   },
   {
     "id": "sim-l",
@@ -257,11 +275,11 @@
     "notes": "High emissions scenario. Output used in impact studies.",
     "keyFeatures": "SSP585 scenario, high emissions.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-l"],
-    "outputLocation": ["https://dummy.url/output-l"],
-    "archiveLocation": ["https://dummy.url/archive-l"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-l"],
-    "paceLinks": ["https://dummy.url/pace-l"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-l" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-l" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-l" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-l" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-l" }]
   },
   {
     "id": "sim-m",
@@ -279,11 +297,11 @@
     "notes": "Abrupt 4xCO2 for v2.0. Results consistent with previous versions.",
     "keyFeatures": "Abrupt 4xCO2, v2.0.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-m"],
-    "outputLocation": ["https://dummy.url/output-m"],
-    "archiveLocation": ["https://dummy.url/archive-m"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-m"],
-    "paceLinks": ["https://dummy.url/pace-m"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-m" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-m" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-m" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-m" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-m" }]
   },
   {
     "id": "sim-n",
@@ -301,11 +319,11 @@
     "notes": "1% CO2 increase scenario. Model output under review.",
     "keyFeatures": "1% CO2 increase, v2.1.",
     "knownIssues": "Model output under review.",
-    "runScripts": ["https://dummy.url/run-script-n"],
-    "outputLocation": ["https://dummy.url/output-n"],
-    "archiveLocation": ["https://dummy.url/archive-n"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-n"],
-    "paceLinks": ["https://dummy.url/pace-n"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-n" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-n" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-n" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-n" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-n" }]
   },
   {
     "id": "sim-o",
@@ -323,11 +341,11 @@
     "notes": "SSP245 scenario. Used for multi-model comparison.",
     "keyFeatures": "SSP245 scenario, multi-model comparison.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-o"],
-    "outputLocation": ["https://dummy.url/output-o"],
-    "archiveLocation": ["https://dummy.url/archive-o"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-o"],
-    "paceLinks": ["https://dummy.url/pace-o"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-o" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-o" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-o" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-o" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-o" }]
   },
   {
     "id": "sim-p",
@@ -345,10 +363,10 @@
     "notes": "Historical simulation for v2.1. Includes updated aerosol emissions.",
     "keyFeatures": "Updated aerosol emissions, historical run.",
     "knownIssues": "None reported.",
-    "runScripts": ["https://dummy.url/run-script-p"],
-    "outputLocation": ["https://dummy.url/output-p"],
-    "archiveLocation": ["https://dummy.url/archive-p"],
-    "diagnosticLinks": ["https://dummy.url/diagnostics-p"],
-    "paceLinks": ["https://dummy.url/pace-p"]
+    "runScripts": [{ "label": "Run Script", "url": "https://dummy.url/run-script-p" }],
+    "outputLocation": [{ "label": "Output", "url": "https://dummy.url/output-p" }],
+    "archiveLocation": [{ "label": "Archive", "url": "https://dummy.url/archive-p" }],
+    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-p" }],
+    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-p" }]
   }
 ]
