@@ -6,13 +6,32 @@ import { useEffect, useMemo, useState } from 'react';
 export interface Simulation {
   id: string;
   name: string;
-  startDate: string;
-  tag: string;
+  modelStartDate: string; // Start date of the model simulation
+  runStartDate: string; // Date when the simulation run started
+
+  repo: string; // Default "E3SM", can be forked repos for rare cases
+  branch: string; // At least one of branch or tag is required
+  tag: string; // At least one of branch or tag is required
+
   campaign: string;
   compset: string;
-  resolution: string;
+  gridName: string;
   machine: string;
-  notes?: string;
+  compiler: string;
+
+  notes: string;
+  keyFeatures: string;
+  knownIssues: string;
+
+  runScripts: ExternalUrl[];
+  outputLocation: ExternalUrl[];
+  archiveLocation: ExternalUrl[];
+  diagnosticLinks: ExternalUrl[];
+  paceLinks: ExternalUrl[];
+}
+export interface ExternalUrl {
+  label: string; // e.g., "Documentation", "Results"
+  url: string;
 }
 
 export default function App() {

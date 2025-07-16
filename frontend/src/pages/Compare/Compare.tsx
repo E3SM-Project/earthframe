@@ -57,7 +57,7 @@ const CompareSimulations = ({
       {
         label: 'Resolution',
         values: selectedDataIds.map(
-          (id) => selectedData.find((sim) => sim.id === id)?.resolution || '',
+          (id) => selectedData.find((sim) => sim.id === id)?.gridName || '',
         ),
       },
       {
@@ -184,6 +184,13 @@ const CompareSimulations = ({
 
   return (
     <div className="max-w-screen-2xl mx-auto p-4 overflow-x-auto">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">Compare Simulations</h1>
+        <p className="text-gray-600 max-w-6xl">
+          Compare multiple simulations side by side. Drag columns to reorder, hide or remove
+          simulations, and expand sections for detailed metrics.
+        </p>
+      </header>
       {/* ComparisonAI section */}
       <ComparisonAI
         selectedSimulations={selectedData.filter((sim) => selectedDataIds.includes(sim.id))}

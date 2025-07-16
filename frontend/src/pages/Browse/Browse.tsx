@@ -6,13 +6,18 @@ import { useState, useMemo } from 'react';
 export interface FilterState {
   id: string;
   name: string;
-  startDate: string;
-  tag: string;
+  modelStartDate: string; // Start date of the model simulation
+  runStartDate: string; // Date when the simulation was run
+
+  repo: string; // Default "E3SM", can be forked repos for rare cases
+  branch: string; // At least one of branch or tag is required
+  tag: string; // At least one of branch or tag is required
+
   campaign: string;
   compset: string;
-  resolution: string;
+  gridName: string;
   machine: string;
-  notes?: string;
+  compiler: string;
 }
 
 interface BrowseProps {
@@ -25,12 +30,16 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   const [filters, setFilters] = useState<FilterState>({
     id: '',
     name: '',
-    startDate: '',
+    modelStartDate: '',
+    runStartDate: '',
+    repo: '',
+    branch: '',
     tag: '',
     campaign: '',
     compset: '',
-    resolution: '',
+    gridName: '',
     machine: '',
+    compiler: '',
   });
 
   const filteredData = useMemo(() => {
@@ -38,14 +47,16 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
       return (
         (!filters.id || record.id === filters.id) &&
         (!filters.name || record.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.startDate || record.startDate === filters.startDate) &&
+        (!filters.modelStartDate || record.modelStartDate === filters.modelStartDate) &&
+        (!filters.runStartDate || record.runStartDate === filters.runStartDate) &&
+        (!filters.repo || record.repo === filters.repo) &&
+        (!filters.branch || record.branch === filters.branch) &&
         (!filters.tag || record.tag === filters.tag) &&
         (!filters.campaign || record.campaign === filters.campaign) &&
         (!filters.compset || record.compset === filters.compset) &&
-        (!filters.resolution || record.resolution === filters.resolution) &&
+        (!filters.gridName || record.gridName === filters.gridName) &&
         (!filters.machine || record.machine === filters.machine) &&
-        (!filters.notes ||
-          (record.notes && record.notes.toLowerCase().includes(filters.notes.toLowerCase())))
+        (!filters.compiler || record.compiler === filters.compiler)
       );
     });
   }, [data, filters]);
@@ -57,6 +68,13 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
           <FiltersPanel filters={filters} onChange={setFilters} />
         </div>
         <div className="flex-1">
+          <div className="w-full flex flex-col items-start mb-2 mt-4 px-2">
+            <h2 className="text-2xl font-semibold mb-1">Browse</h2>
+            <p className="text-gray-600 text-sm mb-4 max-w-4xl">
+              Explore and filter available simulations using the panel on the left. Select
+              simulations to view more details or take further actions.
+            </p>
+          </div>
           <DataTable
             data={data}
             filteredData={filteredData}

@@ -320,42 +320,62 @@ const columns: ColumnDef<Simulation>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('name') as string}</div>,
+    cell: ({ row }) => <div>{row.getValue('name')}</div>,
   },
   {
-    accessorKey: 'startDate',
+    accessorKey: 'modelStartDate',
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Start Date
+        Model Start Date
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('startDate') as string}</div>,
+    cell: ({ row }) => <div>{row.getValue('modelStartDate')}</div>,
+  },
+  {
+    accessorKey: 'runDate',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Run Start Date
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('runDate')}</div>,
+  },
+  {
+    accessorKey: 'branch',
+    header: 'Branch',
+    cell: ({ row }) => <div>{row.getValue('branch')}</div>,
   },
   {
     accessorKey: 'tag',
     header: 'Tag',
-    cell: ({ row }) => <div>{row.getValue('tag') as string}</div>,
+    cell: ({ row }) => <div>{row.getValue('tag')}</div>,
   },
   {
     accessorKey: 'campaign',
     header: 'Campaign',
-    cell: ({ row }) => <div>{row.getValue('campaign') as string}</div>,
+    cell: ({ row }) => <div>{row.getValue('campaign')}</div>,
   },
   {
     accessorKey: 'compset',
     header: 'Compset',
-    cell: ({ row }) => <div>{row.getValue('compset') as string}</div>,
+    cell: ({ row }) => <div>{row.getValue('compset')}</div>,
   },
   {
-    accessorKey: 'resolution',
-    header: 'Resolution',
-    cell: ({ row }) => <div>{row.getValue('resolution') as string}</div>,
+    accessorKey: 'gridName',
+    header: 'Grid Name',
+    cell: ({ row }) => <div>{row.getValue('gridName')}</div>,
   },
   {
     accessorKey: 'machine',
     header: 'Machine',
-    cell: ({ row }) => <div>{row.getValue('machine') as string}</div>,
+    cell: ({ row }) => <div>{row.getValue('machine')}</div>,
+  },
+  {
+    accessorKey: 'compiler',
+    header: 'Compiler',
+    cell: ({ row }) => <div>{row.getValue('compiler')}</div>,
   },
   {
     id: 'actions',
