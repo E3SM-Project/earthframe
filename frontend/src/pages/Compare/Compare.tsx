@@ -33,13 +33,33 @@ const CompareSimulations = ({
   const metrics = {
     configuration: [
       {
-        label: 'Simulation Date',
+        label: 'Simulation Name',
+        values: selectedDataIds.map((id) => selectedData.find((sim) => sim.id === id)?.name || ''),
+      },
+      {
+        label: 'Model Start Date',
         values: selectedDataIds.map(
-          (id) => selectedData.find((sim) => sim.id === id)?.startDate || '',
+          (id) => selectedData.find((sim) => sim.id === id)?.modelStartDate || '',
         ),
       },
       {
-        label: 'Model Version',
+        label: 'Run Start Date',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.runStartDate || '',
+        ),
+      },
+      {
+        label: 'Repo',
+        values: selectedDataIds.map((id) => selectedData.find((sim) => sim.id === id)?.repo || ''),
+      },
+      {
+        label: 'Branch',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.branch || '',
+        ),
+      },
+      {
+        label: 'Tag',
         values: selectedDataIds.map((id) => selectedData.find((sim) => sim.id === id)?.tag || ''),
       },
       {
@@ -66,17 +86,66 @@ const CompareSimulations = ({
           (id) => selectedData.find((sim) => sim.id === id)?.machine || '',
         ),
       },
+      {
+        label: 'Compiler',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.compiler || '',
+        ),
+      },
+    ],
+
+    keyFeatures: [
+      {
+        label: 'Key Features',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.keyFeatures || '',
+        ),
+      },
     ],
     knownIssues: [
       {
-        label: 'Known Bug 1',
-        values: selectedDataIds.map((_, i) => (i % 2 === 0 ? '✅' : '❌')),
+        label: 'Known Issues',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.knownIssues || '',
+        ),
       },
     ],
     notes: [
       {
         label: 'Notes',
         values: selectedDataIds.map((id) => selectedData.find((sim) => sim.id === id)?.notes || ''),
+      },
+    ],
+    locations: [
+      {
+        label: 'Run Scripts',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.runScripts || [],
+        ),
+      },
+      {
+        label: 'Output Location',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.outputLocation || [],
+        ),
+      },
+      {
+        label: 'Archive Location',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.archiveLocation || [],
+        ),
+      },
+      {
+        label: 'Diagnostic Links',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.diagnosticLinks || [],
+        ),
+      },
+      {
+        label: 'PACE Links',
+        values: selectedDataIds.map(
+          (id) => selectedData.find((sim) => sim.id === id)?.paceLinks || [],
+        ),
       },
     ],
   };
@@ -329,7 +398,30 @@ const CompareSimulations = ({
                             key={colIdx}
                             className="flex-1 min-w-[12rem] px-4 py-2 border-t text-sm"
                           >
-                            {row.values[colIdx]}
+                            {/* Render links as clickable with label for locations section */}
+                            {sectionKey === 'locations' && Array.isArray(row.values[colIdx]) ? (
+                              row.values[colIdx].length > 0 ? (
+                                row.values[colIdx].map(
+                                  (linkObj: { url: string; label?: string }, idx: number) => (
+                                    <a
+                                      key={idx}
+                                      href={linkObj.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 underline mr-2 break-all"
+                                    >
+                                      {linkObj.label || linkObj.url}
+                                    </a>
+                                  ),
+                                )
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )
+                            ) : Array.isArray(row.values[colIdx]) ? (
+                              row.values[colIdx].join(', ')
+                            ) : (
+                              row.values[colIdx]
+                            )}
                           </div>
                         ))}
                     </div>
