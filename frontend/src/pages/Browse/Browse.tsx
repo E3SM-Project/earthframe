@@ -64,23 +64,25 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   return (
     <div className="flex justify-center w-full">
       <div className="flex flex-col md:flex-row w-full gap-8 md:max-w-[70%]">
-        <div className="w-full md:w-[15%] min-w-0 md:min-w-[180px]">
-          <FiltersPanel filters={filters} onChange={setFilters} />
-        </div>
-        <div className="flex-1">
-          <div className="w-full flex flex-col items-start mb-2 mt-4 px-2">
-            <h2 className="text-2xl font-semibold mb-1">Browse</h2>
-            <p className="text-gray-600 text-sm mb-4 max-w-4xl">
-              Explore and filter available simulations using the panel on the left. Select
-              simulations to view more details or take further actions.
-            </p>
+        <div className="flex flex-row w-full gap-6">
+          <div className="w-full md:w-[220px] min-w-0 md:min-w-[180px]">
+            <FiltersPanel filters={filters} onChange={setFilters} />
           </div>
-          <DataTable
-            data={data}
-            filteredData={filteredData}
-            selectedDataIds={selectedDataIds}
-            setSelectedDataIds={setSelectedDataIds}
-          />
+          <div className="flex-1 flex flex-col">
+            <header className="mb-3 px-2 mt-4">
+              <h1 className="text-3xl font-bold mb-2">Browse Simulations</h1>
+              <p className="text-gray-600 max-w-6xl">
+                Explore and filter available simulations using the panel on the left. Select
+                simulations to view more details or take further actions.
+              </p>
+            </header>
+            <DataTable
+              data={data}
+              filteredData={filteredData}
+              selectedDataIds={selectedDataIds}
+              setSelectedDataIds={setSelectedDataIds}
+            />
+          </div>
         </div>
       </div>
     </div>

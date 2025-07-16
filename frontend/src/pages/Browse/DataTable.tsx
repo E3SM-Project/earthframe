@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/table';
 import { Simulation } from '@/App';
 import { useNavigate } from 'react-router-dom';
+import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 
 // Max number of rows that can be selected at once.
 const MAX_SELECTION = 5;
@@ -151,60 +152,13 @@ export const DataTable = ({
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <div>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => handleCompare()}
-            disabled={Object.values(rowSelection).filter(Boolean).length < 2}
-          >
-            Compare
-          </Button>
-        </div>
-        <div className="ml-4 flex flex-wrap items-center gap-2">
-          <span
-            className={`text-xs ${
-              (selectedDataIds?.length ?? 0) === MAX_SELECTION
-                ? 'text-warning font-bold'
-                : 'text-muted-foreground'
-            }`}
-          >
-            {selectedDataIds?.length ?? 0} / {MAX_SELECTION} selected
-          </span>
-          {(selectedDataIds ?? []).map((id) => {
-            // Always find the row in the full data set (not just filtered)
-            const row = data.find((r) => r.id === id);
-            if (!row) return null;
-            return (
-              <span
-                key={id}
-                className="flex items-center rounded bg-muted px-2 py-1 text-xs font-medium text-muted-foreground"
-              >
-                {row.name}
-                <button
-                  type="button"
-                  className="ml-1 text-muted-foreground hover:text-destructive focus:outline-none"
-                  aria-label={`Remove ${row.name}`}
-                  onClick={() => {
-                    setSelectedDataIds(selectedDataIds.filter((rowId) => rowId !== id));
-                  }}
-                >
-                  ×
-                </button>
-              </span>
-            );
-          })}
-          {selectedDataIds.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="ml-2 text-xs"
-              onClick={() => setSelectedDataIds([])}
-            >
-              Deselect all
-            </Button>
-          )}
-        </div>
+        <SelectedSimulationChipList
+          data={data}
+          buttonText="Compare"
+          handleButtonClick={handleCompare}
+          selectedDataIds={selectedDataIds}
+          setSelectedDataIds={setSelectedDataIds}
+        />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

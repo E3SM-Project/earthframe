@@ -41,6 +41,7 @@ const createRoutes = ({
       path: '/compare',
       element: (
         <Compare
+          data={data}
           selectedDataIds={selectedDataIds}
           setSelectedDataIds={setSelectedDataIds}
           selectedData={selectedData}
