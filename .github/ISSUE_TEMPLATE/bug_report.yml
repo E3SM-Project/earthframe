@@ -1,0 +1,63 @@
+name: Bug Report
+description: File a bug report to help improve EarthFrame.
+title: "[Bug]: "
+labels: ["type: bug"]
+assignees: []
+
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: |
+        Describe what you were trying to do and what went wrong.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        List the steps to reproduce the issue.
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What did you expect to happen?
+      description: |
+        Describe what you expected to happen.
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Include browser, OS, Node.js, and npm versions if relevant.
+    validations:
+      required: false
+
+  - type: textarea
+    id: code-or-screenshots
+    attributes:
+      label: Relevant code or screenshots
+      description: |
+        Paste any relevant code snippets or screenshots.
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: |
+        Any other information?
+    validations:
+      required: false

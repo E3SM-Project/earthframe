@@ -1,0 +1,61 @@
+name: DevOps Task
+description: Template for tracking DevOps-related tasks and improvements.
+title: "[DevOps] "
+labels: ["type: devops"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## DevOps Task
+
+        Please provide details about the DevOps task or improvement.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Briefly describe the DevOps task.
+      placeholder: e.g., Set up CI/CD pipeline for project
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Task Details
+      description: Describe the task, including goals, requirements, and any relevant context.
+      placeholder: What needs to be done? Why is it important?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Complete
+      description: List the steps required to complete this task.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: false
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline
+      description: When should this task be completed by? (optional)
+      placeholder: YYYY-MM-DD
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Notes
+      description: Any other information or resources.
+      placeholder: Links, references, or related issues.
+    validations:
+      required: false

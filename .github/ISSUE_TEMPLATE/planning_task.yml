@@ -1,0 +1,58 @@
+name: Planning Task
+description: General project management or planning task
+title: "[Planning] "
+labels: ["type: planning"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Planning Task
+
+        Please provide details for the planning or project management task.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Briefly describe the planning task.
+      placeholder: e.g., Define project milestones
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Provide a detailed description of the task, including objectives, stakeholders, and any relevant context.
+      placeholder: Describe the task in detail...
+    validations:
+      required: true
+
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+      description: List the expected deliverables or outcomes.
+      placeholder: e.g., Project timeline, resource allocation plan
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies & Blockers
+      description: List any dependencies or blockers for this task.
+      placeholder: e.g., Waiting on design approval
+    validations:
+      required: false
+
+  - type: input
+    id: due-date
+    attributes:
+      label: Due Date
+      description: When should this task be completed?
+      placeholder: YYYY-MM-DD
+    validations:
+      required: false
