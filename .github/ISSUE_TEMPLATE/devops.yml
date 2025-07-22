@@ -1,7 +1,7 @@
 name: DevOps Task
 description: Template for tracking DevOps-related tasks and improvements.
 title: "[DevOps] "
-labels: ["devops"]
+labels: ["type: devops"]
 assignees: []
 
 body:

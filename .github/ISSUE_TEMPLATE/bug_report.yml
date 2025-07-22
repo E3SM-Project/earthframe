@@ -1,7 +1,9 @@
 name: Bug Report
 description: File a bug report to help improve EarthFrame.
 title: "[Bug]: "
-labels: ["bug"]
+labels: ["type: bug"]
+assignees: []
+
 body:
   - type: textarea
     id: what-happened
