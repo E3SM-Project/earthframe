@@ -1,6 +1,6 @@
 import { Simulation } from '@/App';
-import { DataTable } from '@/pages/Browse/DataTable';
-import FiltersPanel from '@/pages/Browse/FiltersPanel';
+import { DataTable } from '@/pages/Search/DataTable';
+import FiltersPanel from '@/pages/Search/FiltersPanel';
 import { useState, useMemo } from 'react';
 
 export interface FilterState {
@@ -26,7 +26,7 @@ interface BrowseProps {
   setSelectedDataIds: (ids: string[]) => void;
 }
 
-const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
+const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   const [filters, setFilters] = useState<FilterState>({
     id: '',
     name: '',
@@ -70,7 +70,7 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
           </div>
           <div className="flex-1 flex flex-col">
             <header className="mb-3 px-2 mt-4">
-              <h1 className="text-3xl font-bold mb-2">Browse Simulations</h1>
+              <h1 className="text-3xl font-bold mb-2">Search Simulations</h1>
               <p className="text-gray-600 max-w-6xl">
                 Explore and filter available simulations using the panel on the left. Select
                 simulations to view more details or take further actions.
@@ -89,4 +89,4 @@ const Browse = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   );
 };
 
-export default Browse;
+export default Search;

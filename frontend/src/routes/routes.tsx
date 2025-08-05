@@ -2,12 +2,12 @@
 
 import { RouteObject, useRoutes } from 'react-router-dom';
 
-import Browse from '@/pages/Browse/Browse';
+import Search from '@/pages/Search/Search';
 import Compare from '@/pages/Compare/Compare';
-import Submit from '@/pages/Submit/Submit';
+import Upload from '@/pages/Upload/Upload';
 import Docs from '@/pages/Docs/Docs';
-import { Navigate } from 'react-router-dom';
 import { Simulation } from '@/App';
+import Home from '@/pages/Home/Home';
 
 interface RoutesProps {
   data: Simulation[];
@@ -25,12 +25,12 @@ const createRoutes = ({
   return [
     {
       path: '/',
-      element: <Navigate to="/browse" replace />,
+      element: <Home />,
     },
     {
-      path: '/browse',
+      path: '/search',
       element: (
-        <Browse
+        <Search
           data={data}
           selectedDataIds={selectedDataIds}
           setSelectedDataIds={setSelectedDataIds}
@@ -49,8 +49,8 @@ const createRoutes = ({
       ),
     },
     {
-      path: '/submit',
-      element: <Submit />,
+      path: '/upload',
+      element: <Upload />,
     },
     {
       path: '/docs',

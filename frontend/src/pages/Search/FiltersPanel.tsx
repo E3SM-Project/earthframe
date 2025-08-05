@@ -1,4 +1,4 @@
-import type { FilterState } from '@/pages/Browse/Browse';
+import type { FilterState } from '@/pages/Search/Search';
 
 interface FilterPanelProps {
   filters: FilterState;

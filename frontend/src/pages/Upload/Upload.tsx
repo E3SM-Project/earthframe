@@ -35,7 +35,7 @@ const cardHeader =
 
 const cardBody = 'px-6 py-4';
 
-const Submit = () => {
+const Upload = () => {
   const [openSection, setOpenSection] = useState<string | null>('config');
 
   const [config, setConfig] = useState<ConfigData>({
@@ -295,4 +295,4 @@ const Submit = () => {
   );
 };
 
-export default Submit;
+export default Upload;

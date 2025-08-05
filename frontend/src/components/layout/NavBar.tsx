@@ -4,9 +4,9 @@ import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 
 const navItems = [
-  { label: 'Browse', href: '/browse' },
-  { label: 'Compare', href: '/compare' },
-  { label: 'Submit', href: '/submit' },
+  { label: 'Home', href: '/' },
+  { label: 'Search', href: '/search' },
+  { label: 'Upload', href: '/upload' },
   { label: 'Docs', href: '/docs' },
 ];
 
