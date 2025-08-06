@@ -25,7 +25,7 @@ const createRoutes = ({
   return [
     {
       path: '/',
-      element: <Home />,
+      element: <Home data={data} />,
     },
     {
       path: '/search',

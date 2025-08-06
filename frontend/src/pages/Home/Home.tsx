@@ -1,11 +1,21 @@
+import { Simulation } from '@/App';
 import { Button } from '@/components/ui/button';
 import { Earth } from 'lucide-react'; // Or use your own SVG if you have one
 import { Link } from 'react-router-dom';
+import NewSimsTable from '@/pages/Home/NewSimsTable';
 
-const Home = () => {
+interface HomeProps {
+  data: Simulation[];
+}
+
+const Home = ({ data }: HomeProps) => {
+  const latestSimulations = [...data]
+    .sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
+    .slice(0, 6);
+
   return (
     <main className="flex flex-col items-center justify-center min-h-[70vh] bg-white px-4 py-12">
-      <section className="flex flex-col md:flex-row items-center gap-10 w-full max-w-7xl mx-auto bg-white/90 shadow-2xl rounded-3xl border border-muted p-10 md:p-20">
+      <section className="flex flex-col md:flex-row items-center gap-10 w-full max-w-7xl mx-auto bg</main>-white/90 shadow-2xl rounded-3xl border border-muted p-10 md:p-20">
         {/* Left: Text */}
         <div className="flex-[1.3]">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -90,6 +100,21 @@ const Home = () => {
             <Button asChild variant="default" className="self-start">
               <Link to="/upload">Upload Simulation</Link>
             </Button>
+          </div>
+        </div>
+        {/* Recently Added Simulations */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-2">Recently Added Simulations</h2>
+          <p className="text-muted-foreground mb-4">
+            Newly submitted simulations appear here for quick access.
+          </p>
+          <div className="bg-white border border-muted rounded-xl shadow p-6">
+            <NewSimsTable data={latestSimulations} />
+            <div className="flex justify-center mt-4">
+              <Button asChild variant="default">
+                <Link to="/search">View All Simulations</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

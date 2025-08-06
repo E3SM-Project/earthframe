@@ -4,30 +4,54 @@ import NavBar from '@/components/layout/NavBar';
 import { useEffect, useMemo, useState } from 'react';
 
 export interface Simulation {
+  // 🧾 Identification
   id: string;
   name: string;
-  modelStartDate: string; // Start date of the model simulation
-  runStartDate: string; // Date when the simulation run started
+  tag: string;
+  status: string;
+  simulationType: 'production' | 'master';
 
-  repo: string; // Default "E3SM", can be forked repos for rare cases
-  branch: string; // At least one of branch or tag is required
-  tag: string; // At least one of branch or tag is required
+  // 📦 Provenance & Submission
+  campaignId: string;
+  experimentTypeId: string;
+  variables: string[];
+  uploadedBy: string;
+  uploadDate: string;
+  lastModified: string;
+  lastEditedBy: string;
+  lastEditedAt: string;
 
-  campaign: string;
+  // 🧪 Model Setup
+  machineId: string;
+  compiler: string;
   compset: string;
   gridName: string;
-  machine: string;
-  compiler: string;
+  versionTag: string;
+  gitHash: string;
+  externalRepoUrl: string;
+  initializationType: string;
+  parentSimulationId: string;
+  branch: string;
+  branchTime: string;
+  modelStartDate: string;
+  calendarStartDate: string;
 
-  notes: string;
-  keyFeatures: string;
-  knownIssues: string;
+  // 🏃 Execution & Output
+  runDate: string;
+  outputPath: string;
+  archivePath: string;
+  runScriptPath: string;
+  batchLogPaths: ExternalUrl[];
 
-  runScripts: ExternalUrl[];
-  outputLocation: ExternalUrl[];
-  archiveLocation: ExternalUrl[];
+  // 🧹 Postprocessing & Diagnostics
+  postprocessingScriptPath: string;
   diagnosticLinks: ExternalUrl[];
   paceLinks: ExternalUrl[];
+
+  // 📝 Metadata & Audit
+  notesMarkdown: string;
+  knownIssues: string;
+  annotations: string;
 }
 export interface ExternalUrl {
   label: string; // e.g., "Documentation", "Results"

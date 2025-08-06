@@ -4,20 +4,27 @@ import FiltersPanel from '@/pages/Search/FiltersPanel';
 import { useState, useMemo } from 'react';
 
 export interface FilterState {
-  id: string;
-  name: string;
-  modelStartDate: string; // Start date of the model simulation
-  runStartDate: string; // Date when the simulation was run
-
-  repo: string; // Default "E3SM", can be forked repos for rare cases
-  branch: string; // At least one of branch or tag is required
-  tag: string; // At least one of branch or tag is required
-
+  // Scientific Goal
   campaign: string;
+  experiment: string;
+  targetVariables: string[];
+  frequency: string;
+
+  // Simulation Context
+  machine: string;
   compset: string;
   gridName: string;
-  machine: string;
-  compiler: string;
+  simulationType: string;
+  versionTag: string;
+
+  // Execution Details
+  status: string;
+  modelRunStartDate: string;
+  modelRunEndDate: string;
+
+  // Metadata
+  uploadStartDate: string;
+  uploadEndDate: string;
 }
 
 interface BrowseProps {
@@ -27,38 +34,45 @@ interface BrowseProps {
 }
 
 const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
+  // Scientific Goal
   const [filters, setFilters] = useState<FilterState>({
-    id: '',
-    name: '',
-    modelStartDate: '',
-    runStartDate: '',
-    repo: '',
-    branch: '',
-    tag: '',
+    // Scientific Goal
     campaign: '',
-    compset: '',
-    gridName: '',
+    experiment: '',
+    targetVariables: [], // e.g. ['ta', 'tas', 'tasmax']
+    frequency: '', // e.g. '3hr', 'day', 'year', 'mon'
+
+    // Simulation Context
     machine: '',
-    compiler: '',
+    compset: '', // e.g. 'E3SM-1-0', 'E3SM-2-0'
+    gridName: '',
+    simulationType: '', // e.g. 'Production', 'Master'
+    versionTag: '', // e.g. 'v1.0.0', 'v2.0.0', 'v3.0.0'
+
+    // Execution Details
+    status: '',
+    modelRunStartDate: '',
+    modelRunEndDate: '',
+
+    // Metadata
+    uploadStartDate: '',
+    uploadEndDate: '',
   });
 
   const filteredData = useMemo(() => {
-    return data.filter((record) => {
-      return (
-        (!filters.id || record.id === filters.id) &&
-        (!filters.name || record.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-        (!filters.modelStartDate || record.modelStartDate === filters.modelStartDate) &&
-        (!filters.runStartDate || record.runStartDate === filters.runStartDate) &&
-        (!filters.repo || record.repo === filters.repo) &&
-        (!filters.branch || record.branch === filters.branch) &&
-        (!filters.tag || record.tag === filters.tag) &&
-        (!filters.campaign || record.campaign === filters.campaign) &&
-        (!filters.compset || record.compset === filters.compset) &&
-        (!filters.gridName || record.gridName === filters.gridName) &&
-        (!filters.machine || record.machine === filters.machine) &&
-        (!filters.compiler || record.compiler === filters.compiler)
-      );
-    });
+    const filterKeys = Object.keys(filters) as (keyof FilterState)[];
+
+    return data.filter((record) =>
+      filterKeys.every((key) => {
+        const filterValue = filters[key];
+
+        if (Array.isArray(filterValue)) {
+          return !filterValue.length || filterValue.every((v) => record[key]?.includes?.(v));
+        }
+
+        return !filterValue || record[key] === filterValue;
+      }),
+    );
   }, [data, filters]);
 
   return (
