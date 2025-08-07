@@ -155,8 +155,7 @@ const Home = ({ data }: HomeProps) => {
               <span className="font-semibold text-lg">Step 1: Explore Curated Simulations</span>
             </div>
             <p className="text-muted-foreground text-sm mb-4">
-              Search for production and master branch simulation runs by scientific goal, simulation
-              context, and execution detials.
+              Explore simuations by scientific goal, simulation context, and execution details.
             </p>
             <Button asChild variant="default" className="self-start">
               <Link to="/search">Search Simulations</Link>
