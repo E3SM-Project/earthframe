@@ -2,6 +2,8 @@ import { Simulation } from '@/App';
 import { DataTable } from '@/pages/Search/DataTable';
 import FiltersPanel from '@/pages/Search/FiltersPanel';
 import { useState, useMemo } from 'react';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export interface FilterState {
   // Scientific Goal
@@ -39,7 +41,7 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
     // Scientific Goal
     campaign: '',
     experiment: '',
-    targetVariables: [], // e.g. ['ta', 'tas', 'tasmax']
+    variables: [], // e.g. ['ta', 'tas', 'tasmax']
     frequency: '', // e.g. '3hr', 'day', 'year', 'mon'
 
     // Simulation Context
@@ -59,17 +61,53 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
     uploadEndDate: '',
   });
 
+  // Sync filter state with URL query params
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Parse filters from URL when location.search changes
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const newFilters: Partial<FilterState> = {};
+    // Define which keys are arrays
+    const arrayKeys: (keyof FilterState)[] = ['variables'];
+    (Object.keys(filters) as (keyof FilterState)[]).forEach((key) => {
+      const value = params.get(key);
+      if (value !== null) {
+        if (arrayKeys.includes(key)) {
+          newFilters[key] = value.split(',') as any;
+        } else {
+          newFilters[key] = value as any;
+        }
+      }
+    });
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
+
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (Array.isArray(value) && value.length) {
+        params.set(key, value.join(','));
+      } else if (typeof value === 'string' && value) {
+        params.set(key, value);
+      }
+    });
+    navigate({ search: params.toString() }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
   const filteredData = useMemo(() => {
     const filterKeys = Object.keys(filters) as (keyof FilterState)[];
-
     return data.filter((record) =>
       filterKeys.every((key) => {
         const filterValue = filters[key];
-
         if (Array.isArray(filterValue)) {
           return !filterValue.length || filterValue.every((v) => record[key]?.includes?.(v));
         }
-
         return !filterValue || record[key] === filterValue;
       }),
     );

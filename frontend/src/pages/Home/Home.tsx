@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Earth } from 'lucide-react'; // Or use your own SVG if you have one
 import { Link } from 'react-router-dom';
 import NewSimsTable from '@/pages/Home/NewSimsTable';
+import VariableCard from '@/pages/Home/VariableCard';
 
 interface HomeProps {
   data: Simulation[];
@@ -12,6 +13,92 @@ const Home = ({ data }: HomeProps) => {
   const latestSimulations = [...data]
     .sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
     .slice(0, 6);
+
+  const getSimulationCount = (variable: string) =>
+    data.filter((sim) => sim.variables?.includes(variable)).length;
+
+  const keyVariables = {
+    tas: {
+      longName: 'Near-surface air temperature',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('tas'),
+      icon: (
+        <span role="img" aria-label="temperature" className="text-2xl">
+          🌡️
+        </span>
+      ),
+    },
+    ta: {
+      longName: 'Air temperature',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('ta'),
+      icon: (
+        <span role="img" aria-label="temperature" className="text-2xl">
+          🌡️
+        </span>
+      ),
+    },
+    tasmax: {
+      longName: 'Daily maximum near-surface air temperature',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('tasmax'),
+      icon: (
+        <span role="img" aria-label="temperature max" className="text-2xl">
+          🌡️
+        </span>
+      ),
+    },
+    pr: {
+      longName: 'Precipitation',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('pr'),
+      icon: (
+        <span role="img" aria-label="precipitation" className="text-2xl">
+          🌧️
+        </span>
+      ),
+    },
+    psl: {
+      longName: 'Sea level pressure',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('psl'),
+      icon: (
+        <span role="img" aria-label="pressure" className="text-2xl">
+          📈
+        </span>
+      ),
+    },
+    uas: {
+      longName: 'Zonal wind',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('uas'),
+      icon: (
+        <span role="img" aria-label="wind" className="text-2xl">
+          💨
+        </span>
+      ),
+    },
+    rsds: {
+      longName: 'Surface downwelling shortwave radiation',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('rsds'),
+      icon: (
+        <span role="img" aria-label="radiation" className="text-2xl">
+          ☀️
+        </span>
+      ),
+    },
+    zg: {
+      longName: 'Geopotential height',
+      description: 'Some lorem ipsum for now',
+      simulationCount: getSimulationCount('zg'),
+      icon: (
+        <span role="img" aria-label="height" className="text-2xl">
+          📏
+        </span>
+      ),
+    },
+  };
 
   return (
     <main className="flex flex-col items-center justify-center min-h-[70vh] bg-white px-4 py-12">
@@ -102,6 +189,28 @@ const Home = ({ data }: HomeProps) => {
             </Button>
           </div>
         </div>
+        {/* Key Variables */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-2">Key Variables</h2>
+          <p className="text-muted-foreground mb-4">
+            Explore key variables commonly used for model evaluation and analysis.
+            <br />
+            Click any variable to view simulations.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Object.entries(keyVariables).map(([key, variable]) => (
+              <VariableCard
+                key={key}
+                variableKey={key}
+                longName={variable.longName}
+                description={variable.description}
+                simulationCount={variable.simulationCount}
+                icon={variable.icon}
+              />
+            ))}
+          </div>
+        </div>
+
         {/* Recently Added Simulations */}
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-2">Recently Added Simulations</h2>
