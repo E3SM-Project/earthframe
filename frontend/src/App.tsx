@@ -34,6 +34,7 @@ export interface Simulation {
   branch: string;
   branchTime: string;
   modelStartDate: string;
+  modelEndDate: string;
   calendarStartDate: string;
 
   // 🏃 Execution & Output

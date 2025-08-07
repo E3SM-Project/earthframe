@@ -39,13 +39,13 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   // Scientific Goal
   const [filters, setFilters] = useState<FilterState>({
     // Scientific Goal
-    campaign: '',
-    experiment: '',
+    campaignId: '',
+    experimentTypeId: '',
     variables: [], // e.g. ['ta', 'tas', 'tasmax']
     frequency: '', // e.g. '3hr', 'day', 'year', 'mon'
 
     // Simulation Context
-    machine: '',
+    machineId: '',
     compset: '', // e.g. 'E3SM-1-0', 'E3SM-2-0'
     gridName: '',
     simulationType: '', // e.g. 'Production', 'Master'
@@ -128,12 +128,14 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
                 simulations to view more details or take further actions.
               </p>
             </header>
-            <DataTable
-              data={data}
-              filteredData={filteredData}
-              selectedDataIds={selectedDataIds}
-              setSelectedDataIds={setSelectedDataIds}
-            />
+            <div className="overflow-x-auto">
+              <DataTable
+                data={data}
+                filteredData={filteredData}
+                selectedDataIds={selectedDataIds}
+                setSelectedDataIds={setSelectedDataIds}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -113,7 +113,7 @@ const Home = ({ data }: HomeProps) => {
             Energy's Energy Exascale Earth System Model (E3SM).
           </p>
           <ul className="list-disc list-inside mb-4 text-base text-muted-foreground">
-            <li>Browse validated production runs and recent latest master</li>
+            <li>Explore validated production runs and recent latest master</li>
             <li>Compare output across simulation campaigns, versions, and configurations</li>
             <li>
               Explore high-impact variables like temperature, precipitation, and pressure trends
@@ -145,7 +145,7 @@ const Home = ({ data }: HomeProps) => {
           Get started with EarthFrame by following these key steps.
         </p>
         <p className="text-muted-foreground mb-6">
-          Browse curated simulations, compare outputs, or upload your own results.
+          Explore curated simulations, compare outputs, or upload your own results.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Step 1 */}
@@ -155,7 +155,8 @@ const Home = ({ data }: HomeProps) => {
               <span className="font-semibold text-lg">Step 1: Explore Curated Simulations</span>
             </div>
             <p className="text-muted-foreground text-sm mb-4">
-              Browse production and latest master runs with key variables summarized.
+              Search for production and master branch simulation runs by scientific goal, simulation
+              context, and execution detials.
             </p>
             <Button asChild variant="default" className="self-start">
               <Link to="/search">Search Simulations</Link>

@@ -58,7 +58,10 @@ export const DataTable = ({
 }: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    gridName: false,
+    compset: false,
+  });
 
   const navigate = useNavigate();
   const handleCompare = () => {
@@ -183,46 +186,48 @@ export const DataTable = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  onClick={(e) => handleRowClick(row, e)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+      <div className="rounded-md border" style={{ overflowX: 'auto' }}>
+        <div className="min-w-full" style={{ width: 'max-content' }}>
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                    onClick={(e) => handleRowClick(row, e)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
@@ -251,7 +256,6 @@ export const DataTable = ({
     </div>
   );
 };
-
 const columns: ColumnDef<Simulation>[] = [
   {
     id: 'select',
@@ -265,94 +269,132 @@ const columns: ColumnDef<Simulation>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    meta: { sticky: true }, // Add sticky class if needed
   },
   {
     accessorKey: 'name',
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+      <Button variant="ghost" onClick={() => column.toggleSorting()} style={{ minWidth: 200 }}>
         Name
         <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => <div>{row.getValue('name')}</div>,
     enableSorting: true,
+    meta: { sticky: true }, // Add sticky class if needed
   },
   {
-    accessorKey: 'modelStartDate',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Model Start Date
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('modelStartDate')}</div>,
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'runStartDate',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Run Start Date
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('runStartDate')}</div>,
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'repo',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Repo
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('repo')}</div>,
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'branch',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Branch
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('branch')}</div>,
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'tag',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Tag
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('tag')}</div>,
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'campaign',
+    accessorKey: 'campaignId',
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting()}>
         Campaign
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('campaign')}</div>,
+    cell: ({ row }) => <div>{row.getValue('campaignId')}</div>,
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'experimentTypeId',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Experiment
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('experimentTypeId')}</div>,
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'variables',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Variables
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const variables = row.getValue('variables') as string[];
+      return (
+        <div>
+          {Array.isArray(variables) && variables.length > 0 ? (
+            variables.join(', ')
+          ) : (
+            <span className="text-muted-foreground italic">None</span>
+          )}
+        </div>
+      );
+    },
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'versionTag',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Version Tag
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('versionTag')}</div>,
+    enableSorting: true,
+  },
+  {
+    id: 'modelDateRange',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Model Date Range
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const start = row.original.modelStartDate;
+      const end = row.original.modelEndDate;
+      if (!start && !end) return <span className="text-muted-foreground italic">N/A</span>;
+      if (start && end)
+        return (
+          <span>
+            {start} to {end}
+          </span>
+        );
+      if (start) return <span>{start}</span>;
+      if (end) return <span>{end}</span>;
+      return null;
+    },
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'ensembleMember',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Ensemble Member
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('ensembleMember')}</div>,
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'gridResolution',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Grid Resolution
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue('gridResolution')}</div>,
     enableSorting: true,
   },
   {
     accessorKey: 'compset',
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Compset
+        Component Set
         <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => <div>{row.getValue('compset')}</div>,
     enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: 'gridName',
@@ -364,51 +406,24 @@ const columns: ColumnDef<Simulation>[] = [
     ),
     cell: ({ row }) => <div>{row.getValue('gridName')}</div>,
     enableSorting: true,
+    enableHiding: true,
   },
   {
-    accessorKey: 'machine',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Machine
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('machine')}</div>,
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'compiler',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Compiler
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => <div>{row.getValue('compiler')}</div>,
-    enableSorting: true,
-  },
-  {
-    id: 'actions',
+    id: 'details',
     enableHiding: false,
     cell: ({ row }) => {
       const simulation = row.original;
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(simulation.id)}>
-              Copy simulation ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            // Replace with your navigation logic
+            window.location.href = `/simulations/${simulation.id}`;
+          }}
+        >
+          Details
+        </Button>
       );
     },
     enableSorting: false,
