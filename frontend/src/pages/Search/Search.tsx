@@ -120,7 +120,7 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
           <div className="w-full md:w-[220px] min-w-0 md:min-w-[180px]">
             <FiltersPanel filters={filters} onChange={setFilters} />
           </div>
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-w-0">
             <header className="mb-3 px-2 mt-4">
               <h1 className="text-3xl font-bold mb-2">Search Simulations</h1>
               <p className="text-gray-600 max-w-6xl">
@@ -128,7 +128,7 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
                 simulations to view more details or take further actions.
               </p>
             </header>
-            <div className="overflow-x-auto">
+            <div>
               <DataTable
                 data={data}
                 filteredData={filteredData}

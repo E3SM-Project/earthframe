@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -22,9 +22,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -39,6 +36,7 @@ import {
 import { Simulation } from '@/App';
 import { useNavigate } from 'react-router-dom';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
+import { cn } from '@/lib/utils';
 
 // Max number of rows that can be selected at once.
 const MAX_SELECTION = 5;
@@ -59,6 +57,8 @@ export const DataTable = ({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    ensembleMember: false,
+    gridResolution: false,
     gridName: false,
     compset: false,
   });
@@ -154,6 +154,7 @@ export const DataTable = ({
 
   return (
     <div className="w-full">
+      {/* Top controls */}
       <div className="flex items-center py-4">
         <SelectedSimulationChipList
           data={data}
@@ -162,7 +163,6 @@ export const DataTable = ({
           selectedDataIds={selectedDataIds}
           setSelectedDataIds={setSelectedDataIds}
         />
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -172,63 +172,88 @@ export const DataTable = ({
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
+              .filter((col) => col.getCanHide())
+              .map((col) => (
                 <DropdownMenuCheckboxItem
-                  key={column.id}
+                  key={col.id}
                   className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  checked={col.getIsVisible()}
+                  onCheckedChange={(val) => col.toggleVisibility(!!val)}
                 >
-                  {column.id}
+                  {col.id}
                 </DropdownMenuCheckboxItem>
               ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border" style={{ overflowX: 'auto' }}>
-        <div className="min-w-full" style={{ width: 'max-content' }}>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+
+      {/* Scroll container for sticky columns */}
+      <div className="rounded-md border overflow-x-auto w-full max-w-full">
+        <Table className="min-w-max table-auto border-separate border-spacing-0 [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap">
+          <TableHeader>
+            {table.getHeaderGroups().map((hg) => (
+              <TableRow key={hg.id}>
+                {hg.headers.map((header) => {
+                  const meta = header.column.columnDef.meta; // { sticky?: boolean, width?: number, position?: 'left'|'right' }
+                  const isSticky = meta?.sticky;
+                  const left =
+                    meta?.position === 'left' ? getStickyLeftOffset(header, table) : undefined;
+                  const right = meta?.position === 'right' ? 0 : undefined;
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={isSticky ? 'sticky bg-background z-20' : undefined}
+                      style={{
+                        left,
+                        right,
+                        minWidth: meta?.width,
+                        maxWidth: meta?.width,
+                        width: meta?.width,
+                      }}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                    onClick={(e) => handleRowClick(row, e)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => {
+                  const meta = cell.column.columnDef.meta;
+                  const isSticky = meta?.sticky;
+                  const left =
+                    meta?.position === 'left' ? getStickyLeftOffset(cell, table) : undefined;
+                  const right = meta?.position === 'right' ? 0 : undefined;
+
+                  return (
+                    <TableCell
+                      key={cell.id}
+                      className={isSticky ? 'sticky bg-background z-10' : undefined}
+                      style={{
+                        left,
+                        right,
+                        minWidth: meta?.width,
+                        maxWidth: meta?.width,
+                        width: meta?.width,
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
+
+      {/* Pagination */}
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{' '}
@@ -256,6 +281,7 @@ export const DataTable = ({
     </div>
   );
 };
+
 const columns: ColumnDef<Simulation>[] = [
   {
     id: 'select',
@@ -269,19 +295,19 @@ const columns: ColumnDef<Simulation>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-    meta: { sticky: true }, // Add sticky class if needed
+    meta: { sticky: true, width: 50, position: 'left' },
   },
   {
     accessorKey: 'name',
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting()} style={{ minWidth: 200 }}>
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
         Name
         <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => <div>{row.getValue('name')}</div>,
     enableSorting: true,
-    meta: { sticky: true }, // Add sticky class if needed
+    meta: { sticky: true, width: 200, position: 'left' },
   },
   {
     accessorKey: 'campaignId',
@@ -339,26 +365,34 @@ const columns: ColumnDef<Simulation>[] = [
     enableSorting: true,
   },
   {
-    id: 'modelDateRange',
+    accessorKey: 'modelStartDate',
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting()}>
-        Model Date Range
+        Model Start Date
         <ArrowUpDown />
       </Button>
     ),
     cell: ({ row }) => {
       const start = row.original.modelStartDate;
+      return start ? (
+        <span>{start}</span>
+      ) : (
+        <span className="text-muted-foreground italic">N/A</span>
+      );
+    },
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'modelEndDate',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting()}>
+        Model End Date
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => {
       const end = row.original.modelEndDate;
-      if (!start && !end) return <span className="text-muted-foreground italic">N/A</span>;
-      if (start && end)
-        return (
-          <span>
-            {start} to {end}
-          </span>
-        );
-      if (start) return <span>{start}</span>;
-      if (end) return <span>{end}</span>;
-      return null;
+      return end ? <span>{end}</span> : <span className="text-muted-foreground italic">N/A</span>;
     },
     enableSorting: true,
   },
@@ -418,7 +452,6 @@ const columns: ColumnDef<Simulation>[] = [
           variant="outline"
           size="sm"
           onClick={() => {
-            // Replace with your navigation logic
             window.location.href = `/simulations/${simulation.id}`;
           }}
         >
@@ -427,6 +460,7 @@ const columns: ColumnDef<Simulation>[] = [
       );
     },
     enableSorting: false,
+    meta: { sticky: true, width: 100, position: 'right' },
   },
 ];
 
@@ -459,4 +493,19 @@ const limitRowSelection = (
   return limitedSelection;
 };
 
-export default DataTable;
+const getStickyLeftOffset = (
+  headerOrCell: {
+    column: { id: string; columnDef: { meta?: { sticky?: boolean; width?: number } } };
+  },
+  table: { getAllLeafColumns: () => any[] },
+): number => {
+  const all = table.getAllLeafColumns();
+  const idx = all.findIndex((c) => c.id === headerOrCell.column.id);
+  let left = 0;
+  for (let i = 0; i < idx; i++) {
+    if (all[i].columnDef.meta?.sticky) {
+      left += all[i].columnDef.meta.width || 0;
+    }
+  }
+  return left;
+};
