@@ -1,11 +1,11 @@
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from '@/components/ui/accordion';
 import './Compare.css';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Simulation } from '@/App';
 import { ComparisonAI } from './ComparisonAI';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';

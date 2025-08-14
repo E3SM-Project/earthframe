@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { fetchAISimAnalysis } from '@/api/compareAPI';
 import { Button } from '@/components/ui/button';
 import { Simulation } from '@/App';
-import { X, Sparkles } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 import { Loader2 } from 'lucide-react'; // shadcn spinner icon
 
 interface Props {

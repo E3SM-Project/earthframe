@@ -3,7 +3,7 @@ import { DataTable } from '@/pages/Search/DataTable';
 import FiltersPanel from '@/pages/Search/FiltersPanel';
 import ResultCards from '@/pages/Search/ResultCards';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LayoutGrid, Table } from 'lucide-react';
@@ -126,8 +126,8 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="flex flex-col md:flex-row w-full gap-8 md:max-w-[50%]">
+    <div className="w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 flex flex-col md:flex-row gap-8">
         <div className="flex flex-row w-full gap-6">
           <div className="w-full md:w-[220px] min-w-0 md:min-w-[180px]">
             <FiltersPanel filters={filters} onChange={setFilters} />

@@ -1,5 +1,5 @@
 import { Simulation } from '@/App';
-import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';

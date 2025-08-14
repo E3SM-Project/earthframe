@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -18,23 +17,19 @@ import {
   X,
 } from 'lucide-react';
 
-// Import Simulation interface from app.tsx
 import type { Simulation } from '@/App.tsx';
+import { useState } from 'react';
 
-type ResultCardProps = {
+interface ResultCardProps {
   simulation: Simulation;
   selected: boolean;
   selectedDataIds: Simulation[];
   onSelect: (sim: Simulation) => void;
   onViewDetails: (id: string) => void;
-};
-const ResultCard: React.FC<ResultCardProps> = ({
-  simulation,
-  selected,
-  onSelect,
-  onViewDetails,
-}) => {
-  const [showAllVariables, setShowAllVariables] = React.useState(false);
+}
+
+const ResultCard = ({ simulation, selected, onSelect, onViewDetails }: ResultCardProps) => {
+  const [showAllVariables, setShowAllVariables] = useState(false);
 
   return (
     <Card className="w-full h-full p-0 flex flex-col shadow-md rounded-lg border">
@@ -46,10 +41,10 @@ const ResultCard: React.FC<ResultCardProps> = ({
           className="mt-1"
           style={{ width: 24, height: 24 }}
         />
-        <div className="flex-1 w-full">
+        <div className="flex-1 w-full min-w-0">
           <CardHeader className="p-0 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <span className="font-semibold text-lg">{simulation.name}</span>
-            <div className="flex items-center gap-2">
+            <span className="font-semibold text-lg break-words">{simulation.name}</span>
+            <div className="flex items-center gap-2 shrink-0">
               <span className="text-sm font-medium text-gray-700">Status:</span>
               <span
                 className={`px-2 py-1 rounded text-xs font-semibold flex items-center gap-1
@@ -83,7 +78,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm mb-4">
               <div className="flex items-center gap-2">
                 <span>
                   <Rocket className="w-4 h-4" />
