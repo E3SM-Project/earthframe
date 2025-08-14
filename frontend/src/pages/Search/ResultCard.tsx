@@ -24,21 +24,20 @@ import type { Simulation } from '@/App.tsx';
 type ResultCardProps = {
   simulation: Simulation;
   selected: boolean;
-  onSelect: (id: string, selected: boolean) => void;
-  onSave: (id: string) => void;
+  selectedDataIds: Simulation[];
+  onSelect: (sim: Simulation) => void;
   onViewDetails: (id: string) => void;
 };
 const ResultCard: React.FC<ResultCardProps> = ({
   simulation,
   selected,
   onSelect,
-  onSave,
   onViewDetails,
 }) => {
   const [showAllVariables, setShowAllVariables] = React.useState(false);
 
   return (
-    <Card className="w-full max-w-xl p-0 flex flex-col shadow-md rounded-lg border">
+    <Card className="w-full h-full p-0 flex flex-col shadow-md rounded-lg border">
       <div className="flex flex-col sm:flex-row items-start gap-4 p-4">
         <Checkbox
           checked={selected}

@@ -1,13 +1,14 @@
 import { Simulation } from '@/App';
 import { DataTable } from '@/pages/Search/DataTable';
 import FiltersPanel from '@/pages/Search/FiltersPanel';
+import ResultCards from '@/pages/Search/ResultCards';
+
 import { useState, useMemo } from 'react';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LayoutGrid, Table } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
-import ResultCard from '@/pages/Search/ResultCard';
 
 export interface FilterState {
   // Scientific Goal
@@ -70,6 +71,10 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const handleCompareButtonClick = () => {
+    navigate('/compare');
+  };
+
   // Parse filters from URL when location.search changes
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -122,7 +127,7 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
 
   return (
     <div className="flex justify-center w-full">
-      <div className="flex flex-col md:flex-row w-full gap-8 md:max-w-[70%]">
+      <div className="flex flex-col md:flex-row w-full gap-8 md:max-w-[50%]">
         <div className="flex flex-row w-full gap-6">
           <div className="w-full md:w-[220px] min-w-0 md:min-w-[180px]">
             <FiltersPanel filters={filters} onChange={setFilters} />
@@ -180,14 +185,16 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
                   filteredData={filteredData}
                   selectedDataIds={selectedDataIds}
                   setSelectedDataIds={setSelectedDataIds}
+                  handleCompareButtonClick={handleCompareButtonClick}
                 />
               ) : (
-                // Replace below with your grid/card component if available
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filteredData.map((sim) => (
-                    <ResultCard key={sim.id} simulation={sim} />
-                  ))}
-                </div>
+                <ResultCards
+                  data={data}
+                  filteredData={filteredData}
+                  selectedDataIds={selectedDataIds}
+                  setSelectedDataIds={setSelectedDataIds}
+                  handleCompareButtonClick={handleCompareButtonClick}
+                />
               )}
             </div>
           </div>

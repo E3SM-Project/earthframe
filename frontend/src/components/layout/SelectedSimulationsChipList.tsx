@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 interface SelectedSimulationsBreadcrumbProps {
   data: Simulation[];
   buttonText: string;
-  handleButtonClick: () => void;
+  onCompareButtonClick: () => void;
   selectedDataIds: string[];
   setSelectedDataIds: (ids: string[]) => void;
 }
@@ -14,7 +14,7 @@ const MAX_SELECTION = 5;
 const SelectedSimulationChipList = ({
   data,
   buttonText,
-  handleButtonClick,
+  onCompareButtonClick,
   selectedDataIds,
   setSelectedDataIds,
 }: SelectedSimulationsBreadcrumbProps) => {
@@ -23,7 +23,7 @@ const SelectedSimulationChipList = ({
       <Button
         variant="default"
         size="sm"
-        onClick={() => handleButtonClick()}
+        onClick={() => onCompareButtonClick()}
         disabled={selectedDataIds.length < 2}
       >
         {buttonText}
@@ -37,7 +37,7 @@ const SelectedSimulationChipList = ({
               : 'text-muted-foreground'
           }`}
         >
-          {selectedDataIds.length} / {MAX_SELECTION} selected
+          Selected: {selectedDataIds.length} / {MAX_SELECTION}
         </span>
         {selectedDataIds.map((id) => {
           const row = data.find((r) => r.id === id);

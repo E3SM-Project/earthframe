@@ -34,7 +34,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Simulation } from '@/App';
-import { useNavigate } from 'react-router-dom';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 
 // Max number of rows that can be selected at once.
@@ -45,6 +44,7 @@ interface DataTableProps {
   filteredData: Simulation[];
   selectedDataIds: string[];
   setSelectedDataIds: (ids: string[]) => void;
+  handleCompareButtonClick: () => void;
 }
 
 export const DataTable = ({
@@ -52,6 +52,7 @@ export const DataTable = ({
   filteredData,
   selectedDataIds,
   setSelectedDataIds,
+  handleCompareButtonClick,
 }: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -61,11 +62,6 @@ export const DataTable = ({
     gridName: false,
     compset: false,
   });
-
-  const navigate = useNavigate();
-  const handleCompare = () => {
-    navigate('/compare');
-  };
 
   // Convert selectedDataIds to rowSelection object for react-table.
   const rowSelection = idsToRowSelection(selectedDataIds);
@@ -135,7 +131,7 @@ export const DataTable = ({
         <SelectedSimulationChipList
           data={data}
           buttonText="Compare"
-          handleButtonClick={handleCompare}
+          onCompareButtonClick={handleCompareButtonClick}
           selectedDataIds={selectedDataIds}
           setSelectedDataIds={setSelectedDataIds}
         />
