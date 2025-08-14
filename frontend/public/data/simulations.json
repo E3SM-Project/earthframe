@@ -8,7 +8,7 @@
     "campaignId": "DECK",
     "experimentTypeId": "highres-bgchist",
     "ensembleMember": "r1i1p1f1",
-    "variables": ["ta", "tas", "pr", "rsds"],
+    "variables": ["ta", "tas", "pr", "rsds", "tasmax", "tasmin"],
     "uploadedBy": "Alice Smith",
     "uploadDate": "2024-06-11T12:00:00.000Z",
     "lastModified": "2024-06-11T12:00:00.000Z",
