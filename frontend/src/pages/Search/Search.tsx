@@ -4,6 +4,10 @@ import FiltersPanel from '@/pages/Search/FiltersPanel';
 import { useState, useMemo } from 'react';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { LayoutGrid, Table } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+import ResultCard from '@/pages/Search/ResultCard';
 
 export interface FilterState {
   // Scientific Goal
@@ -113,6 +117,9 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
     );
   }, [data, filters]);
 
+  // View mode state: 'grid' or 'table'
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+
   return (
     <div className="flex justify-center w-full">
       <div className="flex flex-col md:flex-row w-full gap-8 md:max-w-[70%]">
@@ -121,20 +128,67 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
             <FiltersPanel filters={filters} onChange={setFilters} />
           </div>
           <div className="flex-1 flex flex-col min-w-0">
-            <header className="mb-3 px-2 mt-4">
-              <h1 className="text-3xl font-bold mb-2">Search Simulations</h1>
-              <p className="text-gray-600 max-w-6xl">
-                Explore and filter available simulations using the panel on the left. Select
-                simulations to view more details or take further actions.
-              </p>
+            <header className="mb-3 px-2 mt-4 flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Search Simulations</h1>
+                <p className="text-gray-600 max-w-6xl">
+                  Explore and filter available simulations using the panel on the left. Select
+                  simulations to view more details or take further actions.
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <span className="text-xs text-gray-500 mb-1">
+                  View mode:
+                  <span className="ml-1 font-medium">
+                    {viewMode === 'grid' ? 'Cards' : 'Table'}
+                  </span>
+                </span>
+                <TooltipProvider delayDuration={150}>
+                  <div className="flex gap-2">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Grid view"
+                          className={`p-2 rounded ${viewMode === 'grid' ? 'bg-gray-200' : ''}`}
+                          onClick={() => setViewMode('grid')}
+                        >
+                          <LayoutGrid size={24} strokeWidth={2} />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>Show simulations as cards</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Table view"
+                          className={`p-2 rounded ${viewMode === 'table' ? 'bg-gray-200' : ''}`}
+                          onClick={() => setViewMode('table')}
+                        >
+                          <Table size={24} strokeWidth={2} />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>Show simulations in a table</TooltipContent>
+                    </Tooltip>
+                  </div>
+                </TooltipProvider>
+              </div>
             </header>
             <div>
-              <DataTable
-                data={data}
-                filteredData={filteredData}
-                selectedDataIds={selectedDataIds}
-                setSelectedDataIds={setSelectedDataIds}
-              />
+              {viewMode === 'table' ? (
+                <DataTable
+                  data={data}
+                  filteredData={filteredData}
+                  selectedDataIds={selectedDataIds}
+                  setSelectedDataIds={setSelectedDataIds}
+                />
+              ) : (
+                // Replace below with your grid/card component if available
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredData.map((sim) => (
+                    <ResultCard key={sim.id} simulation={sim} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

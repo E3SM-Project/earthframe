@@ -7,9 +7,11 @@ export interface Simulation {
   // 🧾 Identification
   id: string;
   name: string;
-  tag: string;
-  status: string;
-  simulationType: 'production' | 'master';
+  versionTag: string;
+  gitHash: string;
+  externalRepoUrl: string;
+  status: 'complete' | 'running' | 'not-started' | 'failed';
+  simulationType: 'production' | 'master' | 'experimental';
 
   // 📦 Provenance & Submission
   campaignId: string;
@@ -26,9 +28,6 @@ export interface Simulation {
   compiler: string;
   compset: string;
   gridName: string;
-  versionTag: string;
-  gitHash: string;
-  externalRepoUrl: string;
   initializationType: string;
   parentSimulationId: string;
   branch: string;

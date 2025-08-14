@@ -36,7 +36,6 @@ import {
 import { Simulation } from '@/App';
 import { useNavigate } from 'react-router-dom';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
-import { cn } from '@/lib/utils';
 
 // Max number of rows that can be selected at once.
 const MAX_SELECTION = 5;
@@ -128,29 +127,6 @@ export const DataTable = ({
       rowSelection,
     },
   });
-
-  // Allow row click to select/deselect, except when clicking on interactive elements (like the checkbox or actions)
-  const handleRowClick = (row: Row<Simulation>, event: React.MouseEvent) => {
-    const target = event.target as HTMLElement;
-    const tag = target.tagName;
-
-    // Ignore clicks on interactive elements
-    if (
-      tag === 'BUTTON' ||
-      tag === 'INPUT' ||
-      tag === 'A' ||
-      target.closest('button, input, a, [role="menu"]')
-    ) {
-      return;
-    }
-
-    const isSelected = row.getIsSelected();
-    const selectedCount = Object.values(rowSelection).filter(Boolean).length;
-    if (!isSelected && selectedCount >= MAX_SELECTION) {
-      return;
-    }
-    row.toggleSelected();
-  };
 
   return (
     <div className="w-full">
