@@ -23,7 +23,7 @@ import { useState } from 'react';
 interface ResultCardProps {
   simulation: Simulation;
   selected: boolean;
-  selectedDataIds: Simulation[];
+  selectedSimulationIds: Simulation[];
   onSelect: (sim: Simulation) => void;
   onViewDetails: (id: string) => void;
 }

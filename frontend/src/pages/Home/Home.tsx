@@ -6,16 +6,16 @@ import NewSimsTable from '@/pages/Home/NewSimsTable';
 import VariableCard from '@/pages/Home/VariableCard';
 
 interface HomeProps {
-  data: Simulation[];
+  simulations: Simulation[];
 }
 
-const Home = ({ data }: HomeProps) => {
-  const latestSimulations = [...data]
+const Home = ({ simulations }: HomeProps) => {
+  const latestSimulations = [...simulations]
     .sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime())
     .slice(0, 6);
 
   const getSimulationCount = (variable: string) =>
-    data.filter((sim) => sim.variables?.includes(variable)).length;
+    simulations.filter((sim) => sim.variables?.includes(variable)).length;
 
   const keyVariables = {
     tas: {
@@ -218,7 +218,7 @@ const Home = ({ data }: HomeProps) => {
             Newly submitted simulations appear here for quick access.
           </p>
           <div className="bg-white border border-muted rounded-xl shadow p-6">
-            <NewSimsTable data={latestSimulations} />
+            <NewSimsTable latestSimulations={latestSimulations} />
             <div className="flex justify-center mt-4">
               <Button asChild variant="default">
                 <Link to="/search">View All Simulations</Link>

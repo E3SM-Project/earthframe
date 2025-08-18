@@ -2,21 +2,21 @@ import { Simulation } from '@/App';
 import { Button } from '@/components/ui/button';
 
 interface SelectedSimulationsBreadcrumbProps {
-  data: Simulation[];
+  simulations: Simulation[];
   buttonText: string;
   onCompareButtonClick: () => void;
-  selectedDataIds: string[];
-  setSelectedDataIds: (ids: string[]) => void;
+  selectedSimulationIds: string[];
+  setSelectedSimulationIds: (ids: string[]) => void;
 }
 
 const MAX_SELECTION = 5;
 
 const SelectedSimulationChipList = ({
-  data,
+  simulations,
   buttonText,
   onCompareButtonClick,
-  selectedDataIds,
-  setSelectedDataIds,
+  selectedSimulationIds,
+  setSelectedSimulationIds,
 }: SelectedSimulationsBreadcrumbProps) => {
   return (
     <div className="flex items-center">
@@ -24,7 +24,7 @@ const SelectedSimulationChipList = ({
         variant="default"
         size="sm"
         onClick={() => onCompareButtonClick()}
-        disabled={selectedDataIds.length < 2}
+        disabled={selectedSimulationIds.length < 2}
       >
         {buttonText}
       </Button>
@@ -32,15 +32,15 @@ const SelectedSimulationChipList = ({
       <div className="ml-4 flex flex-wrap items-center gap-2">
         <span
           className={`text-xs ${
-            selectedDataIds.length === MAX_SELECTION
+            selectedSimulationIds.length === MAX_SELECTION
               ? 'text-warning font-bold'
               : 'text-muted-foreground'
           }`}
         >
-          Selected: {selectedDataIds.length} / {MAX_SELECTION}
+          Selected: {selectedSimulationIds.length} / {MAX_SELECTION}
         </span>
-        {selectedDataIds.map((id) => {
-          const row = data.find((r) => r.id === id);
+        {selectedSimulationIds.map((id) => {
+          const row = simulations.find((r) => r.id === id);
           if (!row) return null;
           return (
             <span
@@ -52,19 +52,21 @@ const SelectedSimulationChipList = ({
                 type="button"
                 className="ml-1 text-muted-foreground hover:text-destructive focus:outline-none"
                 aria-label={`Remove ${row.name}`}
-                onClick={() => setSelectedDataIds(selectedDataIds.filter((rowId) => rowId !== id))}
+                onClick={() =>
+                  setSelectedSimulationIds(selectedSimulationIds.filter((rowId) => rowId !== id))
+                }
               >
                 ×
               </button>
             </span>
           );
         })}
-        {selectedDataIds.length > 0 && (
+        {selectedSimulationIds.length > 0 && (
           <Button
             variant="ghost"
             size="sm"
             className="ml-2 text-xs"
-            onClick={() => setSelectedDataIds([])}
+            onClick={() => setSelectedSimulationIds([])}
           >
             Deselect all
           </Button>

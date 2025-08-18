@@ -59,40 +59,40 @@ export interface ExternalUrl {
 }
 
 export default function App() {
-  const [data, setData] = useState<Simulation[]>([]); // data
+  const [simulations, setSimulations] = useState<Simulation[]>([]);
 
-  const LOCAL_STORAGE_KEY = 'selectedDataIds';
+  const LOCAL_STORAGE_KEY = 'selectedSimulationIds';
 
-  const [selectedDataIds, setSelectedDataIds] = useState<string[]>(() => {
+  const [selectedSimulationIds, setSelectedSimulationIds] = useState<string[]>(() => {
     // Initialize from localStorage
     const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   });
 
-  // Save to localStorage whenever selectedDataIds changes
+  // Save to localStorage whenever selectedSimulationIds changes
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedDataIds));
-  }, [selectedDataIds]);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedSimulationIds));
+  }, [selectedSimulationIds]);
 
-  const selectedData = useMemo(
-    () => data.filter((item) => selectedDataIds.includes(item.id)),
-    [data, selectedDataIds],
+  const selectedSimulations = useMemo(
+    () => simulations.filter((item) => selectedSimulationIds.includes(item.id)),
+    [simulations, selectedSimulationIds],
   );
 
   useEffect(() => {
     fetch('/data/simulations.json')
       .then((res) => res.json())
-      .then((json) => setData(json));
+      .then((json) => setSimulations(json));
   }, []);
 
   return (
     <BrowserRouter>
-      <NavBar selectedDataIds={selectedDataIds} />
+      <NavBar selectedSimulationIds={selectedSimulationIds} />
       <AppRoutes
-        data={data}
-        selectedDataIds={selectedDataIds}
-        setSelectedDataIds={setSelectedDataIds}
-        selectedData={selectedData}
+        simulations={simulations}
+        selectedSimulationIds={selectedSimulationIds}
+        setSelectedSimulationIds={setSelectedSimulationIds}
+        selectedSimulations={selectedSimulations}
       />
     </BrowserRouter>
   );

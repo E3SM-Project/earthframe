@@ -10,30 +10,30 @@ import { Simulation } from '@/App';
 import Home from '@/pages/Home/Home';
 
 interface RoutesProps {
-  data: Simulation[];
-  selectedDataIds: string[];
-  setSelectedDataIds: (ids: string[]) => void;
-  selectedData: Simulation[];
+  simulations: Simulation[];
+  selectedSimulationIds: string[];
+  setSelectedSimulationIds: (ids: string[]) => void;
+  selectedSimulations: Simulation[];
 }
 
 const createRoutes = ({
-  data,
-  selectedDataIds,
-  setSelectedDataIds,
-  selectedData,
+  simulations,
+  selectedSimulationIds,
+  setSelectedSimulationIds,
+  selectedSimulations,
 }: RoutesProps): RouteObject[] => {
   return [
     {
       path: '/',
-      element: <Home data={data} />,
+      element: <Home simulations={simulations} />,
     },
     {
       path: '/search',
       element: (
         <Search
-          data={data}
-          selectedDataIds={selectedDataIds}
-          setSelectedDataIds={setSelectedDataIds}
+          simulations={simulations}
+          selectedSimulationIds={selectedSimulationIds}
+          setSelectedSimulationIds={setSelectedSimulationIds}
         />
       ),
     },
@@ -41,10 +41,10 @@ const createRoutes = ({
       path: '/compare',
       element: (
         <Compare
-          data={data}
-          selectedDataIds={selectedDataIds}
-          setSelectedDataIds={setSelectedDataIds}
-          selectedData={selectedData}
+          simulations={simulations}
+          selectedSimulationIds={selectedSimulationIds}
+          setSelectedSimulationIds={setSelectedSimulationIds}
+          selectedSimulations={selectedSimulations}
         />
       ),
     },
@@ -64,12 +64,17 @@ const createRoutes = ({
 };
 
 export const AppRoutes = ({
-  data,
-  selectedDataIds,
-  setSelectedDataIds,
-  selectedData,
+  simulations,
+  selectedSimulationIds,
+  setSelectedSimulationIds,
+  selectedSimulations,
 }: RoutesProps) => {
-  const routes = createRoutes({ data, selectedDataIds, setSelectedDataIds, selectedData });
+  const routes = createRoutes({
+    simulations,
+    selectedSimulationIds,
+    setSelectedSimulationIds,
+    selectedSimulations,
+  });
   const routing = useRoutes(routes);
 
   return routing;

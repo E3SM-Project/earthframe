@@ -12,7 +12,7 @@ import { TooltipProvider } from '@radix-ui/react-tooltip';
 
 export interface FilterState {
   // Scientific Goal
-  campaign: string;
+  campaignId: string;
   experiment: string;
   targetVariables: string[];
   frequency: string;
@@ -35,12 +35,12 @@ export interface FilterState {
 }
 
 interface BrowseProps {
-  data: Simulation[];
-  selectedDataIds: string[];
-  setSelectedDataIds: (ids: string[]) => void;
+  simulations: Simulation[];
+  selectedSimulationIds: string[];
+  setSelectedSimulationIds: (ids: string[]) => void;
 }
 
-const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
+const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }: BrowseProps) => {
   // Scientific Goal
   const [filters, setFilters] = useState<FilterState>({
     // Scientific Goal
@@ -111,7 +111,7 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
 
   const filteredData = useMemo(() => {
     const filterKeys = Object.keys(filters) as (keyof FilterState)[];
-    return data.filter((record) =>
+    return simulations.filter((record) =>
       filterKeys.every((key) => {
         const filterValue = filters[key];
         if (Array.isArray(filterValue)) {
@@ -120,7 +120,7 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
         return !filterValue || record[key] === filterValue;
       }),
     );
-  }, [data, filters]);
+  }, [simulations, filters]);
 
   // View mode state: 'grid' or 'table'
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
@@ -181,18 +181,18 @@ const Search = ({ data, selectedDataIds, setSelectedDataIds }: BrowseProps) => {
             <div>
               {viewMode === 'table' ? (
                 <DataTable
-                  data={data}
+                  simulations={simulations}
                   filteredData={filteredData}
-                  selectedDataIds={selectedDataIds}
-                  setSelectedDataIds={setSelectedDataIds}
+                  selectedSimulationIds={selectedSimulationIds}
+                  setSelectedSimulationIds={setSelectedSimulationIds}
                   handleCompareButtonClick={handleCompareButtonClick}
                 />
               ) : (
                 <ResultCards
-                  data={data}
+                  simulations={simulations}
                   filteredData={filteredData}
-                  selectedDataIds={selectedDataIds}
-                  setSelectedDataIds={setSelectedDataIds}
+                  selectedSimulationIds={selectedSimulationIds}
+                  setSelectedSimulationIds={setSelectedSimulationIds}
                   handleCompareButtonClick={handleCompareButtonClick}
                 />
               )}

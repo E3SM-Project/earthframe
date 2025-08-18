@@ -26,12 +26,12 @@ const simulationTypeIcon = (sim: Simulation) => {
 };
 
 interface NewSimTableProps {
-  data: Simulation[];
+  latestSimulations: Simulation[];
 }
 
-export const NewSimsTable = ({ data }: NewSimTableProps) => {
+export const NewSimsTable = ({ latestSimulations }: NewSimTableProps) => {
   const table = useReactTable({
-    data: data,
+    data: latestSimulations,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
@@ -52,7 +52,9 @@ export const NewSimsTable = ({ data }: NewSimTableProps) => {
                   background: '#f9f9f9',
                 }}
               >
-                {header.isPlaceholder ? null : header.column.columnDef.header}
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
               </th>
             ))}
           </tr>
@@ -121,7 +123,7 @@ const tableColumns: ColumnDef<Simulation>[] = [
   {
     id: 'details',
     header: 'Details',
-    cell: (info) => (
+    cell: () => (
       <Button
         variant="outline"
         size="sm"

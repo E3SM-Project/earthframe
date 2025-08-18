@@ -40,18 +40,18 @@ import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsC
 const MAX_SELECTION = 5;
 
 interface DataTableProps {
-  data: Simulation[];
+  simulations: Simulation[];
   filteredData: Simulation[];
-  selectedDataIds: string[];
-  setSelectedDataIds: (ids: string[]) => void;
+  selectedSimulationIds: string[];
+  setSelectedSimulationIds: (ids: string[]) => void;
   handleCompareButtonClick: () => void;
 }
 
 export const DataTable = ({
-  data,
+  simulations,
   filteredData,
-  selectedDataIds,
-  setSelectedDataIds,
+  selectedSimulationIds,
+  setSelectedSimulationIds,
   handleCompareButtonClick,
 }: DataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -63,8 +63,8 @@ export const DataTable = ({
     compset: false,
   });
 
-  // Convert selectedDataIds to rowSelection object for react-table.
-  const rowSelection = idsToRowSelection(selectedDataIds);
+  // Convert selectedSimulationIds to rowSelection object for react-table.
+  const rowSelection = idsToRowSelection(selectedSimulationIds);
 
   // Helper to render the select checkbox with max selection logic.
   const renderSelectCheckbox = (row: Row<Simulation>) => {
@@ -101,7 +101,7 @@ export const DataTable = ({
     const limitedSelection = limitRowSelection(nextRowSelection, MAX_SELECTION);
     const selectedIds = Object.keys(limitedSelection).filter((id) => limitedSelection[id]);
 
-    setSelectedDataIds(selectedIds);
+    setSelectedSimulationIds(selectedIds);
   };
 
   const table = useReactTable({
@@ -129,11 +129,11 @@ export const DataTable = ({
       {/* Top controls */}
       <div className="flex items-center py-4">
         <SelectedSimulationChipList
-          data={data}
+          simulations={simulations}
           buttonText="Compare"
           onCompareButtonClick={handleCompareButtonClick}
-          selectedDataIds={selectedDataIds}
-          setSelectedDataIds={setSelectedDataIds}
+          selectedSimulationIds={selectedSimulationIds}
+          setSelectedSimulationIds={setSelectedSimulationIds}
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

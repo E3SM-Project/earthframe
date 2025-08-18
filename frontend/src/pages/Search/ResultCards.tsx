@@ -3,18 +3,18 @@ import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsC
 import ResultCard from '@/pages/Search/ResultCard';
 
 interface ResultCardsProps {
-  data: Simulation[];
+  simulations: Simulation[];
   filteredData: Simulation[];
-  selectedDataIds: string[];
-  setSelectedDataIds: (ids: string[]) => void;
+  selectedSimulationIds: string[];
+  setSelectedSimulationIds: (ids: string[]) => void;
   handleCompareButtonClick: () => void;
 }
 
 const ResultCards = ({
-  data,
+  simulations,
   filteredData,
-  selectedDataIds,
-  setSelectedDataIds,
+  selectedSimulationIds,
+  setSelectedSimulationIds,
   handleCompareButtonClick,
 }: ResultCardsProps) => {
   return (
@@ -22,11 +22,11 @@ const ResultCards = ({
       {/* Top controls */}
       <div className="flex items-center py-4">
         <SelectedSimulationChipList
-          data={data}
+          simulations={simulations}
           buttonText="Compare"
           onCompareButtonClick={handleCompareButtonClick}
-          selectedDataIds={selectedDataIds}
-          setSelectedDataIds={setSelectedDataIds}
+          selectedSimulationIds={selectedSimulationIds}
+          setSelectedSimulationIds={setSelectedSimulationIds}
         />
       </div>
 
@@ -35,12 +35,12 @@ const ResultCards = ({
           <div key={sim.id} className="h-full">
             <ResultCard
               simulation={sim}
-              selected={selectedDataIds.includes(sim.id)}
+              selected={selectedSimulationIds.includes(sim.id)}
               onSelect={() => {
-                if (selectedDataIds.includes(sim.id)) {
-                  setSelectedDataIds(selectedDataIds.filter((id) => id !== sim.id));
+                if (selectedSimulationIds.includes(sim.id)) {
+                  setSelectedSimulationIds(selectedSimulationIds.filter((id) => id !== sim.id));
                 } else {
-                  setSelectedDataIds([...selectedDataIds, sim.id]);
+                  setSelectedSimulationIds([...selectedSimulationIds, sim.id]);
                 }
               }}
               onViewDetails={null}

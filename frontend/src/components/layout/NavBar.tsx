@@ -12,10 +12,10 @@ const navItems = [
 ];
 
 interface NavBarProps {
-  selectedDataIds: string[];
+  selectedSimulationIds: string[];
 }
 
-export default function Navbar({ selectedDataIds }: NavBarProps) {
+export default function Navbar({ selectedSimulationIds }: NavBarProps) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -50,7 +50,7 @@ export default function Navbar({ selectedDataIds }: NavBarProps) {
           <nav className="flex gap-4">
             {navItems.map((item) => {
               if (item.label === 'Compare') {
-                const disabled = selectedDataIds.length <= 1;
+                const disabled = selectedSimulationIds.length <= 1;
                 return (
                   <div key={item.href} className="relative flex items-center group">
                     <Link
