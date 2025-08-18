@@ -87,7 +87,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <NavBar />
+      <NavBar selectedDataIds={selectedDataIds} />
       <AppRoutes
         data={data}
         selectedDataIds={selectedDataIds}

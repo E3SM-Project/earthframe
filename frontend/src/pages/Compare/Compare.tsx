@@ -29,7 +29,7 @@ const CompareSimulations = ({
 
   const navigate = useNavigate();
   const handleButtonClick = () => {
-    navigate('/browse');
+    navigate('/search');
   };
 
   // Dynamically generate headers from selectedDataIds and selectedData
@@ -275,7 +275,7 @@ const CompareSimulations = ({
           <SelectedSimulationChipList
             data={data}
             buttonText="Change Selection"
-            handleButtonClick={handleButtonClick}
+            onCompareButtonClick={handleButtonClick}
             selectedDataIds={selectedDataIds}
             setSelectedDataIds={setSelectedDataIds}
           />

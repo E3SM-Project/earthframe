@@ -6,11 +6,16 @@ import { useEffect, useRef, useState } from 'react';
 const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Search', href: '/search' },
+  { label: 'Compare', href: '/compare' },
   { label: 'Upload', href: '/upload' },
   { label: 'Docs', href: '/docs' },
 ];
 
-export default function Navbar() {
+interface NavBarProps {
+  selectedDataIds: string[];
+}
+
+export default function Navbar({ selectedDataIds }: NavBarProps) {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -32,7 +37,7 @@ export default function Navbar() {
 
   return (
     <header className="w-full px-6 py-4 bg-white border-b">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4">
         {/* Left: Logo + Nav Links */}
         <div className="flex items-center gap-6">
           {/* Logo */}
@@ -43,19 +48,46 @@ export default function Navbar() {
 
           {/* Nav Links */}
           <nav className="flex gap-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent',
-                  location.pathname === item.href &&
-                    'text-foreground border-foreground font-semibold',
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              if (item.label === 'Compare') {
+                const disabled = selectedDataIds.length <= 1;
+                return (
+                  <div key={item.href} className="relative flex items-center group">
+                    <Link
+                      to={item.href}
+                      className={cn(
+                        'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded',
+                        location.pathname === item.href &&
+                          'text-foreground border-foreground font-semibold',
+                        disabled && 'pointer-events-none opacity-50 cursor-not-allowed',
+                      )}
+                      tabIndex={disabled ? -1 : 0}
+                      aria-disabled={disabled}
+                    >
+                      {item.label}
+                    </Link>
+                    {disabled && (
+                      <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-10 px-2 py-1 text-xs bg-gray-900 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Select at least 2 items to compare
+                      </span>
+                    )}
+                  </div>
+                );
+              }
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={cn(
+                    'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded',
+                    location.pathname === item.href &&
+                      'text-foreground border-foreground font-semibold',
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
