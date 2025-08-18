@@ -24,21 +24,15 @@ const CompareSimulations = ({
   setSelectedSimulationIds,
   selectedSimulations,
 }: CompareSimulationsProps) => {
-  // Persist hidden state in localStorage by a key unique to this page/component
   const HIDDEN_KEY = 'compare_hidden_cols';
-
   const navigate = useNavigate();
-  const handleButtonClick = () => {
-    navigate('/search');
-  };
+  const handleButtonClick = () => navigate('/search');
 
-  // Dynamically generate headers from selectedSimulationIds and selectedSimulations
   const simHeaders = selectedSimulationIds.map((id) => {
     const sim = selectedSimulations.find((s) => s.id === id);
     return sim?.name || id;
   });
 
-  // Build metrics from Simulation attributes
   const metrics = {
     configuration: [
       {
@@ -108,7 +102,6 @@ const CompareSimulations = ({
         ),
       },
     ],
-
     keyFeatures: [
       {
         label: 'Key Features',
@@ -170,8 +163,6 @@ const CompareSimulations = ({
   const [order, setOrder] = useState(selectedSimulationIds.map((_, i) => i));
   const [headers, setHeaders] = useState(simHeaders);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
-
-  // Load hidden state from localStorage on mount
   const [hidden, setHidden] = useState<string[]>(() => {
     const stored = localStorage.getItem(HIDDEN_KEY);
     try {
@@ -181,43 +172,32 @@ const CompareSimulations = ({
       return [];
     }
   });
-
   const dragCol = useRef<number | null>(null);
 
   useEffect(() => {
     setHidden((prev) => prev.filter((id) => selectedSimulationIds.includes(id)));
   }, [selectedSimulationIds]);
 
-  // Save hidden state to localStorage whenever it changes
   React.useEffect(() => {
     localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
   }, [hidden]);
 
-  // Keep headers in sync with selectedSimulationIds and selectedSimulations
   React.useEffect(() => {
     setHeaders(
-      selectedSimulationIds.map((id) => {
-        const sim = selectedSimulations.find((s) => s.id === id);
-        return sim?.name || id;
-      }),
+      selectedSimulationIds.map((id) => selectedSimulations.find((s) => s.id === id)?.name || id),
     );
     setOrder(selectedSimulationIds.map((_, i) => i));
   }, [selectedSimulationIds, selectedSimulations]);
 
-  const handleDragStart = (idx: number) => {
-    dragCol.current = idx;
-  };
-
+  const handleDragStart = (idx: number) => (dragCol.current = idx);
   const handleDragOver = (e: React.DragEvent, idx: number) => {
     e.preventDefault();
     if (dragCol.current === null || dragCol.current === idx) return;
     setDragOverIdx(idx);
   };
-
   const handleDragLeave = (idx: number) => {
     if (dragOverIdx === idx) setDragOverIdx(null);
   };
-
   const handleDrop = (idx: number) => {
     if (dragCol.current === null || dragCol.current === idx) return;
     const newOrder = [...order];
@@ -227,13 +207,9 @@ const CompareSimulations = ({
     dragCol.current = null;
     setDragOverIdx(null);
   };
-
   const handleRemove = (idx: number) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to remove "${headers[order[idx]]}"? This action cannot be undone.`,
-    );
+    const confirmed = window.confirm(`Are you sure you want to remove "${headers[order[idx]]}"?`);
     if (!confirmed) return;
-    // Remove from headers and update order
     const removedIdx = order[idx];
     const removedId = selectedSimulationIds[removedIdx];
     const newHeaders = headers.filter((_, i) => i !== removedIdx);
@@ -241,18 +217,11 @@ const CompareSimulations = ({
     setHeaders(newHeaders);
     setOrder(newOrder);
     setHidden((prev) => prev.filter((id) => id !== removedId));
-    // Update selectedSimulationIds to remove the corresponding id
     setSelectedSimulationIds(selectedSimulationIds.filter((_, i) => i !== removedIdx));
   };
-
-  const handleHide = (idx: number) => {
-    const simId = selectedSimulationIds[order[idx]];
-    setHidden((prev) => [...prev, simId]);
-  };
-
-  const handleShow = (simId: string) => {
-    setHidden((prev) => prev.filter((id) => id !== simId));
-  };
+  const handleHide = (idx: number) =>
+    setHidden((prev) => [...prev, selectedSimulationIds[order[idx]]]);
+  const handleShow = (simId: string) => setHidden((prev) => prev.filter((id) => id !== simId));
 
   if (selectedSimulationIds.length === 0) {
     return (
@@ -269,65 +238,63 @@ const CompareSimulations = ({
   }
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="flex flex-col md:flex-row w-full gap-8 md:max-w-[70%]">
-        <div className="w-full">
-          <header className="mb-3">
-            <h1 className="text-3xl font-bold mb-2 mt-6">Compare Simulations</h1>
-            <p className="text-gray-600 max-w-6xl">
-              Compare multiple simulations side by side. Drag columns to reorder, hide or remove
-              simulations, and expand sections for detailed metrics.
-            </p>
-          </header>
+    <div className="w-full bg-white">
+      <div className="mx-auto max-w-[1440px] px-6 py-8">
+        <header className="mb-6">
+          <h1 className="text-3xl font-bold mb-2">Compare Simulations</h1>
+          <p className="text-gray-600">
+            Compare multiple simulations side by side. Drag columns to reorder, hide or remove
+            simulations, and expand sections for detailed metrics.
+          </p>
+        </header>
 
-          <SelectedSimulationChipList
-            simulations={simulations}
-            buttonText="Change Selection"
-            onCompareButtonClick={handleButtonClick}
-            selectedSimulationIds={selectedSimulationIds}
-            setSelectedSimulationIds={setSelectedSimulationIds}
-          />
+        <SelectedSimulationChipList
+          simulations={simulations}
+          buttonText="Change Selection"
+          onCompareButtonClick={handleButtonClick}
+          selectedSimulationIds={selectedSimulationIds}
+          setSelectedSimulationIds={setSelectedSimulationIds}
+        />
 
-          <section
-            aria-label="Show hidden simulations"
-            className={`mb-2 flex gap-2 items-center min-h-[2.25rem]${hidden.length === 0 ? ' invisible' : ''}`}
-            style={{ height: '2.25rem' }}
-          >
-            {hidden.length > 0 && (
-              <>
-                <span className="text-sm text-gray-600">Hidden:</span>
-                {hidden.map((hiddenId) => {
-                  const idx = selectedSimulationIds.indexOf(hiddenId);
-                  const headerName = headers[idx] ?? hiddenId;
-                  return (
-                    <button
-                      key={hiddenId}
-                      className="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-blue-200 transition"
-                      onClick={() => handleShow(hiddenId)}
-                      type="button"
-                    >
-                      {headerName} <span className="ml-1 text-blue-600 font-bold">+</span>
-                    </button>
-                  );
-                })}
-                <button
-                  className="ml-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                  onClick={() => setHidden([])}
-                  type="button"
-                >
-                  Unhide All
-                </button>
-              </>
-            )}
-          </section>
+        <section
+          aria-label="Show hidden simulations"
+          className={`mb-2 flex gap-2 items-center min-h-[2.25rem]${hidden.length === 0 ? ' invisible' : ''}`}
+          style={{ height: '2.25rem' }}
+        >
+          {hidden.length > 0 && (
+            <>
+              <span className="text-sm text-gray-600">Hidden:</span>
+              {hidden.map((hiddenId) => {
+                const idx = selectedSimulationIds.indexOf(hiddenId);
+                const headerName = headers[idx] ?? hiddenId;
+                return (
+                  <button
+                    key={hiddenId}
+                    className="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-blue-200 transition"
+                    onClick={() => handleShow(hiddenId)}
+                    type="button"
+                  >
+                    {headerName} <span className="ml-1 text-blue-600 font-bold">+</span>
+                  </button>
+                );
+              })}
+              <button
+                className="ml-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                onClick={() => setHidden([])}
+                type="button"
+              >
+                Unhide All
+              </button>
+            </>
+          )}
+        </section>
 
+        {/* Table container with horizontal scroll */}
+        <div className="overflow-x-auto">
           {/* Header row */}
-          <div
-            className="flex w-full min-w-[calc(12rem*5+12rem)] border-b bg-gray-100 font-semibold text-sm"
-            style={{ minWidth: '72rem' }}
-          >
+          <div className="flex w-full min-w-[72rem] border-b bg-gray-100 font-semibold text-sm">
             <div className="sticky-col shrink-0 w-48 px-4 py-2 border-r">Metric</div>
-            <div className="flex flex-1" style={{ minWidth: '60rem' }}>
+            <div className="flex flex-1 min-w-[60rem]">
               {order
                 .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
                 .map((colIdx) => (
@@ -397,11 +364,7 @@ const CompareSimulations = ({
             {Object.entries(metrics).map(([sectionKey, rows]) => (
               <div key={sectionKey}>
                 <AccordionItem value={sectionKey}>
-                  <div
-                    className="flex w-full min-w-[calc(12rem*5+12rem)]"
-                    style={{ minWidth: '72rem' }}
-                  >
-                    {/* Only left column has the accordion trigger */}
+                  <div className="flex w-full min-w-[72rem]">
                     <AccordionTrigger className="sticky-col w-48 px-4 py-2 text-base font-semibold text-left border-r border-t bg-white z-10">
                       {sectionKey
                         .replace(/([A-Z])/g, ' $1')
@@ -411,15 +374,11 @@ const CompareSimulations = ({
 
                   <AccordionContent>
                     {rows.map((row, i) => (
-                      <div
-                        key={i}
-                        className="flex w-full min-w-[calc(12rem*5+12rem)]"
-                        style={{ minWidth: '72rem' }}
-                      >
+                      <div key={i} className="flex w-full min-w-[72rem]">
                         <div className="sticky-col w-48 px-4 py-2 font-medium text-sm border-r border-t bg-white">
                           {row.label}
                         </div>
-                        <div className="flex flex-1" style={{ minWidth: '60rem' }}>
+                        <div className="flex flex-1 min-w-[60rem]">
                           {order
                             .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
                             .map((colIdx) => (
@@ -427,7 +386,6 @@ const CompareSimulations = ({
                                 key={colIdx}
                                 className="flex-1 min-w-[12rem] px-4 py-2 border-t text-sm"
                               >
-                                {/* Render links as clickable with label for locations section */}
                                 {sectionKey === 'locations' && Array.isArray(row.values[colIdx]) ? (
                                   row.values[colIdx].length > 0 ? (
                                     row.values[colIdx].map(
@@ -461,14 +419,13 @@ const CompareSimulations = ({
               </div>
             ))}
           </Accordion>
-
-          {/* ComparisonAI section */}
-          <ComparisonAI
-            selectedSimulations={selectedSimulations.filter((sim) =>
-              selectedSimulationIds.includes(sim.id),
-            )}
-          />
         </div>
+
+        <ComparisonAI
+          selectedSimulations={selectedSimulations.filter((sim) =>
+            selectedSimulationIds.includes(sim.id),
+          )}
+        />
       </div>
     </div>
   );
