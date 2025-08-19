@@ -1,15 +1,10 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import './Compare.css';
-import React, { useEffect, useRef, useState } from 'react';
-import { Simulation } from '@/App';
-import { ComparisonAI } from './ComparisonAI';
-import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useReactTable, getCoreRowModel } from '@tanstack/react-table';
+
+import { Simulation } from '@/App';
+import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
+import { ComparisonAI } from '@/pages/Compare/ComparisonAI';
 
 interface CompareSimulationsProps {
   simulations: Simulation[];
@@ -30,132 +25,105 @@ const CompareSimulations = ({
 
   const simHeaders = selectedSimulationIds.map((id) => {
     const sim = selectedSimulations.find((s) => s.id === id);
+
     return sim?.name || id;
   });
+
+  const getSimProp = <K extends keyof Simulation>(
+    id: string,
+    prop: K,
+    fallback: Simulation[K] | '',
+  ): Simulation[K] => {
+    const sim = selectedSimulations.find((s) => s.id === id);
+
+    return (sim?.[prop] ?? fallback) as Simulation[K];
+  };
 
   const metrics = {
     configuration: [
       {
         label: 'Simulation Name',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.name || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'name', '')),
       },
       {
         label: 'Model Start Date',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.modelStartDate || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'modelStartDate', '')),
       },
       {
         label: 'Run Start Date',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.modelStartDate || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'modelStartDate', '')),
       },
       {
         label: 'Repo',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.externalRepoUrl || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'externalRepoUrl', '')),
       },
       {
         label: 'Branch',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.branch || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'branch', '')),
       },
       {
         label: 'Tag',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.versionTag || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'versionTag', '')),
       },
       {
         label: 'Campaign',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.campaignId || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'campaignId', '')),
       },
       {
         label: 'Compset',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.compset || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'compset', '')),
       },
       {
         label: 'Resolution',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.gridName || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'gridName', '')),
       },
       {
         label: 'Machine',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.machineId || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'machineId', '')),
       },
       {
         label: 'Compiler',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.compiler || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'compiler', '')),
       },
     ],
     keyFeatures: [
       {
         label: 'Key Features',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.keyFeatures || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'keyFeatures', '')),
       },
     ],
     knownIssues: [
       {
         label: 'Known Issues',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.knownIssues || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'knownIssues', '')),
       },
     ],
     notes: [
       {
         label: 'Notes',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.notes || '',
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'notes', '')),
       },
     ],
     locations: [
       {
         label: 'Run Scripts',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.runScriptPath || [],
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'runScriptPath', [])),
       },
       {
         label: 'Output Location',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.outputPath || [],
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'outputPath', [])),
       },
       {
         label: 'Archive Location',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.archivePath || [],
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'archivePath', [])),
       },
       {
         label: 'Diagnostic Links',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.diagnosticLinks || [],
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'diagnosticLinks', [])),
       },
       {
         label: 'PACE Links',
-        values: selectedSimulationIds.map(
-          (id) => selectedSimulations.find((sim) => sim.id === id)?.paceLinks || [],
-        ),
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'paceLinks', [])),
       },
     ],
   };
@@ -174,6 +142,50 @@ const CompareSimulations = ({
   });
   const dragCol = useRef<number | null>(null);
 
+  const handleShow = (hiddenId: string) => {
+    setHidden((prev) => prev.filter((id) => id !== hiddenId));
+  };
+
+  const handleHide = (colIdx: number) => {
+    const simId = selectedSimulationIds[colIdx];
+    if (!hidden.includes(simId)) {
+      setHidden((prev) => [...prev, simId]);
+    }
+  };
+
+  const handleRemove = (colIdx: number) => {
+    const simId = selectedSimulationIds[colIdx];
+    setSelectedSimulationIds(selectedSimulationIds.filter((id) => id !== simId));
+  };
+
+  const handleDragStart = (colIdx: number) => {
+    dragCol.current = colIdx;
+  };
+
+  const handleDragOver = (e: React.DragEvent, colIdx: number) => {
+    e.preventDefault();
+    setDragOverIdx(colIdx);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIdx(null);
+  };
+
+  const handleDrop = (colIdx: number) => {
+    if (dragCol.current === null || dragCol.current === colIdx) {
+      setDragOverIdx(null);
+      dragCol.current = null;
+      return;
+    }
+    const newOrder = [...order];
+    const fromIdx = newOrder.indexOf(dragCol.current);
+    const toIdx = newOrder.indexOf(colIdx);
+    newOrder.splice(toIdx, 0, newOrder.splice(fromIdx, 1)[0]);
+    setOrder(newOrder);
+    setDragOverIdx(null);
+    dragCol.current = null;
+  };
+
   useEffect(() => {
     setHidden((prev) => prev.filter((id) => selectedSimulationIds.includes(id)));
   }, [selectedSimulationIds]);
@@ -188,40 +200,6 @@ const CompareSimulations = ({
     );
     setOrder(selectedSimulationIds.map((_, i) => i));
   }, [selectedSimulationIds, selectedSimulations]);
-
-  const handleDragStart = (idx: number) => (dragCol.current = idx);
-  const handleDragOver = (e: React.DragEvent, idx: number) => {
-    e.preventDefault();
-    if (dragCol.current === null || dragCol.current === idx) return;
-    setDragOverIdx(idx);
-  };
-  const handleDragLeave = (idx: number) => {
-    if (dragOverIdx === idx) setDragOverIdx(null);
-  };
-  const handleDrop = (idx: number) => {
-    if (dragCol.current === null || dragCol.current === idx) return;
-    const newOrder = [...order];
-    const [removed] = newOrder.splice(dragCol.current, 1);
-    newOrder.splice(idx, 0, removed);
-    setOrder(newOrder);
-    dragCol.current = null;
-    setDragOverIdx(null);
-  };
-  const handleRemove = (idx: number) => {
-    const confirmed = window.confirm(`Are you sure you want to remove "${headers[order[idx]]}"?`);
-    if (!confirmed) return;
-    const removedIdx = order[idx];
-    const removedId = selectedSimulationIds[removedIdx];
-    const newHeaders = headers.filter((_, i) => i !== removedIdx);
-    const newOrder = order.filter((i) => i !== removedIdx).map((i) => (i > removedIdx ? i - 1 : i));
-    setHeaders(newHeaders);
-    setOrder(newOrder);
-    setHidden((prev) => prev.filter((id) => id !== removedId));
-    setSelectedSimulationIds(selectedSimulationIds.filter((_, i) => i !== removedIdx));
-  };
-  const handleHide = (idx: number) =>
-    setHidden((prev) => [...prev, selectedSimulationIds[order[idx]]]);
-  const handleShow = (simId: string) => setHidden((prev) => prev.filter((id) => id !== simId));
 
   if (selectedSimulationIds.length === 0) {
     return (
@@ -289,12 +267,14 @@ const CompareSimulations = ({
           )}
         </section>
 
-        {/* Table container with horizontal scroll */}
+        {/* Single table container with horizontal scroll */}
         <div className="overflow-x-auto">
-          {/* Header row */}
-          <div className="flex w-full min-w-[72rem] border-b bg-gray-100 font-semibold text-sm">
-            <div className="sticky-col shrink-0 w-48 px-4 py-2 border-r">Metric</div>
-            <div className="flex flex-1 min-w-[60rem]">
+          <div className="min-w-[72rem]">
+            {/* Table header */}
+            <div className="flex border-b bg-gray-100 font-semibold text-sm">
+              <div className="sticky-col shrink-0 w-48 px-4 py-2 border-r z-10 bg-white">
+                Metric
+              </div>
               {order
                 .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
                 .map((colIdx) => (
@@ -353,79 +333,86 @@ const CompareSimulations = ({
                   </div>
                 ))}
             </div>
-          </div>
+            {/* Table body */}
+            {(() => {
+              // Flatten all metrics into a single array with sectionKey
+              const allRows: { label: string; values: any[]; sectionKey: string }[] = [];
+              Object.entries(metrics).forEach(([sectionKey, rows]) => {
+                rows.forEach((row) => {
+                  allRows.push({ ...row, sectionKey });
+                });
+              });
 
-          {/* Accordion rows */}
-          <Accordion
-            type="multiple"
-            className="w-full space-y-0"
-            defaultValue={Object.keys(metrics)}
-          >
-            {Object.entries(metrics).map(([sectionKey, rows]) => (
-              <div key={sectionKey}>
-                <AccordionItem value={sectionKey}>
-                  <div className="flex w-full min-w-[72rem]">
-                    <AccordionTrigger className="sticky-col w-48 px-4 py-2 text-base font-semibold text-left border-r border-t bg-white z-10">
-                      {sectionKey
-                        .replace(/([A-Z])/g, ' $1')
-                        .replace(/^./, (str) => str.toUpperCase())}
-                    </AccordionTrigger>
-                  </div>
+              let lastSection: string | null = null;
+              return allRows.map((row, rowIdx) => {
+                const showSection = row.sectionKey !== lastSection ? row.sectionKey : null;
+                lastSection = row.sectionKey;
 
-                  <AccordionContent>
-                    {rows.map((row, i) => (
-                      <div key={i} className="flex w-full min-w-[72rem]">
-                        <div className="sticky-col w-48 px-4 py-2 font-medium text-sm border-r border-t bg-white">
-                          {row.label}
+                return (
+                  <React.Fragment key={rowIdx}>
+                    {showSection && (
+                      <div className="flex border-t bg-gray-50 items-center">
+                        <div className="sticky-col w-48 px-4 py-2 font-semibold border-r text-base bg-white z-10">
+                          {row.sectionKey
+                            .replace(/([A-Z])/g, ' $1')
+                            .replace(/^./, (str) => str.toUpperCase())}
                         </div>
-                        <div className="flex flex-1 min-w-[60rem]">
-                          {order
-                            .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
-                            .map((colIdx) => (
-                              <div
-                                key={colIdx}
-                                className="flex-1 min-w-[12rem] px-4 py-2 border-t text-sm"
-                              >
-                                {sectionKey === 'locations' && Array.isArray(row.values[colIdx]) ? (
-                                  row.values[colIdx].length > 0 ? (
-                                    row.values[colIdx].map(
-                                      (linkObj: { url: string; label?: string }, idx: number) => (
-                                        <a
-                                          key={idx}
-                                          href={linkObj.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-blue-600 underline mr-2 break-all"
-                                        >
-                                          {linkObj.label || linkObj.url}
-                                        </a>
-                                      ),
-                                    )
-                                  ) : (
-                                    <span className="text-gray-400">—</span>
+                        <div className="flex-1"></div>
+                      </div>
+                    )}
+                    <div className="flex border-t">
+                      <div className="sticky-col w-48 px-4 py-2 font-medium text-sm border-r bg-white z-10">
+                        {row.label}
+                      </div>
+                      {order
+                        .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
+                        .map((colIdx) => {
+                          const value = row.values[colIdx];
+                          // Render links for locations section
+                          if (row.sectionKey === 'locations' && Array.isArray(value)) {
+                            return (
+                              <div key={colIdx} className="flex-1 min-w-[12rem] px-4 py-2 text-sm">
+                                {value.length > 0 ? (
+                                  value.map(
+                                    (linkObj: { url: string; label?: string }, idx: number) => (
+                                      <a
+                                        key={idx}
+                                        href={linkObj.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline mr-2 break-all"
+                                      >
+                                        {linkObj.label || linkObj.url}
+                                      </a>
+                                    ),
                                   )
-                                ) : Array.isArray(row.values[colIdx]) ? (
-                                  row.values[colIdx].join(', ')
                                 ) : (
-                                  row.values[colIdx]
+                                  <span className="text-gray-400">—</span>
                                 )}
                               </div>
-                            ))}
-                        </div>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              </div>
-            ))}
-          </Accordion>
-        </div>
+                            );
+                          }
+                          return (
+                            <div key={colIdx} className="flex-1 min-w-[12rem] px-4 py-2 text-sm">
+                              {Array.isArray(value)
+                                ? value.join(', ')
+                                : value || <span className="text-gray-400">—</span>}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </React.Fragment>
+                );
+              });
+            })()}
 
-        <ComparisonAI
-          selectedSimulations={selectedSimulations.filter((sim) =>
-            selectedSimulationIds.includes(sim.id),
-          )}
-        />
+            <ComparisonAI
+              selectedSimulations={selectedSimulations.filter((sim) =>
+                selectedSimulationIds.includes(sim.id),
+              )}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
