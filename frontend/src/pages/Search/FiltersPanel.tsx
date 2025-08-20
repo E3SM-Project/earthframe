@@ -22,7 +22,7 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
       {/* Scientific Goal */}
       <CollapsibleGroup
         title="Scientific Goal"
-        description="Filter by experiment type, campaign, and available outputs."
+        description="Filter by high-level scientific purpose, such as campaign, experiment, or outputs."
       >
         <MultiSelectCheckboxGroup
           label="Campaign"
@@ -49,7 +49,7 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
       {/* Simulation Context */}
       <CollapsibleGroup
         title="Simulation Context"
-        description="Refine simulations by machine, grid, and code version."
+        description="Refine results based on the technical setup of the simulation."
       >
         <MultiSelectCheckboxGroup
           label="Machine"
@@ -76,7 +76,7 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
       {/* Execution Details */}
       <CollapsibleGroup
         title="Execution Details"
-        description="Filter simulations by their run status and execution date."
+        description="Filter by run status or time information."
       >
         <MultiSelectCheckboxGroup
           label="Status"
@@ -107,7 +107,7 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
       </CollapsibleGroup>
 
       {/* Metadata */}
-      <CollapsibleGroup title="Metadata" description="Narrow results based on submission date.">
+      <CollapsibleGroup title="Metadata" description="Filter by upload information.">
         <div>
           {/* TODO: Upload start and end date picker */}
           {/* <label className="block text-sm font-medium mb-1">Upload Date Range</label>
@@ -131,58 +131,60 @@ const CollapsibleGroup = ({ title, description, children, defaultOpen = true }: 
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger asChild>
-        <motion.div
-          layout
-          initial={false}
-          className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg shadow-sm p-4 cursor-pointer flex items-center justify-between mb-2 border border-gray-200 hover:shadow-md transition-shadow"
-          onClick={() => setOpen((prev) => !prev)}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex-1 flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-lg text-gray-800">{title}</h2>
-              <motion.span
-                animate={{ rotate: open ? 90 : 0 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 30 }}
-                className="inline-block ml-2"
-              >
-                <ChevronRight size={18} strokeWidth={2} />
-              </motion.span>
+    <div className="border-t border-gray-200 first:border-t-0">
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <CollapsibleTrigger asChild>
+          <motion.div
+            layout
+            initial={false}
+            className="rounded-lg shadow-sm p-4 cursor-pointer flex items-center justify-between mb-2 transition-shadow"
+            onClick={() => setOpen((prev) => !prev)}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="flex-1 flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-lg text-gray-800">{title}</h2>
+                <motion.span
+                  animate={{ rotate: open ? 90 : 0 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 30 }}
+                  className="inline-block ml-2"
+                >
+                  <ChevronRight size={18} strokeWidth={2} />
+                </motion.span>
+              </div>
+              {description && (
+                <motion.p
+                  key="desc"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  className="text-sm text-gray-500 px-1"
+                >
+                  {description}
+                </motion.p>
+              )}
             </div>
-            {description && (
-              <motion.p
-                key="desc"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
+          </motion.div>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <AnimatePresence initial={false}>
+            {open && (
+              <motion.div
+                key="content"
+                initial={{ opacity: 0, y: -16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                className="text-sm text-gray-500 px-1"
+                className="pl-4 pt-4 pb-2 flex flex-col gap-4" // pl-4 is 1rem
               >
-                {description}
-              </motion.p>
+                {children}
+              </motion.div>
             )}
-          </div>
-        </motion.div>
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.div
-              key="content"
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-              className="pl-2 pt-4 pb-2 flex flex-col gap-4"
-            >
-              {children}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </CollapsibleContent>
-    </Collapsible>
+          </AnimatePresence>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
   );
 };
 
