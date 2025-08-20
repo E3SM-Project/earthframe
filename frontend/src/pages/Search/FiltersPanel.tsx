@@ -14,7 +14,9 @@ interface FilterPanelProps {
 
 const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPanelProps) => {
   const handleChange = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-    onChange({ ...appliedFilters, [key]: value });
+    // If value is an array, ensure uniqueness
+    const nextValue = Array.isArray(value) ? Array.from(new Set(value)) : value;
+    onChange({ ...appliedFilters, [key]: nextValue });
   };
 
   return (
@@ -36,6 +38,13 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
           options={availableFilters.experimentTypeId || []}
           selected={appliedFilters.experimentTypeId || []}
           onChange={(next) => handleChange('experimentTypeId', next)}
+        />
+
+        <MultiSelectCheckboxGroup
+          label="Variables"
+          options={availableFilters.variables || []}
+          selected={appliedFilters.variables || []}
+          onChange={(next) => handleChange('variables', next)}
         />
 
         {/* <MultiSelectCheckboxGroup

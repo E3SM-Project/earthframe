@@ -41,31 +41,31 @@ interface BrowseProps {
 }
 
 const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }: BrowseProps) => {
-  // Scientific Goal
+  // -------------------- State --------------------
   const [appliedFilters, setAppliedFilters] = useState<FilterState>({
-    // Scientific Goal
     campaignId: [],
     experimentTypeId: [],
-    variables: [], // e.g. ['ta', 'tas', 'tasmax']
-    frequency: [], // e.g. '3hr', 'day', 'year', 'mon'
-
-    // Simulation Context
+    variables: [],
+    frequency: [],
     machineId: [],
-    compset: [], // e.g. 'E3SM-1-0', 'E3SM-2-0'
+    compset: [],
     gridName: [],
-    simulationType: [], // e.g. 'Production', 'Master'
-    versionTag: [], // e.g. 'v1.0.0', 'v2.0.0', 'v3.0.0'
-
-    // Execution Details
+    simulationType: [],
+    versionTag: [],
     status: [],
     modelStartDate: '',
     modelEndDate: '',
-
-    // Metadata
     uploadStartDate: '',
     uploadEndDate: '',
   });
 
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+
+  // -------------------- Router --------------------
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // -------------------- Derived Data --------------------
   const availableFilters = useMemo(() => {
     const initial: FilterState = {
       campaignId: [],
@@ -110,22 +110,43 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     return initial;
   }, [simulations]);
 
+  const filteredData = useMemo(() => {
+    return simulations.filter((record) =>
+      Object.entries(appliedFilters).every(([key, filterValue]) => {
+        const simValue = record[key as keyof FilterState];
+
+        if (Array.isArray(filterValue)) {
+          if (filterValue.length === 0) return true;
+          if (Array.isArray(simValue)) {
+            return filterValue.some((v) => simValue.includes(v));
+          }
+          return filterValue.includes(simValue as string);
+        } else {
+          if (!filterValue) return true;
+          return simValue === filterValue;
+        }
+      }),
+    );
+  }, [simulations, appliedFilters]);
+
+  // -------------------- Effects --------------------
   // Sync filter state with URL query params
-
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleCompareButtonClick = () => {
-    navigate('/compare');
-  };
-
-  // Parse filters from URL when location.search changes
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const newFilters: Partial<FilterState> = {};
 
-    // Define which keys are arrays
-    const arrayKeys: (keyof FilterState)[] = ['variables'];
+    const arrayKeys: (keyof FilterState)[] = [
+      'campaignId',
+      'experimentTypeId',
+      'variables',
+      'frequency',
+      'machineId',
+      'compset',
+      'gridName',
+      'simulationType',
+      'versionTag',
+      'status',
+    ];
 
     (Object.keys(appliedFilters) as (keyof FilterState)[]).forEach((key) => {
       const value = params.get(key);
@@ -133,7 +154,7 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
         if (arrayKeys.includes(key)) {
           newFilters[key] = value ? value.split(',') : [];
         } else {
-          newFilters[key] = value ? [value] : [];
+          newFilters[key] = value;
         }
       }
     });
@@ -145,6 +166,7 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
+
     Object.entries(appliedFilters).forEach(([key, value]) => {
       if (Array.isArray(value) && value.length) {
         params.set(key, value.join(','));
@@ -153,24 +175,33 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
       }
     });
     navigate({ search: params.toString() }, { replace: true });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedFilters]);
 
-  const filteredData = useMemo(() => {
-    const filterKeys = Object.keys(appliedFilters) as (keyof FilterState)[];
-    return simulations.filter((record) =>
-      filterKeys.every((key) => {
-        const filterValue = appliedFilters[key];
-        if (Array.isArray(filterValue)) {
-          return !filterValue.length || filterValue.every((v) => record[key]?.includes?.(v));
-        }
-        return !filterValue || record[key] === filterValue;
-      }),
-    );
-  }, [simulations, appliedFilters]);
+  // -------------------- Handlers --------------------
+  const resetFilters = () => {
+    setAppliedFilters({
+      campaignId: [],
+      experimentTypeId: [],
+      variables: [],
+      frequency: [],
+      machineId: [],
+      compset: [],
+      gridName: [],
+      simulationType: [],
+      versionTag: [],
+      status: [],
+      modelStartDate: '',
+      modelEndDate: '',
+      uploadStartDate: '',
+      uploadEndDate: '',
+    });
+  };
 
-  // View mode state: 'grid' or 'table'
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const handleCompareButtonClick = () => {
+    navigate('/compare');
+  };
 
   return (
     <div className="w-full bg-white">
@@ -307,6 +338,27 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
                     }
                     return [];
                   })}
+                  {/* Clear All Filters Button */}
+                  {Object.values(appliedFilters).some((v) =>
+                    Array.isArray(v) ? v.length > 0 : !!v,
+                  ) && (
+                    <button
+                      type="button"
+                      className="inline-flex items-center px-3 py-1 rounded-full bg-red-100 text-sm text-red-700 border border-red-300 ml-2"
+                      aria-label="Clear all filters"
+                      onClick={() => resetFilters()}
+                    >
+                      <span className="mr-2 font-medium">Clear All</span>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path
+                          d="M4 4L12 12M12 4L4 12"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
               <div>
