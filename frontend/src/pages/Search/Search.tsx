@@ -12,22 +12,22 @@ import ResultCards from '@/pages/Search/ResultCards';
 
 export interface FilterState {
   // Scientific Goal
-  campaignId: string;
-  experiment: string;
-  targetVariables: string[];
-  frequency: string;
+  campaignId: string[];
+  experimentTypeId: string[];
+  variables: string[];
+  frequency: string[];
 
   // Simulation Context
-  machine: string;
-  compset: string;
-  gridName: string;
-  simulationType: string;
-  versionTag: string;
+  machineId: string[];
+  compset: string[];
+  gridName: string[];
+  simulationType: string[];
+  versionTag: string[];
 
   // Execution Details
-  status: string;
-  modelRunStartDate: string;
-  modelRunEndDate: string;
+  status: string[];
+  modelStartDate: string;
+  modelEndDate: string;
 
   // Metadata
   uploadStartDate: string;
@@ -42,29 +42,73 @@ interface BrowseProps {
 
 const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }: BrowseProps) => {
   // Scientific Goal
-  const [filters, setFilters] = useState<FilterState>({
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>({
     // Scientific Goal
-    campaignId: '',
-    experimentTypeId: '',
+    campaignId: [],
+    experimentTypeId: [],
     variables: [], // e.g. ['ta', 'tas', 'tasmax']
-    frequency: '', // e.g. '3hr', 'day', 'year', 'mon'
+    frequency: [], // e.g. '3hr', 'day', 'year', 'mon'
 
     // Simulation Context
-    machineId: '',
-    compset: '', // e.g. 'E3SM-1-0', 'E3SM-2-0'
-    gridName: '',
-    simulationType: '', // e.g. 'Production', 'Master'
-    versionTag: '', // e.g. 'v1.0.0', 'v2.0.0', 'v3.0.0'
+    machineId: [],
+    compset: [], // e.g. 'E3SM-1-0', 'E3SM-2-0'
+    gridName: [],
+    simulationType: [], // e.g. 'Production', 'Master'
+    versionTag: [], // e.g. 'v1.0.0', 'v2.0.0', 'v3.0.0'
 
     // Execution Details
-    status: '',
-    modelRunStartDate: '',
-    modelRunEndDate: '',
+    status: [],
+    modelStartDate: '',
+    modelEndDate: '',
 
     // Metadata
     uploadStartDate: '',
     uploadEndDate: '',
   });
+
+  const availableFilters = useMemo(() => {
+    const initial: FilterState = {
+      campaignId: [],
+      experimentTypeId: [],
+      variables: [],
+      frequency: [],
+      machineId: [],
+      compset: [],
+      gridName: [],
+      simulationType: [],
+      versionTag: [],
+      status: [],
+      modelStartDate: '',
+      modelEndDate: '',
+      uploadStartDate: '',
+      uploadEndDate: '',
+    };
+
+    simulations.forEach((sim) => {
+      Object.keys(initial).forEach((key) => {
+        const value = sim[key as keyof FilterState];
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            if (
+              v &&
+              Array.isArray(initial[key as keyof FilterState]) &&
+              !initial[key as keyof FilterState].includes(v)
+            ) {
+              (initial[key as keyof FilterState] as string[]).push(v);
+            }
+          });
+        } else if (
+          value &&
+          Array.isArray(initial[key as keyof FilterState]) &&
+          !initial[key as keyof FilterState].includes(value)
+        ) {
+          (initial[key as keyof FilterState] as string[]).push(value);
+        }
+      });
+    });
+
+    return initial;
+  }, [simulations]);
 
   // Sync filter state with URL query params
 
@@ -83,25 +127,25 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     // Define which keys are arrays
     const arrayKeys: (keyof FilterState)[] = ['variables'];
 
-    (Object.keys(filters) as (keyof FilterState)[]).forEach((key) => {
+    (Object.keys(appliedFilters) as (keyof FilterState)[]).forEach((key) => {
       const value = params.get(key);
       if (value !== null) {
         if (arrayKeys.includes(key)) {
-          newFilters[key] = value.split(',') as any;
+          newFilters[key] = value ? value.split(',') : [];
         } else {
-          newFilters[key] = value as any;
+          newFilters[key] = value ? [value] : [];
         }
       }
     });
 
-    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setAppliedFilters((prev) => ({ ...prev, ...newFilters }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
+    Object.entries(appliedFilters).forEach(([key, value]) => {
       if (Array.isArray(value) && value.length) {
         params.set(key, value.join(','));
       } else if (typeof value === 'string' && value) {
@@ -110,20 +154,20 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     });
     navigate({ search: params.toString() }, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, [appliedFilters]);
 
   const filteredData = useMemo(() => {
-    const filterKeys = Object.keys(filters) as (keyof FilterState)[];
+    const filterKeys = Object.keys(appliedFilters) as (keyof FilterState)[];
     return simulations.filter((record) =>
       filterKeys.every((key) => {
-        const filterValue = filters[key];
+        const filterValue = appliedFilters[key];
         if (Array.isArray(filterValue)) {
           return !filterValue.length || filterValue.every((v) => record[key]?.includes?.(v));
         }
         return !filterValue || record[key] === filterValue;
       }),
     );
-  }, [simulations, filters]);
+  }, [simulations, appliedFilters]);
 
   // View mode state: 'grid' or 'table'
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
@@ -133,8 +177,12 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
       <div className="mx-auto max-w-[1440px] px-6 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex flex-row w-full gap-6">
-            <div className="w-full md:w-[220px] min-w-0 md:min-w-[180px]">
-              <FiltersPanel filters={filters} onChange={setFilters} />
+            <div className="w-full md:w-[400px] min-w-0 md:min-w-[180px]">
+              <FiltersPanel
+                appliedFilters={appliedFilters}
+                availableFilters={availableFilters}
+                onChange={setAppliedFilters}
+              />
             </div>
             <div className="flex-1 flex flex-col min-w-0">
               <header className="mb-3 px-2 mt-4 flex items-center justify-between">
@@ -182,6 +230,85 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
                   </TooltipProvider>
                 </div>
               </header>
+
+              <div className="flex flex-col items-start gap-2">
+                {/* Active Filters Chips */}
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    Object.entries(appliedFilters) as [keyof FilterState, string[] | string][]
+                  ).flatMap(([key, values]) => {
+                    if (Array.isArray(values)) {
+                      return values.map((value, idx) => (
+                        <span
+                          key={`${key}-${value}-${idx}`}
+                          className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm text-gray-700 border border-gray-300"
+                        >
+                          <span className="mr-2 font-medium capitalize">
+                            {key.replace(/Id$/, '')}:
+                          </span>
+                          <span className="mr-2">{value}</span>
+                          <button
+                            type="button"
+                            aria-label={`Remove ${key} filter`}
+                            className="ml-1 text-gray-400 hover:text-gray-700 rounded-full focus:outline-none"
+                            onClick={() => {
+                              setAppliedFilters((prev) => ({
+                                ...prev,
+                                [key]:
+                                  prev[key] instanceof Array
+                                    ? prev[key].filter((v) => v !== value)
+                                    : '',
+                              }));
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <path
+                                d="M4 4L12 12M12 4L4 12"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </button>
+                        </span>
+                      ));
+                    } else if (values) {
+                      return (
+                        <span
+                          key={`${key}-${values}`}
+                          className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm text-gray-700 border border-gray-300"
+                        >
+                          <span className="mr-2 font-medium capitalize">
+                            {key.replace(/Id$/, '')}:
+                          </span>
+                          <span className="mr-2">{values}</span>
+                          <button
+                            type="button"
+                            aria-label={`Remove ${key} filter`}
+                            className="ml-1 text-gray-400 hover:text-gray-700 rounded-full focus:outline-none"
+                            onClick={() => {
+                              setAppliedFilters((prev) => ({
+                                ...prev,
+                                [key]: '',
+                              }));
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <path
+                                d="M4 4L12 12M12 4L4 12"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </button>
+                        </span>
+                      );
+                    }
+                    return [];
+                  })}
+                </div>
+              </div>
               <div>
                 {viewMode === 'table' ? (
                   <DataTable
