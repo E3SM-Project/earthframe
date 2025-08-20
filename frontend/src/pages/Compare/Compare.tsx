@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useReactTable, getCoreRowModel } from '@tanstack/react-table';
 
 import { Simulation } from '@/App';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
@@ -336,7 +335,7 @@ const CompareSimulations = ({
             {/* Table body */}
             {(() => {
               // Flatten all metrics into a single array with sectionKey
-              const allRows: { label: string; values: any[]; sectionKey: string }[] = [];
+              const allRows: { label: string; values: unknown[]; sectionKey: string }[] = [];
               Object.entries(metrics).forEach(([sectionKey, rows]) => {
                 rows.forEach((row) => {
                   allRows.push({ ...row, sectionKey });

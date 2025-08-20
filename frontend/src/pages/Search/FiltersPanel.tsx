@@ -1,5 +1,4 @@
 import type { FilterState } from '@/pages/Search/Search';
-import type { Simulation } from '@/App';
 import { useState } from 'react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { motion, AnimatePresence } from 'motion/react';
@@ -77,7 +76,7 @@ const CollapsibleGroup = ({ title, description, children, defaultOpen = true }: 
 
 const FiltersPanel = ({ filters, onChange }: FilterPanelProps) => {
   // Helper for updating filter values
-  const handleChange = (key: keyof FilterState, value: any) => {
+  const handleChange = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     onChange({ ...filters, [key]: value });
   };
 

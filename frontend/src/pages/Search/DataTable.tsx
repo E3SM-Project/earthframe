@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import type {
+  Column,
   ColumnDef,
   ColumnFiltersState,
   Row,
   SortingState,
   VisibilityState,
 } from '@tanstack/react-table';
+
 import {
   flexRender,
   getCoreRowModel,
@@ -166,7 +168,8 @@ export const DataTable = ({
             {table.getHeaderGroups().map((hg) => (
               <TableRow key={hg.id}>
                 {hg.headers.map((header) => {
-                  const meta = header.column.columnDef.meta; // { sticky?: boolean, width?: number, position?: 'left'|'right' }
+                  const meta = header.column.columnDef.meta;
+
                   const isSticky = meta?.sticky;
                   const left =
                     meta?.position === 'left' ? getStickyLeftOffset(header, table) : undefined;
@@ -469,14 +472,16 @@ const getStickyLeftOffset = (
   headerOrCell: {
     column: { id: string; columnDef: { meta?: { sticky?: boolean; width?: number } } };
   },
-  table: { getAllLeafColumns: () => any[] },
+  table: { getAllLeafColumns: () => Column<Simulation, unknown>[] },
 ): number => {
   const all = table.getAllLeafColumns();
   const idx = all.findIndex((c) => c.id === headerOrCell.column.id);
+
   let left = 0;
+
   for (let i = 0; i < idx; i++) {
     if (all[i].columnDef.meta?.sticky) {
-      left += all[i].columnDef.meta.width || 0;
+      left += all[i].columnDef.meta?.width ?? 0;
     }
   }
   return left;

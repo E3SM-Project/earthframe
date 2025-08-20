@@ -79,8 +79,10 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const newFilters: Partial<FilterState> = {};
+
     // Define which keys are arrays
     const arrayKeys: (keyof FilterState)[] = ['variables'];
+
     (Object.keys(filters) as (keyof FilterState)[]).forEach((key) => {
       const value = params.get(key);
       if (value !== null) {
@@ -91,6 +93,7 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
         }
       }
     });
+
     setFilters((prev) => ({ ...prev, ...newFilters }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);

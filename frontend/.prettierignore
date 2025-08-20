@@ -2,4 +2,6 @@ dist
 node_modules
 coverage
 build
+# Shadcn UI components and hooks (default)
 src/components/ui
+src/hooks/use-toast.ts
