@@ -2,12 +2,12 @@
 
 import { RouteObject, useRoutes } from 'react-router-dom';
 
-import Search from '@/pages/Search/Search';
-import Compare from '@/pages/Compare/Compare';
-import Upload from '@/pages/Upload/Upload';
-import Docs from '@/pages/Docs/Docs';
 import { Simulation } from '@/App';
+import Compare from '@/pages/Compare/Compare';
+import Docs from '@/pages/Docs/Docs';
 import Home from '@/pages/Home/Home';
+import Search from '@/pages/Search/Search';
+import Upload from '@/pages/Upload/Upload';
 
 interface RoutesProps {
   simulations: Simulation[];

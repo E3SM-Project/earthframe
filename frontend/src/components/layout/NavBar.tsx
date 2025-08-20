@@ -1,7 +1,8 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { useEffect, useRef, useState } from 'react';
 
 const navItems = [
   { label: 'Home', href: '/' },

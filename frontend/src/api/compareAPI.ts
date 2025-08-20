@@ -1,5 +1,6 @@
-import { Simulation } from '@/App';
 import axios from 'axios';
+
+import { Simulation } from '@/App';
 
 const BASE_URL = 'http://localhost:8000/api';
 

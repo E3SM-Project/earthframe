@@ -1,14 +1,14 @@
-import { Simulation } from '@/App';
-import { DataTable } from '@/pages/Search/DataTable';
-import FiltersPanel from '@/pages/Search/FiltersPanel';
-import ResultCards from '@/pages/Search/ResultCards';
-
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { LayoutGrid, Table } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LayoutGrid, Table } from 'lucide-react';
+
+import { Simulation } from '@/App';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { DataTable } from '@/pages/Search/DataTable';
+import FiltersPanel from '@/pages/Search/FiltersPanel';
+import ResultCards from '@/pages/Search/ResultCards';
 
 export interface FilterState {
   // Scientific Goal

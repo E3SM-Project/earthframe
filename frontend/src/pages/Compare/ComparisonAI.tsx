@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { fetchAISimAnalysis } from '@/api/compareAPI';
-import { Button } from '@/components/ui/button';
-import { Simulation } from '@/App';
 import { Sparkles, X } from 'lucide-react';
 import { Loader2 } from 'lucide-react'; // shadcn spinner icon
+import { useState } from 'react';
+
+import { fetchAISimAnalysis } from '@/api/compareAPI';
+import { Simulation } from '@/App';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   selectedSimulations: Simulation[];

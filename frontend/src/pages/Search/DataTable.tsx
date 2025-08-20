@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type {
   Column,
   ColumnDef,
@@ -7,7 +6,6 @@ import type {
   SortingState,
   VisibilityState,
 } from '@tanstack/react-table';
-
 import {
   flexRender,
   getCoreRowModel,
@@ -17,7 +15,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { ArrowUpDown, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 
+import { Simulation } from '@/App';
+import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -26,7 +27,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
 import {
   Table,
   TableBody,
@@ -35,8 +35,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Simulation } from '@/App';
-import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 
 // Max number of rows that can be selected at once.
 const MAX_SELECTION = 5;

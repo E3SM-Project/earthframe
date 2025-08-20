@@ -1,7 +1,8 @@
-import { Simulation } from '@/App';
-import { Button } from '@/components/ui/button';
 import { Earth } from 'lucide-react'; // Or use your own SVG if you have one
 import { Link } from 'react-router-dom';
+
+import { Simulation } from '@/App';
+import { Button } from '@/components/ui/button';
 import NewSimsTable from '@/pages/Home/NewSimsTable';
 import VariableCard from '@/pages/Home/VariableCard';
 
@@ -110,7 +111,7 @@ const Home = ({ simulations }: HomeProps) => {
           </h1>
           <p className="italic text-lg mb-4 text-muted-foreground">
             EarthFrame provides access to curated Earth system simulations from the Department of
-            Energy's Energy Exascale Earth System Model (E3SM).
+            Energy&apos;s Energy Exascale Earth System Model (E3SM).
           </p>
           <ul className="list-disc list-inside mb-4 text-base text-muted-foreground">
             <li>Explore validated production runs and recent latest master</li>

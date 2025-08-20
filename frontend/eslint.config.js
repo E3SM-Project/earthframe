@@ -51,6 +51,8 @@ export default [
       ...react.configs.recommended?.rules,
       ...reactHooks.configs.recommended?.rules,
 
+      'react/react-in-jsx-scope': 'off',
+
       // React Refresh (Vite/fast-refresh)
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 

@@ -1,7 +1,3 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   BadgeCheck,
   ChevronDown,
@@ -10,15 +6,20 @@ import {
   FlaskConical,
   GitBranch,
   Lightbulb,
+  MoreHorizontal,
   Rocket,
   Server,
   Sigma,
   Tag,
   X,
-  MoreHorizontal,
 } from 'lucide-react';
-import type { Simulation } from '@/App.tsx';
 import { useState } from 'react';
+
+import type { Simulation } from '@/App.tsx';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ResultCardProps {
   simulation: Simulation;

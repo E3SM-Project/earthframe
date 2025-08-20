@@ -1,8 +1,9 @@
-import type { FilterState } from '@/pages/Search/Search';
-import { useState } from 'react';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight } from 'lucide-react';
+import { AnimatePresence,motion } from 'motion/react';
+import { useState } from 'react';
+
+import { Collapsible, CollapsibleContent,CollapsibleTrigger } from '@/components/ui/collapsible';
+import type { FilterState } from '@/pages/Search/Search';
 
 interface FilterPanelProps {
   filters: FilterState;

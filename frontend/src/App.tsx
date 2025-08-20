@@ -1,7 +1,8 @@
-import { BrowserRouter } from 'react-router-dom';
-import { AppRoutes } from '@/routes/routes';
-import NavBar from '@/components/layout/NavBar';
 import { useEffect, useMemo, useState } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+
+import NavBar from '@/components/layout/NavBar';
+import { AppRoutes } from '@/routes/routes';
 
 export interface Simulation {
   // 🧾 Identification
