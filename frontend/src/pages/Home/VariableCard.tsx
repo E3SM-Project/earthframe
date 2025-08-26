@@ -16,7 +16,7 @@ const VariableCard = ({
   icon,
 }: VariableCardProps) => (
   <Link
-    to={`/search?variables=${variableKey}`}
+    to={`/Browse?variables=${variableKey}`}
     className="block bg-white border border-muted rounded-xl shadow p-6 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-primary"
   >
     <div className="flex items-center gap-2 mb-2">

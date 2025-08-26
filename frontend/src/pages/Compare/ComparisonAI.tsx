@@ -45,20 +45,22 @@ export function ComparisonAI({ selectedSimulations }: Props) {
             setOpen(true);
             handleAICompare();
           }}
-          variant="default"
+          variant="outline"
           size="lg"
-          className="flex items-center gap-3 shadow-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-extrabold border-0 px-6 py-3 rounded-full transition-transform hover:scale-105 hover:from-indigo-600 hover:to-pink-600 focus:ring-4 focus:ring-purple-300"
+          className="flex items-center gap-3 shadow-xl border border-blue-600 px-6 py-3 rounded-full transition-transform hover:scale-105 bg-white text-blue-900 font-bold"
           style={{
-            boxShadow: '0 8px 24px 0 rgba(99,102,241,0.15), 0 1.5px 4px 0 rgba(139,92,246,0.10)',
-            letterSpacing: '0.03em',
+            boxShadow: '0 8px 24px 0 rgba(99,102,241,0.10), 0 1.5px 4px 0 rgba(139,92,246,0.08)',
+            letterSpacing: '0.01em',
           }}
         >
-          <span className="animate-pulse">
-            <Sparkles size={22} className="mr-2" />
+          <span>
+            <Sparkles size={22} className="mr-2 text-blue-600" />
           </span>
           <span>
-            AI Insights{' '}
-            <span className="bg-white/20 rounded px-2 py-0.5 text-xs font-semibold ml-1">Beta</span>
+            AI Analysis{' '}
+            <span className="bg-blue-100 text-blue-700 rounded px-2 py-0.5 text-xs font-semibold ml-1">
+              Beta
+            </span>
           </span>
         </Button>
       )}

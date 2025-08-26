@@ -6,9 +6,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Simulation } from '@/App';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { DataTable } from '@/pages/Search/DataTable';
-import FiltersPanel from '@/pages/Search/FiltersPanel';
-import ResultCards from '@/pages/Search/ResultCards';
+import { DataTable } from '@/pages/Browse/DataTable';
+import FiltersPanel from '@/pages/Browse/FiltersPanel';
+import ResultCards from '@/pages/Browse/ResultCards';
 
 export interface FilterState {
   // Scientific Goal
@@ -40,7 +40,7 @@ interface BrowseProps {
   setSelectedSimulationIds: (ids: string[]) => void;
 }
 
-const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }: BrowseProps) => {
+const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }: BrowseProps) => {
   // -------------------- State --------------------
   const [appliedFilters, setAppliedFilters] = useState<FilterState>({
     campaignId: [],
@@ -388,4 +388,4 @@ const Search = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
   );
 };
 
-export default Search;
+export default Browse;

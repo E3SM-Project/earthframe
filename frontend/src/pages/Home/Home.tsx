@@ -125,7 +125,7 @@ const Home = ({ simulations }: HomeProps) => {
           </p>
           <div className="flex gap-4">
             <Button asChild variant="default">
-              <Link to="/search">Search Simulations</Link>
+              <Link to="/browse">Browse Simulations</Link>
             </Button>
             <Button asChild variant="secondary">
               <Link to="/upload">Upload Simulation</Link>
@@ -159,7 +159,7 @@ const Home = ({ simulations }: HomeProps) => {
               Explore simuations by scientific goal, simulation context, and execution details.
             </p>
             <Button asChild variant="default" className="self-start">
-              <Link to="/search">Search Simulations</Link>
+              <Link to="/Browse">Browse Simulations</Link>
             </Button>
           </div>
           {/* Step 2 */}
@@ -222,7 +222,7 @@ const Home = ({ simulations }: HomeProps) => {
             <NewSimsTable latestSimulations={latestSimulations} />
             <div className="flex justify-center mt-4">
               <Button asChild variant="default">
-                <Link to="/search">View All Simulations</Link>
+                <Link to="/Browse">View All Simulations</Link>
               </Button>
             </div>
           </div>

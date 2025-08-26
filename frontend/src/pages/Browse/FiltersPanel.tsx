@@ -1,10 +1,10 @@
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import type { FilterState } from '@/pages/Search/Search';
+import type { FilterState } from '@/pages/Browse/Browse';
 
 interface FilterPanelProps {
   appliedFilters: FilterState;

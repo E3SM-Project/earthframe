@@ -1,4 +1,4 @@
-import React, { useEffect,useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Simulation } from '@/App';
@@ -20,7 +20,7 @@ const CompareSimulations = ({
 }: CompareSimulationsProps) => {
   const HIDDEN_KEY = 'compare_hidden_cols';
   const navigate = useNavigate();
-  const handleButtonClick = () => navigate('/search');
+  const handleButtonClick = () => navigate('/Browse');
 
   const simHeaders = selectedSimulationIds.map((id) => {
     const sim = selectedSimulations.find((s) => s.id === id);
@@ -283,14 +283,14 @@ const CompareSimulations = ({
                     draggable
                     onDragStart={() => handleDragStart(colIdx)}
                     onDragOver={(e) => handleDragOver(e, colIdx)}
-                    onDragLeave={() => handleDragLeave(colIdx)}
+                    onDragLeave={() => handleDragLeave()}
                     onDrop={() => handleDrop(colIdx)}
                     style={{
                       opacity: dragCol.current === colIdx ? 0.5 : 1,
                       zIndex: dragOverIdx === colIdx ? 20 : undefined,
                     }}
                   >
-                    <span>{headers[colIdx]}</span>
+                    <span className="text-lg font-semibold">{headers[colIdx]}</span>
                     <button
                       type="button"
                       aria-label={`Hide ${headers[colIdx]}`}

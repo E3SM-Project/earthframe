@@ -1,6 +1,6 @@
 import type { Simulation } from '@/App';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
-import ResultCard from '@/pages/Search/ResultCard';
+import ResultCard from '@/pages/Browse/ResultCard';
 
 interface ResultCardsProps {
   simulations: Simulation[];
