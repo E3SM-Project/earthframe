@@ -1,3 +1,4 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -5,11 +6,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { label: 'Home', href: '/' },
-  { label: 'Browse', href: '/browse' },
-  { label: 'Compare', href: '/compare' },
-  { label: 'Upload', href: '/upload' },
-  { label: 'Docs', href: '/docs' },
+  { label: 'Home', href: '/', description: 'Overview and featured simulations' },
+  { label: 'Browse', href: '/browse', description: 'Guided discovery with filters' },
+  {
+    label: 'All Simulations',
+    href: '/simulations',
+    description: 'Complete catalog in a sortable table',
+  },
+  { label: 'Compare', href: '/compare', description: 'Side-by-side view of selected runs' },
+  { label: 'Upload', href: '/upload', description: 'Add a new simulation to the catalog' },
+  { label: 'Docs', href: '/docs', description: 'Guides and references for using the viewer' },
 ];
 
 interface NavBarProps {
@@ -48,45 +54,57 @@ export default function Navbar({ selectedSimulationIds }: NavBarProps) {
           </Link>
 
           {/* Nav Links */}
-          <nav className="flex gap-4">
+          <nav className="flex gap-2">
             {navItems.map((item) => {
-              if (item.label === 'Compare') {
-                const disabled = selectedSimulationIds.length <= 1;
-                return (
-                  <div key={item.href} className="relative flex items-center group">
-                    <Link
-                      to={item.href}
-                      className={cn(
-                        'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded',
-                        location.pathname === item.href &&
-                          'text-foreground border-foreground font-semibold',
-                        disabled && 'pointer-events-none opacity-50 cursor-not-allowed',
-                      )}
-                      tabIndex={disabled ? -1 : 0}
-                      aria-disabled={disabled}
-                    >
-                      {item.label}
-                    </Link>
-                    {disabled && (
-                      <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-10 px-2 py-1 text-xs bg-gray-900 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        Select at least 2 items to compare
-                      </span>
-                    )}
-                  </div>
-                );
-              }
+              const isCompare = item.label === 'Compare';
+              const disabled = isCompare && selectedSimulationIds.length <= 1;
+
               return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded',
-                    location.pathname === item.href &&
-                      'text-foreground border-foreground font-semibold',
+                <div key={item.href} className="relative flex items-center group">
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {isCompare ? (
+                          <Link
+                            to={item.href}
+                            className={cn(
+                              'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded',
+                              location.pathname === item.href &&
+                                'text-foreground border-foreground font-semibold',
+                              disabled && 'pointer-events-none opacity-50 cursor-not-allowed',
+                            )}
+                            tabIndex={disabled ? -1 : 0}
+                            aria-disabled={disabled}
+                          >
+                            {item.label}
+                          </Link>
+                        ) : (
+                          <Link
+                            to={item.href}
+                            className={cn(
+                              'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded',
+                              location.pathname === item.href &&
+                                'text-foreground border-foreground font-semibold',
+                            )}
+                          >
+                            {item.label}
+                          </Link>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="bottom"
+                        className="bg-gray-900 text-white px-3 py-2 rounded shadow-lg text-xs"
+                      >
+                        {item.description}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  {isCompare && disabled && (
+                    <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-10 px-2 py-1 text-xs bg-gray-900 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      Select at least 2 items to compare
+                    </span>
                   )}
-                >
-                  {item.label}
-                </Link>
+                </div>
               );
             })}
           </nav>

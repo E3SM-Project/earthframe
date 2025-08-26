@@ -3,10 +3,11 @@
 import { RouteObject, useRoutes } from 'react-router-dom';
 
 import { Simulation } from '@/App';
+import Browse from '@/pages/Browse/Browse';
 import Compare from '@/pages/Compare/Compare';
 import Docs from '@/pages/Docs/Docs';
 import Home from '@/pages/Home/Home';
-import Search from '@/pages/Browse/Browse';
+import Simulations from '@/pages/Simulations/Simulations';
 import Upload from '@/pages/Upload/Upload';
 
 interface RoutesProps {
@@ -28,14 +29,18 @@ const createRoutes = ({
       element: <Home simulations={simulations} />,
     },
     {
-      path: '/Browse',
+      path: '/browse',
       element: (
-        <Search
+        <Browse
           simulations={simulations}
           selectedSimulationIds={selectedSimulationIds}
           setSelectedSimulationIds={setSelectedSimulationIds}
         />
       ),
+    },
+    {
+      path: '/simulations',
+      element: <Simulations simulations={simulations} />,
     },
     {
       path: '/compare',
