@@ -16,7 +16,6 @@
     ],
     "editor.codeActionsOnSave": { "source.fixAll.eslint": "always" },
     "debug.javascript.unmapMissingSources": true,
-    // Optional: VS Code uses pnpm for other features; the task itself is a shell command
     "npm.packageManager": "pnpm"
   },
 
@@ -32,7 +31,6 @@
         "isBackground": true,
         "problemMatcher": {
           "owner": "vite",
-          // A real matcher that can parse typical esbuild/Vite errors like: src/App.tsx:10:5: <message>
           "pattern": {
             "regexp": "^([^:\\n]+):(\\d+):(\\d+):\\s+(.*)$",
             "file": 1,
@@ -40,7 +38,6 @@
             "column": 3,
             "message": 4
           },
-          // Background readiness: when Vite prints its banner and the Local URL
           "background": {
             "activeOnStart": true,
             "beginsPattern": "VITE\\s+v\\d+\\.\\d+\\.\\d+",
@@ -61,12 +58,20 @@
     "configurations": [
       {
         "name": "frontend: Vite (Chrome)",
-        "type": "chrome",
+        "type": "chrome", // you can also use "pwa-chrome" if preferred
         "request": "launch",
         "url": "http://localhost:5173",
         "webRoot": "${workspaceFolder}/frontend",
-        "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
-        "preLaunchTask": "frontend: dev (vite)"
+        "preLaunchTask": "frontend: dev (vite)",
+        "skipFiles": [
+          "<node_internals>/**",
+          "**/node_modules/react-dom/**",
+          "**/node_modules/scheduler/**",
+          "**/.vite/deps/react-dom*",
+          "**/.vite/deps/scheduler*",
+          "**/react-refresh/**",
+          "**/node_modules/**"
+        ]
       },
       {
         "name": "frontend: Vite (Firefox)",
@@ -74,10 +79,22 @@
         "request": "launch",
         "url": "http://localhost:5173",
         "webRoot": "${workspaceFolder}/frontend",
-        "preLaunchTask": "frontend: dev (vite)"
-        // Optional:
-        // "firefoxExecutable": "/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox",
-        // "profile": "dev-edition-default"
+        "preLaunchTask": "frontend: dev (vite)",
+        "pathMappings": [
+          {
+            "url": "http://localhost:5173/",
+            "path": "${workspaceFolder}/frontend"
+          }
+        ],
+        "skipFiles": [
+          "**/node_modules/react-dom/**",
+          "**/node_modules/scheduler/**",
+          "**/.vite/deps/react-dom*",
+          "**/.vite/deps/scheduler*",
+          "**/react-refresh/**",
+          "**/node_modules/**"
+        ],
+        "reAttach": true
       }
     ],
     "compounds": [
