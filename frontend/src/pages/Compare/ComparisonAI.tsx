@@ -3,8 +3,8 @@ import { Loader2 } from 'lucide-react'; // shadcn spinner icon
 import { useState } from 'react';
 
 import { fetchAISimAnalysis } from '@/api/compareAPI';
-import { Simulation } from '@/App';
 import { Button } from '@/components/ui/button';
+import type { Simulation } from '@/types/index';
 
 interface Props {
   selectedSimulations: Simulation[];

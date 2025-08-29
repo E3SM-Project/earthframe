@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { Simulation } from '@/App';
+import type { Simulation } from '@/types/index';
 
 const BASE_URL = 'http://localhost:8000/api';
 

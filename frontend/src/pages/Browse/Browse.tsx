@@ -4,11 +4,11 @@ import { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Simulation } from '@/App';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DataTable } from '@/pages/Browse/DataTable';
 import FiltersPanel from '@/pages/Browse/FiltersPanel';
 import ResultCards from '@/pages/Browse/ResultCards';
+import type { Simulation } from '@/types/index';
 
 export interface FilterState {
   // Scientific Goal

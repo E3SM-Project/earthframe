@@ -1,5 +1,5 @@
-import { Simulation } from '@/App';
 import { Button } from '@/components/ui/button';
+import type { Simulation } from '@/types/index';
 
 interface SelectedSimulationsBreadcrumbProps {
   simulations: Simulation[];

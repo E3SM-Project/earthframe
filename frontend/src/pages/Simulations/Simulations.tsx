@@ -13,7 +13,6 @@ import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { Simulation } from '@/App';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -36,6 +35,7 @@ import {
 } from '@/components/ui/table';
 import { TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import type { Simulation } from '@/types/index';
 
 interface SimulationProps {
   simulations: Simulation[];

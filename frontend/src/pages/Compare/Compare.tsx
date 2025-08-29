@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Simulation } from '@/App';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 import { ComparisonAI } from '@/pages/Compare/ComparisonAI';
+import type { Simulation } from '@/types/index';
 
 interface CompareSimulationsProps {
   simulations: Simulation[];

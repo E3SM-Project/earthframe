@@ -17,7 +17,6 @@ import {
 import { ArrowUpDown, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
-import { Simulation } from '@/App';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -35,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import type { Simulation } from '@/types/index';
 
 // Max number of rows that can be selected at once.
 const MAX_SELECTION = 5;

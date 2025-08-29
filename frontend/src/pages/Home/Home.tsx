@@ -1,10 +1,10 @@
 import { Earth } from 'lucide-react'; // Or use your own SVG if you have one
 import { Link } from 'react-router-dom';
 
-import { Simulation } from '@/App';
 import { Button } from '@/components/ui/button';
 import NewSimsTable from '@/pages/Home/NewSimsTable';
 import VariableCard from '@/pages/Home/VariableCard';
+import type { Simulation } from '@/types/index';
 
 interface HomeProps {
   simulations: Simulation[];

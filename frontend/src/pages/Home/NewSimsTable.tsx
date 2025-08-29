@@ -2,8 +2,8 @@ import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-tabl
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowRight, Check, GitBranch } from 'lucide-react';
 
-import { Simulation } from '@/App';
 import { Button } from '@/components/ui/button';
+import type { Simulation } from '@/types/index';
 
 const simulationTypeIcon = (sim: Simulation) => {
   if (sim.simulationType === 'production') {

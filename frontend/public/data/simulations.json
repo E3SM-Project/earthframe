@@ -14,7 +14,7 @@
     "lastModified": "2024-06-12T13:00:00.000Z",
     "lastEditedBy": "Alice Smith",
     "lastEditedAt": "2024-06-13T14:00:00.000Z",
-    "machineId": "Cori",
+    "machineId": "22222222-2222-2222-2222-222222222222",
     "compiler": "intel",
     "compset": "BGC",
     "gridResolution": "1°",
@@ -34,11 +34,31 @@
     "runScriptPath": ["https://dummy.url/run-script-a", "https://dummy.url/run-script-a-alt"],
     "batchLogPaths": ["https://dummy.url/batch-log-a"],
     "postprocessingScriptPath": ["https://dummy.url/postprocess-a"],
-    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-a" }],
-    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-a" }],
+    "diagnosticLinks": [
+      {
+        "label": "Diagnostics",
+        "url": "https://dummy.url/diagnostics-a"
+      }
+    ],
+    "paceLinks": [
+      {
+        "label": "PACE",
+        "url": "https://dummy.url/pace-a"
+      }
+    ],
     "notesMarkdown": "High resolution BGC simulation for DECK. Initial test run showed stable performance.",
     "knownIssues": "None reported.",
-    "annotations": ["dummy-annotation-a"]
+    "annotations": ["dummy-annotation-a"],
+    "machine": {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "name": "Cori",
+      "site": "NERSC",
+      "architecture": "Intel Xeon Phi",
+      "scheduler": "SLURM",
+      "gpu": false,
+      "notes": "Retired system; kept for legacy simulation records",
+      "created_at": "2025-01-01T00:00:00Z"
+    }
   },
   {
     "id": "sim-b",
@@ -55,7 +75,7 @@
     "lastModified": "2024-06-15T16:00:00.000Z",
     "lastEditedBy": "Bob Lee",
     "lastEditedAt": "2024-06-16T17:00:00.000Z",
-    "machineId": "Compy",
+    "machineId": "55555555-5555-5555-5555-555555555555",
     "compiler": "gnu",
     "compset": "AMIP",
     "gridResolution": "1°",
@@ -76,13 +96,34 @@
     "batchLogPaths": ["https://dummy.url/batch-log-b"],
     "postprocessingScriptPath": ["https://dummy.url/postprocess-b"],
     "diagnosticLinks": [
-      { "label": "Diagnostics", "url": "https://dummy.url/diagnostics-b" },
-      { "label": "Extra Diagnostics", "url": "https://dummy.url/diagnostics-b-extra" }
+      {
+        "label": "Diagnostics",
+        "url": "https://dummy.url/diagnostics-b"
+      },
+      {
+        "label": "Extra Diagnostics",
+        "url": "https://dummy.url/diagnostics-b-extra"
+      }
     ],
-    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-b" }],
+    "paceLinks": [
+      {
+        "label": "PACE",
+        "url": "https://dummy.url/pace-b"
+      }
+    ],
     "notesMarkdown": "AMIP run using v2.0. Output validated against observational SSTs.",
     "knownIssues": "None reported.",
-    "annotations": ["dummy-annotation-b"]
+    "annotations": ["dummy-annotation-b"],
+    "machine": {
+      "id": "55555555-5555-5555-5555-555555555555",
+      "name": "Compy",
+      "site": "PNNL",
+      "architecture": "Intel Cascade Lake",
+      "scheduler": "SLURM",
+      "gpu": false,
+      "notes": "CPU-only system used for production E3SM runs",
+      "created_at": "2025-01-01T00:00:00Z"
+    }
   },
   {
     "id": "sim-c",
@@ -99,7 +140,7 @@
     "lastModified": "2024-06-18T19:00:00.000Z",
     "lastEditedBy": "Carol Nguyen",
     "lastEditedAt": "2024-06-19T20:00:00.000Z",
-    "machineId": "Chrysalis",
+    "machineId": "66666666-6666-6666-6666-666666666666",
     "compiler": "intel",
     "compset": "HIST",
     "gridResolution": "1°",
@@ -119,14 +160,35 @@
     "runScriptPath": ["https://dummy.url/run-script-c"],
     "batchLogPaths": ["https://dummy.url/batch-log-c"],
     "postprocessingScriptPath": ["https://dummy.url/postprocess-c"],
-    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-c" }],
+    "diagnosticLinks": [
+      {
+        "label": "Diagnostics",
+        "url": "https://dummy.url/diagnostics-c"
+      }
+    ],
     "paceLinks": [
-      { "label": "PACE", "url": "https://dummy.url/pace-c" },
-      { "label": "PACE Secondary", "url": "https://dummy.url/pace-c2" }
+      {
+        "label": "PACE",
+        "url": "https://dummy.url/pace-c"
+      },
+      {
+        "label": "PACE Secondary",
+        "url": "https://dummy.url/pace-c2"
+      }
     ],
     "notesMarkdown": "Historical simulation for CMIP6. Includes updated forcing datasets.",
     "knownIssues": "None reported.",
-    "annotations": ["dummy-annotation-c"]
+    "annotations": ["dummy-annotation-c"],
+    "machine": {
+      "id": "66666666-6666-6666-6666-666666666666",
+      "name": "Chrysalis",
+      "site": "ANL",
+      "architecture": "Intel Ice Lake",
+      "scheduler": "PBS Pro",
+      "gpu": false,
+      "notes": "Primary E3SM development system at Argonne Leadership Computing Facility",
+      "created_at": "2025-01-01T00:00:00Z"
+    }
   },
   {
     "id": "sim-d",
@@ -143,7 +205,7 @@
     "lastModified": "2024-06-21T22:00:00.000Z",
     "lastEditedBy": "David Kim",
     "lastEditedAt": "2024-06-22T23:00:00.000Z",
-    "machineId": "Cori",
+    "machineId": "22222222-2222-2222-2222-222222222222",
     "compiler": "intel",
     "compset": "PICNTRL",
     "gridResolution": "1°",
@@ -163,10 +225,30 @@
     "runScriptPath": [],
     "batchLogPaths": ["https://dummy.url/batch-log-d"],
     "postprocessingScriptPath": ["https://dummy.url/postprocess-d"],
-    "diagnosticLinks": [{ "label": "Diagnostics", "url": "https://dummy.url/diagnostics-d" }],
-    "paceLinks": [{ "label": "PACE", "url": "https://dummy.url/pace-d" }],
+    "diagnosticLinks": [
+      {
+        "label": "Diagnostics",
+        "url": "https://dummy.url/diagnostics-d"
+      }
+    ],
+    "paceLinks": [
+      {
+        "label": "PACE",
+        "url": "https://dummy.url/pace-d"
+      }
+    ],
     "notesMarkdown": "Pre-industrial control run. Used for baseline comparison.",
     "knownIssues": "None",
-    "annotations": ["dummy-annotation-d"]
+    "annotations": ["dummy-annotation-d"],
+    "machine": {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "name": "Cori",
+      "site": "NERSC",
+      "architecture": "Intel Xeon Phi",
+      "scheduler": "SLURM",
+      "gpu": false,
+      "notes": "Retired system; kept for legacy simulation records",
+      "created_at": "2025-01-01T00:00:00Z"
+    }
   }
 ]
