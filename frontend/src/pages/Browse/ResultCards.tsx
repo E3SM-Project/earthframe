@@ -1,6 +1,6 @@
-import type { Simulation } from '@/App';
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 import ResultCard from '@/pages/Browse/ResultCard';
+import type { Simulation } from '@/types/index';
 
 interface ResultCardsProps {
   simulations: Simulation[];
@@ -17,6 +17,8 @@ const ResultCards = ({
   setSelectedSimulationIds,
   handleCompareButtonClick,
 }: ResultCardsProps) => {
+  const isCompareButtonDisabled = selectedSimulationIds.length < 2;
+
   return (
     <div>
       {/* Top controls */}
@@ -27,6 +29,7 @@ const ResultCards = ({
           onCompareButtonClick={handleCompareButtonClick}
           selectedSimulationIds={selectedSimulationIds}
           setSelectedSimulationIds={setSelectedSimulationIds}
+          isCompareButtonDisabled={isCompareButtonDisabled}
         />
       </div>
 

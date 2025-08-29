@@ -124,6 +124,8 @@ export const DataTable = ({
     },
   });
 
+  const isCompareButtonDisabled = selectedSimulationIds.length < 2;
+
   return (
     <div className="w-full">
       {/* Top controls */}
@@ -134,7 +136,9 @@ export const DataTable = ({
           onCompareButtonClick={handleCompareButtonClick}
           selectedSimulationIds={selectedSimulationIds}
           setSelectedSimulationIds={setSelectedSimulationIds}
+          isCompareButtonDisabled={isCompareButtonDisabled}
         />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

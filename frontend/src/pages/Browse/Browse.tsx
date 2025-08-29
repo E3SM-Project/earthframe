@@ -264,8 +264,6 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     navigate('/compare');
   };
 
-  const isCompareButtonDisabled = selectedSimulationIds.length < 2;
-
   return (
     <div className="w-full bg-white">
       <div className="mx-auto max-w-[1440px] px-6 py-8">
@@ -282,22 +280,28 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
             <div className="flex-1 flex flex-col min-w-0">
               <header className="mb-3 px-2 mt-4 flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">Search Simulations</h1>
+                  <h1 className="text-3xl font-bold mb-2">Browse Simulations</h1>
                   <p className="text-gray-600 max-w-6xl">
                     Explore and filter available simulations using the panel on the left. Select
                     simulations to view more details or take further actions.
                   </p>
                 </div>
-
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-xs text-gray-500 mb-1">
-                    View mode:
-                    <span className="ml-1 font-medium">
-                      {viewMode === 'grid' ? 'Cards' : 'Table'}
+                <div className="flex flex-col items-end gap-1 ml-8">
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <span>
+                      <span className="font-semibold text-foreground">{filteredData.length}</span>{' '}
+                      simulations found
                     </span>
-                  </span>
+                    <span className="h-4 w-px bg-gray-300 mx-1" />
+                    <span>
+                      View mode:{' '}
+                      <span className="font-medium text-foreground">
+                        {viewMode === 'grid' ? 'Cards' : 'Table'}
+                      </span>
+                    </span>
+                  </div>
                   <TooltipProvider delayDuration={150}>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mt-1">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button
