@@ -6,15 +6,21 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import type { FilterState } from '@/pages/Browse/Browse';
 
+// --- Filter panel ---
 interface FilterPanelProps {
   appliedFilters: FilterState;
-  availableFilters: FilterState;
+  availableFilters: FilterState; // still carries raw string values for non-FK filters
   onChange: (next: FilterState) => void;
+  machineOptions: { value: string; label: string }[];
 }
 
-const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPanelProps) => {
+const FiltersPanel = ({
+  appliedFilters,
+  availableFilters,
+  onChange,
+  machineOptions,
+}: FilterPanelProps) => {
   const handleChange = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-    // If value is an array, ensure uniqueness
     const nextValue = Array.isArray(value) ? Array.from(new Set(value)) : value;
     onChange({ ...appliedFilters, [key]: nextValue });
   };
@@ -47,12 +53,7 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
           onChange={(next) => handleChange('variables', next)}
         />
 
-        {/* <MultiSelectCheckboxGroup
-          label="Frequency"
-          options={availableFilters.frequency || []}
-          selected={appliedFilters.frequency || []}
-          onChange={(next) => handleChange('frequency', next)}
-        /> */}
+        {/* Frequency left out for now */}
       </CollapsibleGroup>
 
       {/* Simulation Context */}
@@ -62,7 +63,12 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
       >
         <MultiSelectCheckboxGroup
           label="Machine"
-          options={availableFilters.machineId || []}
+          // Prefer id/label pairs if provided, else fall back to raw ids
+          options={
+            machineOptions && machineOptions.length > 0
+              ? machineOptions
+              : availableFilters.machineId || []
+          }
           selected={appliedFilters.machineId || []}
           onChange={(next) => handleChange('machineId', next)}
         />
@@ -92,36 +98,18 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
           options={availableFilters.status || []}
           selected={appliedFilters.status || []}
           onChange={(next) => handleChange('status', next)}
-          renderOptionLabel={(option) => option.charAt(0).toUpperCase() + option.slice(1)}
+          renderOptionLabel={(option) =>
+            typeof option === 'string'
+              ? option.charAt(0).toUpperCase() + option.slice(1)
+              : option.label
+          }
         />
-        {/* TODO: Model start and end date picker */}
-        {/* <div className="flex flex-col gap-2">
-          <label className="block text-sm font-medium mb-1">Model Run Date Range</label>
-          <div className="flex gap-2">
-            <input
-              type="date"
-              className="rounded-md border px-2 py-1 text-xs"
-              value={appliedFilters.modelStartDate || ''}
-              onChange={(e) => handleChange('modelStartDate', e.target.value)}
-            />
-            <span className="mx-1 text-gray-500 text-xs">to</span>
-            <input
-              type="date"
-              className="rounded-md border px-2 py-1 text-xs"
-              value={appliedFilters.modelEndDate || ''}
-              onChange={(e) => handleChange('modelEndDate', e.target.value)}
-            />
-          </div>
-        </div> */}
+        {/* Date pickers can go here later */}
       </CollapsibleGroup>
 
       {/* Metadata */}
       <CollapsibleGroup title="Metadata" description="Filter by upload information.">
-        <div>
-          {/* TODO: Upload start and end date picker */}
-          {/* <label className="block text-sm font-medium mb-1">Upload Date Range</label>
-          <Calendar mode="range" className="rounded-md border" /> */}
-        </div>
+        <div>{/* Upload date range UI placeholder */}</div>
       </CollapsibleGroup>
     </aside>
   );
@@ -129,6 +117,7 @@ const FiltersPanel = ({ appliedFilters, availableFilters, onChange }: FilterPane
 
 export default FiltersPanel;
 
+// --- Presentational groups & checkbox list ---
 interface GroupProps {
   title: string;
   description?: string;
@@ -185,7 +174,7 @@ const CollapsibleGroup = ({ title, description, children, defaultOpen = true }: 
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                className="pl-4 pt-4 pb-2 flex flex-col gap-4" // pl-4 is 1rem
+                className="pl-4 pt-4 pb-2 flex flex-col gap-4"
               >
                 {children}
               </motion.div>
@@ -197,19 +186,15 @@ const CollapsibleGroup = ({ title, description, children, defaultOpen = true }: 
   );
 };
 
-interface MultiSelectCheckboxGroupProps {
-  label: string;
-  options: string[];
-  selected: string[];
-  onChange: (next: string[]) => void;
-}
+// Allow options to be either strings or {value,label}
+export type Option = string | { value: string; label: string };
 
 interface MultiSelectCheckboxGroupProps {
   label: string;
-  options: string[];
-  selected: string[];
+  options: Option[];
+  selected: string[]; // always IDs under the hood
   onChange: (next: string[]) => void;
-  renderOptionLabel?: (option: string) => React.ReactNode;
+  renderOptionLabel?: (option: Option) => React.ReactNode;
 }
 
 const MultiSelectCheckboxGroup = ({
@@ -223,27 +208,28 @@ const MultiSelectCheckboxGroup = ({
     <div>
       <label className="block text-sm font-medium mb-2">{label}</label>
       <div className="space-y-2">
-        {options.map((option) => {
-          const isChecked = selected?.includes(option);
+        {options.map((opt) => {
+          const value = typeof opt === 'string' ? opt : opt.value;
+          const display = renderOptionLabel
+            ? renderOptionLabel(opt)
+            : typeof opt === 'string'
+              ? opt
+              : opt.label;
+          const isChecked = selected?.includes(value);
           return (
-            <div key={option} className="flex items-center gap-2">
+            <div key={value} className="flex items-center gap-2">
               <Checkbox
-                id={option}
+                id={`${label}-${value}`}
                 checked={isChecked}
                 onCheckedChange={(checked) => {
-                  let next: string[];
-                  if (checked === true) {
-                    next = [...selected, option];
-                  } else if (checked === false) {
-                    next = selected.filter((s) => s !== option);
-                  } else {
-                    next = selected;
-                  }
+                  let next: string[] = selected ?? [];
+                  if (checked === true) next = Array.from(new Set([...next, value]));
+                  else if (checked === false) next = next.filter((s) => s !== value);
                   onChange(next);
                 }}
               />
-              <label htmlFor={option} className="text-sm">
-                {renderOptionLabel ? renderOptionLabel(option) : option}
+              <label htmlFor={`${label}-${value}`} className="text-sm">
+                {display}
               </label>
             </div>
           );

@@ -175,7 +175,7 @@ const ResultCard = ({ simulation, selected, onSelect, onViewDetails }: ResultCar
               <div className="flex items-center gap-1">
                 <Server className="w-3 h-3 text-gray-800" />
                 <span className="font-semibold">Machine:</span>
-                <span className="font-normal ml-1 text-gray-500">{simulation.machineId}</span>
+                <span className="font-normal ml-1 text-gray-500">{simulation.machine.name}</span>
               </div>
             </div>
 

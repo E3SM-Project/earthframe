@@ -152,8 +152,8 @@ const Simulations = ({ simulations }: SimulationProps) => {
       {
         accessorKey: 'machineId',
         header: 'Machine',
-        cell: ({ getValue }) => (
-          <span title={String(getValue() ?? '')}>{String(getValue() ?? '—')}</span>
+        cell: ({ row }) => (
+          <span title={row.original.machine?.name ?? '—'}>{row.original.machine?.name ?? '—'}</span>
         ),
         size: 140,
       },

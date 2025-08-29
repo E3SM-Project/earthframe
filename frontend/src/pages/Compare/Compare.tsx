@@ -225,14 +225,6 @@ const CompareSimulations = ({
           </p>
         </header>
 
-        <SelectedSimulationChipList
-          simulations={simulations}
-          buttonText="Change Selection"
-          onCompareButtonClick={handleButtonClick}
-          selectedSimulationIds={selectedSimulationIds}
-          setSelectedSimulationIds={setSelectedSimulationIds}
-        />
-
         <section
           aria-label="Show hidden simulations"
           className={`mb-2 flex gap-2 items-center min-h-[2.25rem]${hidden.length === 0 ? ' invisible' : ''}`}

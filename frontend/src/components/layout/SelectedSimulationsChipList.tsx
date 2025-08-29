@@ -7,6 +7,7 @@ interface SelectedSimulationsBreadcrumbProps {
   onCompareButtonClick: () => void;
   selectedSimulationIds: string[];
   setSelectedSimulationIds: (ids: string[]) => void;
+  isCompareButtonDisabled: boolean;
 }
 
 const MAX_SELECTION = 5;
@@ -17,6 +18,7 @@ const SelectedSimulationChipList = ({
   onCompareButtonClick,
   selectedSimulationIds,
   setSelectedSimulationIds,
+  isCompareButtonDisabled,
 }: SelectedSimulationsBreadcrumbProps) => {
   return (
     <div className="flex items-center">
@@ -24,7 +26,7 @@ const SelectedSimulationChipList = ({
         variant="default"
         size="sm"
         onClick={() => onCompareButtonClick()}
-        disabled={selectedSimulationIds.length < 2}
+        disabled={isCompareButtonDisabled}
       >
         {buttonText}
       </Button>

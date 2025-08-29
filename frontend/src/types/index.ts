@@ -54,7 +54,7 @@ export interface RawSimulation {
   annotations: string[];
 
   // Optional embedded snapshot (present in your new JSON)
-  machine?: Machine | null;
+  machine: Machine;
 }
 
 export interface ExternalUrl {

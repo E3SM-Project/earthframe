@@ -1,19 +1,19 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { label: 'Home', href: '/', description: 'Overview and featured simulations' },
   { label: 'Browse', href: '/browse', description: 'Guided discovery with filters' },
+  { label: 'Compare', href: '/compare', description: 'Side-by-side view of selected runs' },
   {
     label: 'All Simulations',
     href: '/simulations',
     description: 'Complete catalog in a sortable table',
   },
-  { label: 'Compare', href: '/compare', description: 'Side-by-side view of selected runs' },
   { label: 'Upload', href: '/upload', description: 'Add a new simulation to the catalog' },
   { label: 'Docs', href: '/docs', description: 'Guides and references for using the viewer' },
 ];
@@ -57,7 +57,6 @@ export default function Navbar({ selectedSimulationIds }: NavBarProps) {
           <nav className="flex gap-2">
             {navItems.map((item) => {
               const isCompare = item.label === 'Compare';
-              const disabled = isCompare && selectedSimulationIds.length <= 1;
 
               return (
                 <div key={item.href} className="relative flex items-center group">
@@ -68,15 +67,17 @@ export default function Navbar({ selectedSimulationIds }: NavBarProps) {
                           <Link
                             to={item.href}
                             className={cn(
-                              'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded',
+                              'text-sm font-medium text-muted-foreground hover:text-foreground transition-all border-b-2 border-transparent px-2 py-1 rounded flex items-center gap-1',
                               location.pathname === item.href &&
                                 'text-foreground border-foreground font-semibold',
-                              disabled && 'pointer-events-none opacity-50 cursor-not-allowed',
                             )}
-                            tabIndex={disabled ? -1 : 0}
-                            aria-disabled={disabled}
                           >
                             {item.label}
+                            {selectedSimulationIds.length > 0 && (
+                              <span className="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 transition-opacity">
+                                {selectedSimulationIds.length}
+                              </span>
+                            )}
                           </Link>
                         ) : (
                           <Link
@@ -99,11 +100,6 @@ export default function Navbar({ selectedSimulationIds }: NavBarProps) {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                  {isCompare && disabled && (
-                    <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-10 px-2 py-1 text-xs bg-gray-900 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      Select at least 2 items to compare
-                    </span>
-                  )}
                 </div>
               );
             })}

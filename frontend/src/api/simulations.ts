@@ -1,18 +1,18 @@
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 
-import type { RawSimulation } from '@/types';
+import type { Simulation } from '@/types';
 
 const SIMULATIONS_URL = '/data/simulations.json';
 
-export const fetchSimulations = async (url: string = SIMULATIONS_URL): Promise<RawSimulation[]> => {
-  const res = await axios.get<RawSimulation[]>(url, { headers: { 'Cache-Control': 'no-cache' } });
+export const fetchSimulations = async (url: string = SIMULATIONS_URL): Promise<Simulation[]> => {
+  const res = await axios.get<Simulation[]>(url, { headers: { 'Cache-Control': 'no-cache' } });
 
   return res.data;
 };
 
 export const useSimulations = (url: string = SIMULATIONS_URL) => {
-  const [data, setData] = useState<RawSimulation[]>([]);
+  const [data, setData] = useState<Simulation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
