@@ -70,7 +70,8 @@
           "**/.vite/deps/react-dom*",
           "**/.vite/deps/scheduler*",
           "**/react-refresh/**",
-          "**/node_modules/**"
+          "**/node_modules/**",
+          "**/utils.ts" // Add this line to skip utils.ts
         ]
       },
       {
@@ -92,7 +93,8 @@
           "**/.vite/deps/react-dom*",
           "**/.vite/deps/scheduler*",
           "**/react-refresh/**",
-          "**/node_modules/**"
+          "**/node_modules/**",
+          "**/utils.ts" // Add this line to skip utils.ts
         ],
         "reAttach": true
       }

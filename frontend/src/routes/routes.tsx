@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import { RouteObject, useLocation, useParams, useRoutes } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
+import { useSimulation } from '@/hooks/useSimulation';
 import Browse from '@/pages/Browse/Browse';
 import Compare from '@/pages/Compare/Compare';
 import Docs from '@/pages/Docs/Docs';
@@ -17,24 +17,7 @@ interface RoutesProps {
   setSelectedSimulationIds: (ids: string[]) => void;
   selectedSimulations: Simulation[];
 }
-
-// --- Data fetching hook for a single simulation ---
-function useSimulation(id: string, seed?: Simulation) {
-  return useQuery<Simulation>({
-    queryKey: ['simulation', id],
-    // Seed with optional data passed from the list page for instant paint
-    placeholderData: seed,
-    queryFn: async () => {
-      const res = await fetch(`/api/simulations/${id}`);
-      if (!res.ok) throw new Error('Not found');
-      return res.json();
-    },
-    staleTime: 60_000, // 1 min freshness window
-  });
-}
-
-// --- Route element wrapper that fetches by :id and renders details ---
-function SimulationDetailsRoute() {
+const SimulationDetailsRoute = () => {
   const { id = '' } = useParams();
   const location = useLocation() as { state?: { seed?: Simulation } };
   const seed = location.state?.seed;
@@ -48,7 +31,7 @@ function SimulationDetailsRoute() {
       <div className="p-8 space-y-3">
         <div className="text-base font-semibold">Simulation not found</div>
         <div className="text-sm text-muted-foreground">
-          We couldn`&apos;`t load the simulation with id: <code>{id}</code>.
+          We couldn&apos;t load the simulation with id: <code>{id}</code>.
         </div>
         <Button size="sm" onClick={() => refetch()}>
           Retry
@@ -58,7 +41,7 @@ function SimulationDetailsRoute() {
   }
 
   return <SimulationDetails simulation={data} canEdit={false} />;
-}
+};
 
 const createRoutes = ({
   simulations,

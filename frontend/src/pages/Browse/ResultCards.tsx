@@ -46,7 +46,6 @@ const ResultCards = ({
                   setSelectedSimulationIds([...selectedSimulationIds, sim.id]);
                 }
               }}
-              onViewDetails={null}
             />
           </div>
         ))}

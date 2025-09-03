@@ -3,45 +3,48 @@
  * Keep fields nullable/optional where your JSON allows it.
  */
 export interface RawSimulation {
-  // Identification
+  // Configuration
   id: string;
   name: string;
+  caseName: string;
   versionTag?: string | null;
-  gitHash?: string | null;
-  externalRepoUrl?: string | null;
-  status: 'complete' | 'running' | 'not-started' | 'failed';
-  simulationType: 'production' | 'master' | 'experimental';
+  compset?: string | null;
+  gridName?: string | null;
+  gridResolution?: string | null;
+  initializationType?: string | null;
+  compiler?: string | null;
+  parentSimulationId?: string | null;
 
   // Provenance & submission
-  campaignId: string;
-  experimentTypeId: string;
-  variables: string[];
   uploadedBy: string;
   uploadDate: string;
   lastModified: string;
   lastEditedBy: string;
   lastEditedAt: string;
 
-  // Model setup
+  // Model setup (context)
+  simulationType: 'production' | 'master' | 'experimental';
+  status: 'complete' | 'running' | 'not-started' | 'failed';
+  campaignId: string;
+  experimentTypeId: string;
   machineId: string;
-  compiler?: string | null;
-  compset?: string | null;
-  gridName?: string | null;
-  gridResolution?: string | null;
-  initializationType?: string | null;
-  parentSimulationId?: string | null;
+  variables: string[];
+
   branch?: string | null;
   branchTime?: string | null;
-  modelStartDate?: string | null;
-  modelEndDate?: string | null;
+  gitHash?: string | null;
+  externalRepoUrl?: string | null;
+
+  modelStartDate: string;
+  modelEndDate: string;
   calendarStartDate?: string | null;
 
   // Execution & output
   runDate?: string | null;
   outputPath?: string | null;
-  archivePath: string[];
-  runScriptPath: string[];
-  batchLogPaths: string[];
+  archivePaths: string[];
+  runScriptPaths: string[];
+  batchLogPaths: string[] | null;
 
   // Postprocessing & diagnostics
   postprocessingScriptPath: string[];

@@ -1,7 +1,6 @@
 import {
   BadgeCheck,
   ChevronDown,
-  CircleDashed,
   Clock,
   FlaskConical,
   GitBranch,
@@ -11,14 +10,15 @@ import {
   Server,
   Sigma,
   Tag,
-  X,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import SimulationStatusBadge from '@/pages/Simulations/SimulationStatusBadge';
 import type { Simulation } from '@/types/index';
 
 interface ResultCardProps {
@@ -26,10 +26,11 @@ interface ResultCardProps {
   selected: boolean;
   selectedSimulationIds: Simulation[];
   onSelect: (sim: Simulation) => void;
-  onViewDetails: (id: string) => void;
 }
 
-const ResultCard = ({ simulation, selected, onSelect, onViewDetails }: ResultCardProps) => {
+const ResultCard = ({ simulation, selected, onSelect }: ResultCardProps) => {
+  const navigate = useNavigate();
+
   const [showAllVariables, setShowAllVariables] = useState(false);
 
   const startStr = simulation.modelStartDate
@@ -54,27 +55,7 @@ const ResultCard = ({ simulation, selected, onSelect, onViewDetails }: ResultCar
             <span className="font-semibold text-lg break-words">{simulation.name}</span>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-sm font-medium text-gray-700">Status:</span>
-              <span
-                className={`px-2 py-1 rounded text-xs font-semibold flex items-center gap-1
-                  ${
-                    simulation.status === 'complete'
-                      ? 'bg-green-50 text-green-900 border border-green-300'
-                      : simulation.status === 'running'
-                        ? 'bg-yellow-50 text-yellow-900 border border-yellow-300'
-                        : simulation.status === 'failed'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-gray-200 text-gray-600'
-                  }
-                `}
-              >
-                {simulation.status === 'complete' && <BadgeCheck className="w-4 h-4" />}
-                {simulation.status === 'running' && <Rocket className="w-4 h-4" />}
-                {simulation.status === 'failed' && <X className="w-4 h-4" />}
-                {simulation.status === 'not-started' && <CircleDashed className="w-4 h-4" />}
-                {simulation.status === 'not-started'
-                  ? 'Not Started'
-                  : simulation.status.charAt(0).toUpperCase() + simulation.status.slice(1)}
-              </span>
+              <SimulationStatusBadge status={simulation.status} />
             </div>
           </CardHeader>
 
@@ -246,7 +227,7 @@ const ResultCard = ({ simulation, selected, onSelect, onViewDetails }: ResultCar
                 variant="outline"
                 size="sm"
                 className="w-full sm:w-40"
-                onClick={() => onViewDetails(simulation.id)}
+                onClick={() => navigate(`/simulations/${simulation.id}`)}
               >
                 View All Details
               </Button>

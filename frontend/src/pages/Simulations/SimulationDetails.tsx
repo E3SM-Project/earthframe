@@ -1,17 +1,20 @@
 import { format } from 'date-fns';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import SimulationPathCard from '@/pages/Simulations/SimulationPathCard';
+import SimulationStatusBadge from '@/pages/Simulations/SimulationStatusBadge';
+import SimulationTypeBadge from '@/pages/Simulations/SimulationTypeBadge';
 import type { Simulation } from '@/types/index';
 
 // You likely already have this type elsewhere in your app
@@ -39,6 +42,8 @@ const ReadonlyInput = ({ value, className }: { value?: string; className?: strin
 export default function SimulationDetails({ simulation, canEdit = false }: Props) {
   const [activeTab, setActiveTab] = useState('summary');
   const [notes, setNotes] = useState(simulation.notesMarkdown || '');
+
+  // TODO: Comments will be stored in the backend later
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([
     {
@@ -48,11 +53,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
       text: 'The sea-ice diagnostics will be added later.',
     },
   ] as { id: string; author: string; date: string; text: string }[]);
-
-  const diagThumbs = useMemo(
-    () => simulation.diagnosticThumbs || [],
-    [simulation.diagnosticThumbs],
-  );
 
   const addComment = () => {
     if (!newComment.trim()) return;
@@ -75,12 +75,11 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
         <div>
           <h1 className="text-2xl font-bold">{simulation.name}</h1>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <Badge variant="secondary" className="capitalize">
-              {simulation.simulationType ?? '—'}
-            </Badge>
+            <span>Type:</span>
+            <SimulationTypeBadge type={simulation.simulationType} />
             <span>•</span>
             <span>Status:</span>
-            <Badge className="capitalize">{simulation.status ?? '—'}</Badge>
+            <SimulationStatusBadge status={simulation.status} />
             {simulation.versionTag && (
               <>
                 <span>•</span>
@@ -91,7 +90,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               </>
             )}
             <span>•</span>
-            <Link to="/search" className="text-blue-600 hover:underline">
+            <Link to="/browse" className="text-blue-600 hover:underline">
               Back to results
             </Link>
           </div>
@@ -108,10 +107,8 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger value="configuration">Configuration</TabsTrigger>
           <TabsTrigger value="outputs">Outputs & Logs</TabsTrigger>
-          <TabsTrigger value="diagnostics">Diagnostics & Results</TabsTrigger>
-          <TabsTrigger value="notes">Notes & Issues</TabsTrigger>
+          <TabsTrigger value="versionControl">Version Control</TabsTrigger>
         </TabsList>
 
         {/* SUMMARY TAB */}
@@ -126,81 +123,303 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                 <FieldRow label="Simulation Name">
                   <ReadonlyInput value={simulation.name} />
                 </FieldRow>
-                <FieldRow label="Model Version">
-                  <ReadonlyInput value={simulation.versionTag} />
+                <FieldRow label="Case Name">
+                  <ReadonlyInput value={simulation.caseName} />
                 </FieldRow>
-                <FieldRow label="Start Date">
-                  <ReadonlyInput value={simulation.modelStartDate} />
+                <FieldRow label="Model Version">
+                  <ReadonlyInput value={simulation.versionTag ?? undefined} />
+                </FieldRow>
+                <FieldRow label="Compset">
+                  <ReadonlyInput value={simulation.compset ?? undefined} />
+                </FieldRow>
+                <FieldRow label="Grid Name">
+                  <ReadonlyInput value={simulation.gridName ?? undefined} />
+                </FieldRow>
+                <FieldRow label="Grid Resolution">
+                  <ReadonlyInput value={simulation.gridResolution ?? undefined} />
+                </FieldRow>
+                <FieldRow label="Initialization Type">
+                  <ReadonlyInput value={simulation.initializationType ?? undefined} />
+                </FieldRow>
+                <FieldRow label="Compiler">
+                  <ReadonlyInput value={simulation.compiler ?? undefined} />
+                </FieldRow>
+                <FieldRow label="Parent Simulation ID">
+                  <ReadonlyInput value={simulation.parentSimulationId ?? undefined} />
                 </FieldRow>
               </CardContent>
             </Card>
 
-            {/* Right side small fields */}
+            {/* Model Setup (Context) */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Context</CardTitle>
+                <CardTitle className="text-base">Model Setup</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <FieldRow label="Case Name">
-                  <ReadonlyInput value={simulation.caseName} />
+                <FieldRow label="Simulation Type">
+                  <ReadonlyInput value={simulation.simulationType} />
                 </FieldRow>
-                <FieldRow label="Resolution">
-                  <ReadonlyInput value={simulation.resolution} />
+                <FieldRow label="Status">
+                  <ReadonlyInput value={simulation.status} />
                 </FieldRow>
-                <FieldRow label="Machine">
-                  <ReadonlyInput value={simulation.machine} />
+                <FieldRow label="Campaign ID">
+                  <ReadonlyInput value={simulation.campaignId} />
+                </FieldRow>
+                <FieldRow label="Experiment Type ID">
+                  <ReadonlyInput value={simulation.experimentTypeId} />
+                </FieldRow>
+                <FieldRow label="Machine ID">
+                  <ReadonlyInput value={simulation.machine.name} />
+                </FieldRow>
+                <FieldRow label="Variables">
+                  {simulation.variables && simulation.variables.length ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{simulation.variables.length}</span>
+                      <span className="text-xs text-muted-foreground">→</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto text-xs text-blue-600 underline"
+                          >
+                            View list
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="max-w-xs">
+                          <ul className="list-disc pl-5 text-sm max-h-48 overflow-auto">
+                            {simulation.variables.map((v) => (
+                              <li key={v}>{v}</li>
+                            ))}
+                          </ul>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  ) : (
+                    <span className="text-sm">—</span>
+                  )}
+                </FieldRow>
+                <FieldRow label="Branch">
+                  <ReadonlyInput value={simulation.branch ?? undefined} />
+                </FieldRow>
+
+                <FieldRow label="Version Control">
+                  <Link
+                    to="#"
+                    onClick={() => setActiveTab('versionControl')}
+                    className="text-xs text-blue-600 hover:underline"
+                    tabIndex={0}
+                    aria-label="See version control details"
+                  >
+                    See version control details
+                  </Link>
                 </FieldRow>
               </CardContent>
             </Card>
           </div>
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Timeline</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <FieldRow label="Model Start">
+                <span className="text-sm">
+                  {simulation.modelStartDate
+                    ? format(new Date(simulation.modelStartDate), 'yyyy-MM-dd')
+                    : '—'}
+                </span>
+              </FieldRow>
+              <FieldRow label="Model End">
+                <span className="text-sm">
+                  {simulation.modelEndDate
+                    ? format(new Date(simulation.modelEndDate), 'yyyy-MM-dd')
+                    : '—'}
+                </span>
+              </FieldRow>
+              <FieldRow label="Duration">
+                <span className="text-sm">
+                  {simulation.modelStartDate && simulation.modelEndDate
+                    ? (() => {
+                        const start = new Date(simulation.modelStartDate);
+                        const end = new Date(simulation.modelEndDate);
+                        const ms = end.getTime() - start.getTime();
+                        const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+                        if (days >= 365) {
+                          const years = Math.floor(days / 365);
+                          return `${years} year${years !== 1 ? 's' : ''}`;
+                        } else if (days >= 30) {
+                          const months = Math.floor(days / 30);
+                          return `${months} month${months !== 1 ? 's' : ''}`;
+                        } else if (days >= 1) {
+                          return `${days} day${days !== 1 ? 's' : ''}`;
+                        } else {
+                          const hours = Math.floor(ms / (1000 * 60 * 60));
+                          if (hours >= 1) {
+                            return `${hours} hour${hours !== 1 ? 's' : ''}`;
+                          }
+                          const minutes = Math.floor(ms / (1000 * 60));
+                          return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                        }
+                      })()
+                    : '—'}
+                </span>
+              </FieldRow>
+              {simulation.calendarStartDate && (
+                <FieldRow label="Calendar Start">
+                  <span className="text-sm">
+                    {format(new Date(simulation.calendarStartDate), 'yyyy-MM-dd')}
+                  </span>
+                </FieldRow>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Diagnostics thumbnails + provenance */}
+          {/* Diagnostics & Performance (PACE) links */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Diagnostics & Performance Card */}
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Diagnostics</CardTitle>
-                  <Button asChild variant="ghost" size="sm">
-                    <Link to="#diagnostics">View all diagnostics</Link>
-                  </Button>
+                  <CardTitle className="text-base">Diagnostics & Performance</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                {diagThumbs.length ? (
-                  <div className="grid grid-cols-3 gap-4">
-                    {diagThumbs.slice(0, 6).map((src, i) => (
-                      <div
-                        key={src + i}
-                        className="aspect-video rounded-md bg-muted overflow-hidden"
-                      >
-                        <img
-                          src={src}
-                          alt={`diagnostic ${i + 1}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-3 gap-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="aspect-video rounded-md bg-muted" />
-                    ))}
-                  </div>
-                )}
+                {/* Diagnostics Links */}
+                <div className="mb-4">
+                  <Label className="mb-1 block text-sm">Diagnostics</Label>
+                  {simulation.diagnosticLinks?.length ? (
+                    <ul className="list-disc pl-5 text-sm">
+                      {simulation.diagnosticLinks.map((d) => (
+                        <li key={d.url} className="flex items-center gap-2">
+                          <a
+                            className="text-blue-600 hover:underline flex items-center gap-1"
+                            href={d.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              className="inline-block"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 7h2a5 5 0 015 5v0a5 5 0 01-5 5h-2m-6 0H7a5 5 0 01-5-5v0a5 5 0 015-5h2m1 5h4"
+                              />
+                            </svg>
+                            {d.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="mb-2 text-sm text-muted-foreground">
+                      Diagnostics will appear here once available.
+                    </div>
+                  )}
+                </div>
+                {/* Performance Links */}
+                <div>
+                  <Label className="mb-1 block text-sm">Performance</Label>
+                  {simulation.paceLinks?.length ? (
+                    <ul className="list-disc pl-5 text-sm">
+                      {simulation.paceLinks.map((p) => (
+                        <li key={p.url} className="flex items-center gap-2">
+                          <a
+                            className="text-blue-600 hover:underline flex items-center gap-1"
+                            href={p.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              className="inline-block"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 7h2a5 5 0 015 5v0a5 5 0 01-5 5h-2m-6 0H7a5 5 0 01-5-5v0a5 5 0 015-5h2m1 5h4"
+                              />
+                            </svg>
+                            {p.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="mb-2 text-sm text-muted-foreground">
+                      Performance metrics will appear here once available.
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
-
+            {/* Provenance */}
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Provenance</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-sm space-y-2">
-                  <p className="leading-relaxed">
-                    {simulation.provenance ||
-                      '* netCDF metadata, last updated 2024-03-20\n* Provenance information goes here'}
-                  </p>
+              <CardContent className="space-y-2">
+                {/* Upload row */}
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs text-muted-foreground min-w-[100px]">Upload:</Label>
+                  <span className="text-sm">
+                    {simulation.uploadDate
+                      ? format(new Date(simulation.uploadDate), 'yyyy-MM-dd HH:mm')
+                      : '—'}
+                  </span>
+                  {simulation.uploadedBy && (
+                    <span className="text-sm">by {simulation.uploadedBy}</span>
+                  )}
+                </div>
+                {/* Last edited row */}
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs text-muted-foreground min-w-[100px]">
+                    Last edited:
+                  </Label>
+                  <span className="text-sm">
+                    {simulation.lastEditedAt
+                      ? format(new Date(simulation.lastEditedAt), 'yyyy-MM-dd HH:mm')
+                      : '—'}
+                  </span>
+                  {simulation.lastEditedBy && (
+                    <span className="text-sm">by {simulation.lastEditedBy}</span>
+                  )}
+                </div>
+                {/* Simulation ID row */}
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs text-muted-foreground min-w-[100px]">
+                    Simulation ID:
+                  </Label>
+                  <ReadonlyInput
+                    value={
+                      simulation.id
+                        ? `${simulation.id.slice(0, 8)}…${simulation.id.slice(-6)}`
+                        : undefined
+                    }
+                  />
+                  {simulation.id && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(simulation.id)}
+                      title="Copy full Simulation ID"
+                    >
+                      Copy
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -220,7 +439,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               />
               {!canEdit && (
                 <p className="text-xs text-muted-foreground">
-                  Admin privileges are required to update the simulation page.
+                  A user account with write privilege is required to update this simulation page.
                 </p>
               )}
               <div>
@@ -270,175 +489,62 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
           </div>
         </TabsContent>
 
-        {/* CONFIGURATION TAB */}
-        <TabsContent value="configuration" className="space-y-6">
+        {/* VERSION CONTROL TAB */}
+        <TabsContent value="versionControl" className="space-y-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Configuration</CardTitle>
+              <CardTitle className="text-base">Version Control Information</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FieldRow label="Case Name">
-                <ReadonlyInput value={simulation.caseName} />
+            <CardContent className="space-y-4">
+              <FieldRow label="Repository URL">
+                <ReadonlyInput value={simulation.externalRepoUrl} />
               </FieldRow>
-              <FieldRow label="Compset">
-                <ReadonlyInput value={simulation.compset} />
+              <FieldRow label="Version/Tag">
+                <ReadonlyInput value={simulation.versionTag} />
               </FieldRow>
-              <FieldRow label="Grid">
-                <ReadonlyInput value={simulation.gridName} />
+              <FieldRow label="Commit Hash">
+                <ReadonlyInput value={simulation.gitHash} />
               </FieldRow>
-              <FieldRow label="Resolution">
-                <ReadonlyInput value={simulation.resolution} />
+              <FieldRow label="Branch">
+                <ReadonlyInput value={simulation.branch ?? undefined} />
               </FieldRow>
-              <FieldRow label="Machine">
-                <ReadonlyInput value={simulation.machine} />
+              <FieldRow label="Branch Time">
+                <ReadonlyInput value={simulation.branchTime ?? undefined} />
               </FieldRow>
-              <FieldRow label="Model Start">
-                <ReadonlyInput value={simulation.modelStartDate} />
-              </FieldRow>
-              <FieldRow label="Model End">
-                <ReadonlyInput value={simulation.modelEndDate} />
-              </FieldRow>
-              <FieldRow label="Calendar Start">
-                <ReadonlyInput value={simulation.calendarStartDate} />
-              </FieldRow>
+
+              {simulation.externalRepoUrl && (
+                <Button asChild variant="outline" size="sm">
+                  <a href={simulation.externalRepoUrl} target="_blank" rel="noopener noreferrer">
+                    Open Repository
+                  </a>
+                </Button>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* OUTPUTS & LOGS TAB */}
         <TabsContent value="outputs" className="space-y-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Outputs</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {simulation.outputs?.length ? (
-                <ul className="list-disc pl-5">
-                  {simulation.outputs.map((o) => (
-                    <li key={o.url}>
-                      <a
-                        className="text-blue-600 hover:underline"
-                        href={o.url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {o.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground">No outputs linked.</p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Logs</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {simulation.logs?.length ? (
-                <ul className="list-disc pl-5">
-                  {simulation.logs.map((o) => (
-                    <li key={o.url}>
-                      <a
-                        className="text-blue-600 hover:underline"
-                        href={o.url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {o.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground">No logs linked.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* DIAGNOSTICS TAB */}
-        <TabsContent value="diagnostics" className="space-y-6" id="diagnostics">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Diagnostics & Results</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {simulation.diagnosticLinks?.length ? (
-                <ul className="list-disc pl-5 text-sm">
-                  {simulation.diagnosticLinks.map((d) => (
-                    <li key={d.url}>
-                      <a
-                        className="text-blue-600 hover:underline"
-                        href={d.url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {d.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted-foreground text-sm">No diagnostics linked.</p>
-              )}
-              {!!diagThumbs.length && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {diagThumbs.map((src, i) => (
-                    <div key={src + i} className="aspect-video rounded-md bg-muted overflow-hidden">
-                      <img
-                        src={src}
-                        alt={`diagnostic ${i + 1}`}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* NOTES & ISSUES TAB */}
-        <TabsContent value="notes" className="space-y-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Notes & Issues</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="mb-1 block text-sm">Notes</Label>
-                <Textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="min-h-[160px]"
-                />
-              </div>
-              <div>
-                <Label className="mb-1 block text-sm">Known Issues</Label>
-                {simulation.issues?.length ? (
-                  <ul className="list-disc pl-5 text-sm">
-                    {simulation.issues.map((s, i) => (
-                      <li key={i}>{s}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-muted-foreground text-sm">No issues documented.</p>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button disabled={!canEdit}>Save</Button>
-                {!canEdit && (
-                  <p className="text-xs text-muted-foreground self-center">
-                    Admin privileges are required to update the simulation page.
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <SimulationPathCard
+            title="Output Path"
+            paths={simulation.outputPath ? [simulation.outputPath] : []}
+            emptyText="No output path available."
+          />
+          <SimulationPathCard
+            title="Archive Paths"
+            paths={simulation.archivePaths || []}
+            emptyText="No archive path available."
+          />
+          <SimulationPathCard
+            title="Run Script Paths"
+            paths={simulation.runScriptPaths || []}
+            emptyText="No run script path available."
+          />
+          <SimulationPathCard
+            title="Batch Logs"
+            paths={simulation.batchLogPaths || []}
+            emptyText="No batch logs available."
+          />
         </TabsContent>
       </Tabs>
     </div>

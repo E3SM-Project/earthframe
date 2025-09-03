@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import type { Simulation } from '@/types';
 
-const SIMULATIONS_URL = '/data/simulations.json';
+const SIMULATIONS_URL = '/mock/simulations.json';
 
 export const fetchSimulations = async (url: string = SIMULATIONS_URL): Promise<Simulation[]> => {
   const res = await axios.get<Simulation[]>(url, { headers: { 'Cache-Control': 'no-cache' } });

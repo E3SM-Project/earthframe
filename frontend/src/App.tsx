@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -26,15 +27,20 @@ export default function App() {
     [simulations.data, selectedSimulationIds],
   );
 
+  // Create a QueryClient instance
+  const queryClient = useMemo(() => new QueryClient(), []);
+
   return (
-    <BrowserRouter>
-      <NavBar selectedSimulationIds={selectedSimulationIds} />
-      <AppRoutes
-        simulations={simulations.data}
-        selectedSimulationIds={selectedSimulationIds}
-        setSelectedSimulationIds={setSelectedSimulationIds}
-        selectedSimulations={selectedSimulations}
-      />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <NavBar selectedSimulationIds={selectedSimulationIds} />
+        <AppRoutes
+          simulations={simulations.data}
+          selectedSimulationIds={selectedSimulationIds}
+          setSelectedSimulationIds={setSelectedSimulationIds}
+          selectedSimulations={selectedSimulations}
+        />
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
