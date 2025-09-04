@@ -1,9 +1,11 @@
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 import { ComparisonAI } from '@/pages/Compare/ComparisonAI';
 import type { Simulation } from '@/types/index';
+import { formatDate, getSimulationDuration } from '@/utils/utils';
 
 interface CompareSimulationsProps {
   simulations: Simulation[];
@@ -11,7 +13,6 @@ interface CompareSimulationsProps {
   setSelectedSimulationIds: (ids: string[]) => void;
   selectedSimulations: Simulation[];
 }
-
 const CompareSimulations = ({
   simulations,
   selectedSimulationIds,
@@ -24,7 +25,6 @@ const CompareSimulations = ({
 
   const simHeaders = selectedSimulationIds.map((id) => {
     const sim = selectedSimulations.find((s) => s.id === id);
-
     return sim?.name || id;
   });
 
@@ -34,7 +34,6 @@ const CompareSimulations = ({
     fallback: Simulation[K] | '',
   ): Simulation[K] => {
     const sim = selectedSimulations.find((s) => s.id === id);
-
     return (sim?.[prop] ?? fallback) as Simulation[K];
   };
 
@@ -45,44 +44,110 @@ const CompareSimulations = ({
         values: selectedSimulationIds.map((id) => getSimProp(id, 'name', '')),
       },
       {
-        label: 'Model Start Date',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'modelStartDate', '')),
+        label: 'Case Name',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'caseName', '')),
       },
       {
-        label: 'Run Start Date',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'modelStartDate', '')),
-      },
-      {
-        label: 'Repo',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'externalRepoUrl', '')),
-      },
-      {
-        label: 'Branch',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'branch', '')),
-      },
-      {
-        label: 'Tag',
+        label: 'Model Version',
         values: selectedSimulationIds.map((id) => getSimProp(id, 'versionTag', '')),
-      },
-      {
-        label: 'Campaign',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'campaignId', '')),
       },
       {
         label: 'Compset',
         values: selectedSimulationIds.map((id) => getSimProp(id, 'compset', '')),
       },
       {
-        label: 'Resolution',
+        label: 'Grid Name',
         values: selectedSimulationIds.map((id) => getSimProp(id, 'gridName', '')),
       },
       {
-        label: 'Machine',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'machineId', '')),
+        label: 'Grid Resolution',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'gridResolution', '')),
+      },
+      {
+        label: 'Initialization Type',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'initializationType', '')),
       },
       {
         label: 'Compiler',
         values: selectedSimulationIds.map((id) => getSimProp(id, 'compiler', '')),
+      },
+      {
+        label: 'Parent Simulation ID',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'parentSimulationId', '')),
+      },
+    ],
+    modelSetup: [
+      {
+        label: 'Simulation Type',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'simulationType', '')),
+      },
+      {
+        label: 'Status',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'status', '')),
+      },
+      {
+        label: 'Campaign ID',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'campaignId', '')),
+      },
+      {
+        label: 'Experiment Type ID',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'experimentTypeId', '')),
+      },
+      {
+        label: 'Machine Name',
+        values: selectedSimulationIds.map((id) => {
+          const sim = selectedSimulations.find((s) => s.id === id);
+          return sim?.machine?.name ?? '';
+        }),
+      },
+      {
+        label: 'Variables',
+        values: selectedSimulationIds.map((id) => {
+          const sim = selectedSimulations.find((s) => s.id === id);
+          return Array.isArray(sim?.variables) && sim.variables.length ? sim.variables : [];
+        }),
+      },
+      {
+        label: 'Branch',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'branch', '')),
+      },
+    ],
+    timeline: [
+      {
+        label: 'Model Start',
+        values: selectedSimulationIds.map((id) => {
+          const date = getSimProp(id, 'modelStartDate', '');
+          return date ? formatDate(date as string) : '—';
+        }),
+      },
+      {
+        label: 'Model End',
+        values: selectedSimulationIds.map((id) => {
+          const date = getSimProp(id, 'modelEndDate', '');
+          return date ? formatDate(date as string) : '—';
+        }),
+      },
+      {
+        label: 'Duration',
+        values: selectedSimulationIds.map((id) => {
+          const start = getSimProp(id, 'modelStartDate', '');
+          const end = getSimProp(id, 'modelEndDate', '');
+          if (start && end) {
+            try {
+              return getSimulationDuration(start as string, end as string);
+            } catch {
+              return '—';
+            }
+          }
+          return '—';
+        }),
+      },
+      {
+        label: 'Calendar Start',
+        values: selectedSimulationIds.map((id) => {
+          const date = getSimProp(id, 'calendarStartDate', '');
+          return date ? formatDate(date as string) : '—';
+        }),
       },
     ],
     keyFeatures: [
@@ -97,32 +162,65 @@ const CompareSimulations = ({
         values: selectedSimulationIds.map((id) => getSimProp(id, 'knownIssues', '')),
       },
     ],
+    locations: [
+      {
+        label: 'Output Path',
+        values: selectedSimulationIds.map((id) => {
+          const outputPath = getSimProp(id, 'outputPath', '');
+          return outputPath ? [outputPath] : [];
+        }),
+      },
+      {
+        label: 'Archive Paths',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'archivePaths', [])),
+      },
+      {
+        label: 'Run Script Paths',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'runScriptPaths', [])),
+      },
+      {
+        label: 'Batch Logs',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'batchLogPaths', [])),
+      },
+    ],
+    diagnostics: [
+      {
+        label: 'Diagnostic Links',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'diagnosticLinks', [])),
+      },
+    ],
+    performance: [
+      {
+        label: 'PACE Links',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'paceLinks', [])),
+      },
+    ],
     notes: [
       {
         label: 'Notes',
         values: selectedSimulationIds.map((id) => getSimProp(id, 'notes', '')),
       },
     ],
-    locations: [
+    versionControl: [
       {
-        label: 'Run Scripts',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'runScriptPath', [])),
+        label: 'Repository URL',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'externalRepoUrl', '')),
       },
       {
-        label: 'Output Location',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'outputPath', [])),
+        label: 'Version/Tag',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'versionTag', '')),
       },
       {
-        label: 'Archive Location',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'archivePath', [])),
+        label: 'Commit Hash',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'gitHash', '')),
       },
       {
-        label: 'Diagnostic Links',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'diagnosticLinks', [])),
+        label: 'Branch',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'branch', '')),
       },
       {
-        label: 'PACE Links',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'paceLinks', [])),
+        label: 'Branch Time',
+        values: selectedSimulationIds.map((id) => getSimProp(id, 'branchTime', '')),
       },
     ],
   };
@@ -214,6 +312,23 @@ const CompareSimulations = ({
     );
   }
 
+  // Collapsible section state
+  const defaultExpanded = ['configuration', 'modelSetup', 'timeline'];
+  const allSectionKeys = Object.keys(metrics);
+  const initialExpandedSections: Record<string, boolean> = {};
+  allSectionKeys.forEach((section) => {
+    initialExpandedSections[section] = defaultExpanded.includes(section);
+  });
+  const [expandedSections, setExpandedSections] =
+    useState<Record<string, boolean>>(initialExpandedSections);
+
+  const toggleSection = (sectionKey: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  };
+
   return (
     <div className="w-full bg-white">
       <div className="mx-auto max-w-[1440px] px-6 py-8">
@@ -236,6 +351,7 @@ const CompareSimulations = ({
               {hidden.map((hiddenId) => {
                 const idx = selectedSimulationIds.indexOf(hiddenId);
                 const headerName = headers[idx] ?? hiddenId;
+
                 return (
                   <button
                     key={hiddenId}
@@ -262,16 +378,15 @@ const CompareSimulations = ({
         <div className="overflow-x-auto">
           <div className="min-w-[72rem]">
             {/* Table header */}
-            <div className="flex border-b bg-gray-100 font-semibold text-sm">
-              <div className="sticky-col shrink-0 w-48 px-4 py-2 border-r z-10 bg-white">
-                Metric
-              </div>
+            <div className="flex border-b font-semibold text-sm bg-gray-200">
+              {/* Empty first column header for formatting */}
+              <div className="sticky-col shrink-0 w-64 px-4 py-2 border-r z-10 bg-white"></div>
               {order
                 .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
                 .map((colIdx) => (
                   <div
                     key={colIdx}
-                    className="flex-1 min-w-[12rem] px-4 py-2 text-center cursor-move relative group"
+                    className="flex-1 min-w-[12rem] px-4 py-2 text-center cursor-default relative group bg-gray-200"
                     draggable
                     onDragStart={() => handleDragStart(colIdx)}
                     onDragOver={(e) => handleDragOver(e, colIdx)}
@@ -282,7 +397,50 @@ const CompareSimulations = ({
                       zIndex: dragOverIdx === colIdx ? 20 : undefined,
                     }}
                   >
-                    <span className="text-lg font-semibold">{headers[colIdx]}</span>
+                    <div className="flex items-center justify-center gap-1">
+                      {/* Drag handle */}
+                      <span
+                        className="cursor-grab text-gray-400 hover:text-blue-600"
+                        title="Drag to reorder"
+                        style={{ display: 'inline-flex', alignItems: 'center', marginRight: '2px' }}
+                        tabIndex={-1}
+                        aria-label="Drag handle"
+                      >
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                          <circle cx="5" cy="6" r="1.5" fill="currentColor" />
+                          <circle cx="5" cy="10" r="1.5" fill="currentColor" />
+                          <circle cx="5" cy="14" r="1.5" fill="currentColor" />
+                          <circle cx="10" cy="6" r="1.5" fill="currentColor" />
+                          <circle cx="10" cy="10" r="1.5" fill="currentColor" />
+                          <circle cx="10" cy="14" r="1.5" fill="currentColor" />
+                        </svg>
+                      </span>
+                      {/* Sim name clickable */}
+                      <a
+                        href={`/simulations/${selectedSimulationIds[colIdx]}`}
+                        className="text-lg font-semibold text-blue-700 hover:underline cursor-pointer transition flex items-center gap-1"
+                        tabIndex={0}
+                        title={`Go to details for ${headers[colIdx]}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/simulations/${selectedSimulationIds[colIdx]}`);
+                        }}
+                      >
+                        {headers[colIdx]}
+                        <span className="ml-1 text-blue-500" aria-hidden="true">
+                          {/* External link icon (↗) */}
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                            <path
+                              d="M5.5 10.5L10.5 5.5M10.5 5.5H6.5M10.5 5.5V9.5"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </span>
+                      </a>
+                    </div>
                     <button
                       type="button"
                       aria-label={`Hide ${headers[colIdx]}`}
@@ -324,78 +482,98 @@ const CompareSimulations = ({
                   </div>
                 ))}
             </div>
-            {/* Table body */}
-            {(() => {
-              // Flatten all metrics into a single array with sectionKey
-              const allRows: { label: string; values: unknown[]; sectionKey: string }[] = [];
-              Object.entries(metrics).forEach(([sectionKey, rows]) => {
-                rows.forEach((row) => {
-                  allRows.push({ ...row, sectionKey });
-                });
-              });
 
-              let lastSection: string | null = null;
-              return allRows.map((row, rowIdx) => {
-                const showSection = row.sectionKey !== lastSection ? row.sectionKey : null;
-                lastSection = row.sectionKey;
+            {/* Table body with collapsible sections */}
+            {Object.entries(metrics).map(([sectionKey, rows]) => (
+              <React.Fragment key={sectionKey}>
+                <div
+                  className={`flex border-t items-center transition-all ${
+                    expandedSections[sectionKey]
+                      ? 'border-l-2 border-blue-500 bg-gray-100'
+                      : 'bg-gray-50'
+                  }`}
+                  style={{
+                    ...(expandedSections[sectionKey]
+                      ? { borderLeftWidth: '3px', borderTopWidth: '2px' }
+                      : {}),
+                  }}
+                >
+                  <button
+                    className={`sticky-col w-64 px-4 py-3 font-semibold border-r text-lg uppercase tracking-wide bg-white z-10 flex items-center focus:outline-none ${
+                      expandedSections[sectionKey] ? 'text-gray-900' : 'text-gray-600'
+                    }`}
+                    onClick={() => toggleSection(sectionKey)}
+                    aria-expanded={expandedSections[sectionKey]}
+                    aria-controls={`section-${sectionKey}`}
+                    type="button"
+                  >
+                    <span
+                      className="mr-2 transition-transform duration-200"
+                      style={{
+                        display: 'inline-block',
+                        transform: expandedSections[sectionKey] ? 'rotate(90deg)' : 'rotate(0deg)',
+                      }}
+                    >
+                      <ChevronRight size={16} strokeWidth={2} color="#4B5563" />
+                    </span>
+                    {sectionKey
+                      .replace(/([A-Z])/g, ' $1')
+                      .replace(/^./, (str) => str.toUpperCase())}
+                  </button>
+                </div>
 
-                return (
-                  <React.Fragment key={rowIdx}>
-                    {showSection && (
-                      <div className="flex border-t bg-gray-50 items-center">
-                        <div className="sticky-col w-48 px-4 py-2 font-semibold border-r text-base bg-white z-10">
-                          {row.sectionKey
-                            .replace(/([A-Z])/g, ' $1')
-                            .replace(/^./, (str) => str.toUpperCase())}
+                {expandedSections[sectionKey] && (
+                  <div id={`section-${sectionKey}`}>
+                    {rows.map((row, rowIdx) => (
+                      <div key={rowIdx} className="flex border-t">
+                        <div className="sticky-col w-64 px-4 py-2 font-medium text-sm border-r bg-white z-10">
+                          {row.label}
                         </div>
-                        <div className="flex-1"></div>
-                      </div>
-                    )}
-                    <div className="flex border-t">
-                      <div className="sticky-col w-48 px-4 py-2 font-medium text-sm border-r bg-white z-10">
-                        {row.label}
-                      </div>
-                      {order
-                        .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
-                        .map((colIdx) => {
-                          const value = row.values[colIdx];
-                          // Render links for locations section
-                          if (row.sectionKey === 'locations' && Array.isArray(value)) {
+                        {order
+                          .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
+                          .map((colIdx) => {
+                            const value = row.values[colIdx];
+                            // Render links for locations section
+                            if (sectionKey === 'locations' && Array.isArray(value)) {
+                              return (
+                                <div
+                                  key={colIdx}
+                                  className="flex-1 min-w-[12rem] px-4 py-2 text-sm"
+                                >
+                                  {value.length > 0 ? (
+                                    value.map(
+                                      (linkObj: { url: string; label?: string }, idx: number) => (
+                                        <a
+                                          key={idx}
+                                          href={linkObj.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-600 underline mr-2 break-all"
+                                        >
+                                          {linkObj.label || linkObj.url}
+                                        </a>
+                                      ),
+                                    )
+                                  ) : (
+                                    <span className="text-gray-400">—</span>
+                                  )}
+                                </div>
+                              );
+                            }
                             return (
                               <div key={colIdx} className="flex-1 min-w-[12rem] px-4 py-2 text-sm">
-                                {value.length > 0 ? (
-                                  value.map(
-                                    (linkObj: { url: string; label?: string }, idx: number) => (
-                                      <a
-                                        key={idx}
-                                        href={linkObj.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 underline mr-2 break-all"
-                                      >
-                                        {linkObj.label || linkObj.url}
-                                      </a>
-                                    ),
-                                  )
-                                ) : (
-                                  <span className="text-gray-400">—</span>
-                                )}
+                                {Array.isArray(value)
+                                  ? value.join(', ')
+                                  : value || <span className="text-gray-400">—</span>}
                               </div>
                             );
-                          }
-                          return (
-                            <div key={colIdx} className="flex-1 min-w-[12rem] px-4 py-2 text-sm">
-                              {Array.isArray(value)
-                                ? value.join(', ')
-                                : value || <span className="text-gray-400">—</span>}
-                            </div>
-                          );
-                        })}
-                    </div>
-                  </React.Fragment>
-                );
-              });
-            })()}
+                          })}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
 
             <ComparisonAI
               selectedSimulations={selectedSimulations.filter((sim) =>

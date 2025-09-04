@@ -16,6 +16,7 @@ import SimulationPathCard from '@/pages/Simulations/SimulationPathCard';
 import SimulationStatusBadge from '@/pages/Simulations/SimulationStatusBadge';
 import SimulationTypeBadge from '@/pages/Simulations/SimulationTypeBadge';
 import type { Simulation } from '@/types/index';
+import { formatDate, getSimulationDuration } from '@/utils/utils';
 
 // You likely already have this type elsewhere in your app
 export interface ExternalUrl {
@@ -216,6 +217,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               </CardContent>
             </Card>
           </div>
+
           <Card className="lg:col-span-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Timeline</CardTitle>
@@ -223,51 +225,29 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
             <CardContent className="space-y-2">
               <FieldRow label="Model Start">
                 <span className="text-sm">
-                  {simulation.modelStartDate
-                    ? format(new Date(simulation.modelStartDate), 'yyyy-MM-dd')
-                    : '—'}
+                  {simulation.modelStartDate ? formatDate(simulation.modelStartDate) : '—'}
                 </span>
               </FieldRow>
               <FieldRow label="Model End">
                 <span className="text-sm">
-                  {simulation.modelEndDate
-                    ? format(new Date(simulation.modelEndDate), 'yyyy-MM-dd')
-                    : '—'}
+                  {simulation.modelEndDate ? formatDate(simulation.modelEndDate) : '—'}
                 </span>
               </FieldRow>
               <FieldRow label="Duration">
                 <span className="text-sm">
                   {simulation.modelStartDate && simulation.modelEndDate
                     ? (() => {
-                        const start = new Date(simulation.modelStartDate);
-                        const end = new Date(simulation.modelEndDate);
-                        const ms = end.getTime() - start.getTime();
-                        const days = Math.floor(ms / (1000 * 60 * 60 * 24));
-                        if (days >= 365) {
-                          const years = Math.floor(days / 365);
-                          return `${years} year${years !== 1 ? 's' : ''}`;
-                        } else if (days >= 30) {
-                          const months = Math.floor(days / 30);
-                          return `${months} month${months !== 1 ? 's' : ''}`;
-                        } else if (days >= 1) {
-                          return `${days} day${days !== 1 ? 's' : ''}`;
-                        } else {
-                          const hours = Math.floor(ms / (1000 * 60 * 60));
-                          if (hours >= 1) {
-                            return `${hours} hour${hours !== 1 ? 's' : ''}`;
-                          }
-                          const minutes = Math.floor(ms / (1000 * 60));
-                          return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-                        }
+                        return getSimulationDuration(
+                          simulation.modelStartDate,
+                          simulation.modelEndDate,
+                        );
                       })()
                     : '—'}
                 </span>
               </FieldRow>
               {simulation.calendarStartDate && (
                 <FieldRow label="Calendar Start">
-                  <span className="text-sm">
-                    {format(new Date(simulation.calendarStartDate), 'yyyy-MM-dd')}
-                  </span>
+                  <span className="text-sm">{formatDate(simulation.calendarStartDate)}</span>
                 </FieldRow>
               )}
             </CardContent>
@@ -375,9 +355,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                 <div className="flex items-center gap-2">
                   <Label className="text-xs text-muted-foreground min-w-[100px]">Upload:</Label>
                   <span className="text-sm">
-                    {simulation.uploadDate
-                      ? format(new Date(simulation.uploadDate), 'yyyy-MM-dd HH:mm')
-                      : '—'}
+                    {simulation.uploadDate ? formatDate(simulation.uploadDate) : '—'}
                   </span>
                   {simulation.uploadedBy && (
                     <span className="text-sm">by {simulation.uploadedBy}</span>
@@ -389,9 +367,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                     Last edited:
                   </Label>
                   <span className="text-sm">
-                    {simulation.lastEditedAt
-                      ? format(new Date(simulation.lastEditedAt), 'yyyy-MM-dd HH:mm')
-                      : '—'}
+                    {simulation.lastEditedAt ? formatDate(simulation.lastEditedAt) : '—'}
                   </span>
                   {simulation.lastEditedBy && (
                     <span className="text-sm">by {simulation.lastEditedBy}</span>
@@ -489,6 +465,30 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
           </div>
         </TabsContent>
 
+        {/* OUTPUTS & LOGS TAB */}
+        <TabsContent value="outputs" className="space-y-6">
+          <SimulationPathCard
+            title="Output Path"
+            paths={simulation.outputPath ? [simulation.outputPath] : []}
+            emptyText="No output path available."
+          />
+          <SimulationPathCard
+            title="Archive Paths"
+            paths={simulation.archivePaths || []}
+            emptyText="No archive path available."
+          />
+          <SimulationPathCard
+            title="Run Script Paths"
+            paths={simulation.runScriptPaths || []}
+            emptyText="No run script path available."
+          />
+          <SimulationPathCard
+            title="Batch Logs"
+            paths={simulation.batchLogPaths || []}
+            emptyText="No batch logs available."
+          />
+        </TabsContent>
+
         {/* VERSION CONTROL TAB */}
         <TabsContent value="versionControl" className="space-y-6">
           <Card>
@@ -521,30 +521,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        {/* OUTPUTS & LOGS TAB */}
-        <TabsContent value="outputs" className="space-y-6">
-          <SimulationPathCard
-            title="Output Path"
-            paths={simulation.outputPath ? [simulation.outputPath] : []}
-            emptyText="No output path available."
-          />
-          <SimulationPathCard
-            title="Archive Paths"
-            paths={simulation.archivePaths || []}
-            emptyText="No archive path available."
-          />
-          <SimulationPathCard
-            title="Run Script Paths"
-            paths={simulation.runScriptPaths || []}
-            emptyText="No run script path available."
-          />
-          <SimulationPathCard
-            title="Batch Logs"
-            paths={simulation.batchLogPaths || []}
-            emptyText="No batch logs available."
-          />
         </TabsContent>
       </Tabs>
     </div>
