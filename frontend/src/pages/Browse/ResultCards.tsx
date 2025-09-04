@@ -1,4 +1,4 @@
-import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
+import BrowseToolbar from '@/pages/Browse/BrowseToolbar';
 import ResultCard from '@/pages/Browse/ResultCard';
 import type { Simulation } from '@/types/index';
 
@@ -23,7 +23,7 @@ const ResultCards = ({
     <div>
       {/* Top controls */}
       <div className="flex items-center py-4">
-        <SelectedSimulationChipList
+        <BrowseToolbar
           simulations={simulations}
           buttonText="Compare"
           onCompareButtonClick={handleCompareButtonClick}

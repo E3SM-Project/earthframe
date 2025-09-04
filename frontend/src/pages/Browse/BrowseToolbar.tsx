@@ -12,7 +12,7 @@ interface SelectedSimulationsBreadcrumbProps {
 
 const MAX_SELECTION = 5;
 
-const SelectedSimulationChipList = ({
+const BrowseToolbar = ({
   simulations,
   buttonText,
   onCompareButtonClick,
@@ -78,4 +78,4 @@ const SelectedSimulationChipList = ({
   );
 };
 
-export default SelectedSimulationChipList;
+export default BrowseToolbar;

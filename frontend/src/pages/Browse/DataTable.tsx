@@ -17,7 +17,6 @@ import {
 import { ArrowUpDown, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
-import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -34,6 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import BrowseToolbar from '@/pages/Browse/BrowseToolbar';
 import type { Simulation } from '@/types/index';
 
 // Max number of rows that can be selected at once.
@@ -130,7 +130,7 @@ export const DataTable = ({
     <div className="w-full">
       {/* Top controls */}
       <div className="flex items-center py-4">
-        <SelectedSimulationChipList
+        <BrowseToolbar
           simulations={simulations}
           buttonText="Compare"
           onCompareButtonClick={handleCompareButtonClick}

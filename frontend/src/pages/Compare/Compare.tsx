@@ -1,8 +1,8 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import SelectedSimulationChipList from '@/components/layout/SelectedSimulationsChipList';
+import CompareToolbar from '@/pages/Compare/CompareToolbar';
 import { ComparisonAI } from '@/pages/Compare/ComparisonAI';
 import type { Simulation } from '@/types/index';
 import { formatDate, getSimulationDuration } from '@/utils/utils';
@@ -14,7 +14,6 @@ interface CompareSimulationsProps {
   selectedSimulations: Simulation[];
 }
 const CompareSimulations = ({
-  simulations,
   selectedSimulationIds,
   setSelectedSimulationIds,
   selectedSimulations,
@@ -339,6 +338,10 @@ const CompareSimulations = ({
             simulations, and expand sections for detailed metrics.
           </p>
         </header>
+        <CompareToolbar
+          simulationCount={selectedSimulationIds.length}
+          onBackToBrowse={handleButtonClick}
+        />
 
         <section
           aria-label="Show hidden simulations"
@@ -378,7 +381,7 @@ const CompareSimulations = ({
         <div className="overflow-x-auto">
           <div className="min-w-[72rem]">
             {/* Table header */}
-            <div className="flex border-b font-semibold text-sm bg-gray-200">
+            <div className="flex border-b bg-gray-100 font-semibold text-sm">
               {/* Empty first column header for formatting */}
               <div className="sticky-col shrink-0 w-64 px-4 py-2 border-r z-10 bg-white"></div>
               {order
@@ -386,7 +389,7 @@ const CompareSimulations = ({
                 .map((colIdx) => (
                   <div
                     key={colIdx}
-                    className="flex-1 min-w-[12rem] px-4 py-2 text-center cursor-default relative group bg-gray-200"
+                    className="flex-1 min-w-[12rem] px-4 py-2 text-center cursor-default relative group"
                     draggable
                     onDragStart={() => handleDragStart(colIdx)}
                     onDragOver={(e) => handleDragOver(e, colIdx)}
@@ -397,12 +400,12 @@ const CompareSimulations = ({
                       zIndex: dragOverIdx === colIdx ? 20 : undefined,
                     }}
                   >
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex items-center justify-center gap-2">
                       {/* Drag handle */}
                       <span
                         className="cursor-grab text-gray-400 hover:text-blue-600"
                         title="Drag to reorder"
-                        style={{ display: 'inline-flex', alignItems: 'center', marginRight: '2px' }}
+                        style={{ display: 'inline-flex', alignItems: 'center' }}
                         tabIndex={-1}
                         aria-label="Drag handle"
                       >
@@ -418,7 +421,7 @@ const CompareSimulations = ({
                       {/* Sim name clickable */}
                       <a
                         href={`/simulations/${selectedSimulationIds[colIdx]}`}
-                        className="text-lg font-semibold text-blue-700 hover:underline cursor-pointer transition flex items-center gap-1"
+                        className="text-lg font-semibold text-blue-700 hover:underline transition"
                         tabIndex={0}
                         title={`Go to details for ${headers[colIdx]}`}
                         onClick={(e) => {
@@ -427,18 +430,6 @@ const CompareSimulations = ({
                         }}
                       >
                         {headers[colIdx]}
-                        <span className="ml-1 text-blue-500" aria-hidden="true">
-                          {/* External link icon (↗) */}
-                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                            <path
-                              d="M5.5 10.5L10.5 5.5M10.5 5.5H6.5M10.5 5.5V9.5"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </span>
                       </a>
                     </div>
                     <button
@@ -482,7 +473,6 @@ const CompareSimulations = ({
                   </div>
                 ))}
             </div>
-
             {/* Table body with collapsible sections */}
             {Object.entries(metrics).map(([sectionKey, rows]) => (
               <React.Fragment key={sectionKey}>
