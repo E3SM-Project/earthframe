@@ -95,7 +95,10 @@ const tableColumns: ColumnDef<Simulation>[] = [
   {
     accessorKey: 'variables',
     header: 'Variables',
-    cell: (info) => (Array.isArray(info.getValue()) ? info.getValue().join(', ') : info.getValue()),
+    cell: (info) => {
+      const value = info.getValue();
+      return Array.isArray(value) ? (value as string[]).join(', ') : value;
+    },
   },
   {
     accessorKey: 'modelStartDate',

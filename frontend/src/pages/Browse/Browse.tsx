@@ -117,7 +117,8 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
       ] as const;
 
       for (const key of keys) {
-        const value = (sim as any)[key];
+        const value = (sim as Simulation)[key];
+
         if (Array.isArray(value)) {
           for (const v of value) {
             if (v && !(initial[key] as string[]).includes(v)) {
@@ -176,14 +177,14 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
 
       // Date range filters
       if (startModel || endModel) {
-        const recStart = parseDate((record as any).modelStartDate);
-        const recEnd = parseDate((record as any).modelEndDate);
+        const recStart = parseDate((record as Simulation).modelStartDate);
+        const recEnd = parseDate((record as Simulation).modelEndDate);
         if (startModel && recStart && recStart < startModel) return false;
         if (endModel && recEnd && recEnd > endModel) return false;
       }
 
       if (startUpload || endUpload) {
-        const recUpload = parseDate((record as any).uploadDate);
+        const recUpload = parseDate((record as Simulation).uploadDate);
         if (startUpload && recUpload && recUpload < startUpload) return false;
         if (endUpload && recUpload && recUpload > endUpload) return false;
       }
@@ -210,6 +211,7 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     const params = new URLSearchParams(location.search);
     const next: Partial<FilterState> = {};
 
+    // FIXME: typescript-eslint issues with any.
     (Object.keys(appliedFilters) as (keyof FilterState)[]).forEach((key) => {
       const value = params.get(key);
       if (value !== null) {

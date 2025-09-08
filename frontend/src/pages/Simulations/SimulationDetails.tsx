@@ -77,7 +77,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
           <h1 className="text-2xl font-bold">{simulation.name}</h1>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <span>Type:</span>
-            <SimulationTypeBadge type={simulation.simulationType} />
+            <SimulationTypeBadge simulationType={simulation.simulationType} />
             <span>•</span>
             <span>Status:</span>
             <SimulationStatusBadge status={simulation.status} />
@@ -497,13 +497,13 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
             </CardHeader>
             <CardContent className="space-y-4">
               <FieldRow label="Repository URL">
-                <ReadonlyInput value={simulation.externalRepoUrl} />
+                <ReadonlyInput value={simulation.externalRepoUrl ?? undefined} />
               </FieldRow>
               <FieldRow label="Version/Tag">
-                <ReadonlyInput value={simulation.versionTag} />
+                <ReadonlyInput value={simulation.versionTag ?? undefined} />
               </FieldRow>
               <FieldRow label="Commit Hash">
-                <ReadonlyInput value={simulation.gitHash} />
+                <ReadonlyInput value={simulation.gitHash ?? undefined} />
               </FieldRow>
               <FieldRow label="Branch">
                 <ReadonlyInput value={simulation.branch ?? undefined} />

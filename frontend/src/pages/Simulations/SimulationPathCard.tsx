@@ -16,7 +16,7 @@ const SimulationPathCard = ({ title, paths, emptyText }: SimulationPathCard) => 
       <CardContent className="space-y-2 text-sm">
         {paths?.length ? (
           <ul className="list-disc pl-5">
-            {paths.map((path, i) => {
+            {paths.map((path) => {
               const url = typeof path === 'string' ? path : path.url;
               const label = typeof path === 'string' ? path : path.label;
               return (

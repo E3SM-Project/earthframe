@@ -214,9 +214,148 @@ const ResultCard = ({ simulation, selected, onSelect }: ResultCardProps) => {
                   More Details
                   <ChevronDown className="w-4 h-4 ml-2" />
                 </summary>
-                <div className="mt-2 px-2 py-2 text-sm text-muted-foreground">
-                  <span className="font-medium">Description:</span>{' '}
-                  {simulation.description || 'No description.'}
+                <div className="px-2 py-2 space-y-2 text-sm text-gray-700">
+                  {/* Key Features */}
+                  {simulation.keyFeatures && (
+                    <div>
+                      <span className="font-semibold">Key Features:</span>
+                      <span className="ml-1 text-gray-600">{simulation.keyFeatures}</span>
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  {simulation.notesMarkdown && (
+                    <div>
+                      <span className="font-semibold">Notes:</span>
+                      <span className="ml-1 text-gray-600">{simulation.notesMarkdown}</span>
+                    </div>
+                  )}
+
+                  {/* Known Issues */}
+                  {simulation.knownIssues && (
+                    <div>
+                      <span className="font-semibold">Known Issues:</span>
+                      <span className="ml-1 text-gray-600">{simulation.knownIssues}</span>
+                    </div>
+                  )}
+
+                  {/* Annotations */}
+                  {simulation.annotations && simulation.annotations.length > 0 && (
+                    <div>
+                      <span className="font-semibold">Annotations:</span>
+                      <ul className="list-disc ml-6 text-gray-600">
+                        {simulation.annotations.map((a, i) => (
+                          <li key={i}>{a}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Diagnostic Links */}
+                  {simulation.diagnosticLinks && simulation.diagnosticLinks.length > 0 && (
+                    <div>
+                      <span className="font-semibold">Diagnostics:</span>
+                      <ul className="list-disc ml-6">
+                        {simulation.diagnosticLinks.map((d, i) => (
+                          <li key={i}>
+                            <a
+                              href={d.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-700 underline"
+                            >
+                              {d.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* PACE Links */}
+                  {simulation.paceLinks && simulation.paceLinks.length > 0 && (
+                    <div>
+                      <span className="font-semibold">PACE Links:</span>
+                      <ul className="list-disc ml-6">
+                        {simulation.paceLinks.map((p, i) => (
+                          <li key={i}>
+                            <a
+                              href={p.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-700 underline"
+                            >
+                              {p.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Git Info */}
+                  {(simulation.branch || simulation.gitHash) && (
+                    <div>
+                      <span className="font-semibold">Git:</span>
+                      <span className="ml-1 text-gray-600">
+                        {simulation.branch && (
+                          <>
+                            Branch: <span className="font-mono">{simulation.branch}</span>
+                          </>
+                        )}
+                        {simulation.gitHash && (
+                          <>
+                            {simulation.branch ? ' | ' : ''}
+                            Hash:{' '}
+                            <span className="font-mono">{simulation.gitHash.slice(0, 8)}</span>
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Run Script Paths */}
+                  {simulation.runScriptPaths && simulation.runScriptPaths.length > 0 && (
+                    <div>
+                      <span className="font-semibold">Run Scripts:</span>
+                      <ul className="list-disc ml-6 text-gray-600">
+                        {simulation.runScriptPaths.map((p, i) => (
+                          <li key={i} className="break-all">
+                            {p}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Archive Paths */}
+                  {simulation.archivePaths && simulation.archivePaths.length > 0 && (
+                    <div>
+                      <span className="font-semibold">Archive Paths:</span>
+                      <ul className="list-disc ml-6 text-gray-600">
+                        {simulation.archivePaths.map((p, i) => (
+                          <li key={i} className="break-all">
+                            {p}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Postprocessing Scripts */}
+                  {simulation.postprocessingScriptPath &&
+                    simulation.postprocessingScriptPath.length > 0 && (
+                      <div>
+                        <span className="font-semibold">Postprocessing Scripts:</span>
+                        <ul className="list-disc ml-6 text-gray-600">
+                          {simulation.postprocessingScriptPath.map((p, i) => (
+                            <li key={i} className="break-all">
+                              {p}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                 </div>
               </details>
             </div>

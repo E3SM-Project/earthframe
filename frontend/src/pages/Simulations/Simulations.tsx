@@ -343,12 +343,15 @@ const Simulations = ({ simulations }: SimulationProps) => {
             case 'branch':
               return csvEscape(o.branch ?? '');
             case 'runDate':
-              return csvEscape(formatDate(o.runDate));
+              return csvEscape(formatDate(o.runDate ?? undefined));
             case 'lastEditedAt':
               return csvEscape(formatDate(o.lastEditedAt));
             default: {
               // Fallback to value via column accessor
-              const val = (r as any).getValue?.(c.id) ?? (o as any)[c.id];
+              const val =
+                typeof r.getValue === 'function'
+                  ? r.getValue(c.id)
+                  : (r.original as Simulation)[c.id as keyof Simulation];
               return csvEscape(val ?? '');
             }
           }

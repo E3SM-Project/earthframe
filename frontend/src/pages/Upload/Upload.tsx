@@ -258,7 +258,7 @@ export default function Upload() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value as any }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const toggle = (k: OpenKey) => setOpen((prev) => (prev === k ? null : k));
@@ -479,7 +479,7 @@ export default function Upload() {
                 type="datetime-local"
                 className="mt-1 w-full h-10 rounded-md border px-3"
                 name="branchTime"
-                value={(form.branchTime as any) ?? ''}
+                value={(form.branchTime as string) ?? ''}
                 onChange={handleChange}
               />
             </div>
@@ -526,7 +526,7 @@ export default function Upload() {
               <input
                 className="mt-1 w-full h-10 rounded-md border px-3"
                 name="archivePaths"
-                value={(form.archivePaths as any)?.join?.(', ') ?? ''}
+                value={form.archivePaths?.join?.(', ') ?? ''}
                 onChange={(e) =>
                   setForm((p) => ({
                     ...p,
@@ -546,7 +546,7 @@ export default function Upload() {
               <input
                 className="mt-1 w-full h-10 rounded-md border px-3"
                 name="runScriptPaths"
-                value={(form.runScriptPaths as any)?.join?.(', ') ?? ''}
+                value={form.runScriptPaths?.join?.(', ') ?? ''}
                 onChange={(e) =>
                   setForm((p) => ({
                     ...p,
@@ -567,7 +567,7 @@ export default function Upload() {
               <input
                 className="mt-1 w-full h-10 rounded-md border px-3"
                 name="postprocessingScriptPath"
-                value={(form.postprocessingScriptPath as any)?.join?.(', ') ?? ''}
+                value={form.postprocessingScriptPath?.join?.(', ') ?? ''}
                 onChange={(e) =>
                   setForm((p) => ({
                     ...p,
@@ -588,7 +588,7 @@ export default function Upload() {
               <textarea
                 className="mt-1 w-full rounded-md border px-3 py-2"
                 name="batchLogPaths"
-                value={(form.batchLogPaths as any) ?? ''}
+                value={form.batchLogPaths ?? ''}
                 onChange={handleChange}
                 rows={2}
                 placeholder="/autolog/sim/run-19345.log"
@@ -662,7 +662,7 @@ export default function Upload() {
               <textarea
                 className="mt-1 w-full rounded-md border px-3 py-2"
                 name="notesMarkdown"
-                value={(form.notesMarkdown as any) ?? ''}
+                value={form.notesMarkdown ?? ''}
                 onChange={handleChange}
                 rows={4}
               />
@@ -675,7 +675,7 @@ export default function Upload() {
               <textarea
                 className="mt-1 w-full rounded-md border px-3 py-2"
                 name="knownIssues"
-                value={(form.knownIssues as any) ?? ''}
+                value={form.knownIssues ?? ''}
                 onChange={handleChange}
                 rows={2}
               />
@@ -689,7 +689,7 @@ export default function Upload() {
               <textarea
                 className="mt-1 w-full rounded-md border px-3 py-2"
                 name="annotations"
-                value={(form.annotations as any) ?? ''}
+                value={form.annotations ?? ''}
                 onChange={handleChange}
                 rows={2}
               />
