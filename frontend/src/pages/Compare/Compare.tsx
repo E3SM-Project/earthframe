@@ -1,9 +1,10 @@
 import { ChevronRight } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import CompareToolbar from '@/pages/Compare/CompareToolbar';
 import { ComparisonAI } from '@/pages/Compare/ComparisonAI';
+import { norm, renderCellValue } from '@/pages/Compare/utils';
 import type { Simulation } from '@/types/index';
 import { formatDate, getSimulationDuration } from '@/utils/utils';
 
@@ -13,15 +14,22 @@ interface CompareSimulationsProps {
   setSelectedSimulationIds: (ids: string[]) => void;
   selectedSimulations: Simulation[];
 }
+
 const CompareSimulations = ({
   selectedSimulationIds,
   setSelectedSimulationIds,
   selectedSimulations,
 }: CompareSimulationsProps) => {
+  // =========================
+  // Navigation & Constants
+  // =========================
   const HIDDEN_KEY = 'compare_hidden_cols';
   const navigate = useNavigate();
   const handleButtonClick = () => navigate('/Browse');
 
+  // =========================
+  // Simulation Headers & Helpers
+  // =========================
   const simHeaders = selectedSimulationIds.map((id) => {
     const sim = selectedSimulations.find((s) => s.id === id);
     return sim?.name || id;
@@ -36,62 +44,35 @@ const CompareSimulations = ({
     return (sim?.[prop] ?? fallback) as Simulation[K];
   };
 
+  // =========================
+  // Metrics Construction
+  // =========================
+  const makeMetricRow = <T extends keyof Simulation>(
+    label: string,
+    prop: T,
+    fallback: Simulation[T] | '' = '',
+  ) => ({
+    label,
+    values: selectedSimulationIds.map((id) => getSimProp(id, prop, fallback)),
+  });
+
   const metrics = {
     configuration: [
-      {
-        label: 'Simulation Name',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'name', '')),
-      },
-      {
-        label: 'Case Name',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'caseName', '')),
-      },
-      {
-        label: 'Model Version',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'versionTag', '')),
-      },
-      {
-        label: 'Compset',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'compset', '')),
-      },
-      {
-        label: 'Grid Name',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'gridName', '')),
-      },
-      {
-        label: 'Grid Resolution',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'gridResolution', '')),
-      },
-      {
-        label: 'Initialization Type',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'initializationType', '')),
-      },
-      {
-        label: 'Compiler',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'compiler', '')),
-      },
-      {
-        label: 'Parent Simulation ID',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'parentSimulationId', '')),
-      },
+      makeMetricRow('Simulation Name', 'name', ''),
+      makeMetricRow('Case Name', 'caseName', ''),
+      makeMetricRow('Model Version', 'versionTag', ''),
+      makeMetricRow('Compset', 'compset', ''),
+      makeMetricRow('Grid Name', 'gridName', ''),
+      makeMetricRow('Grid Resolution', 'gridResolution', ''),
+      makeMetricRow('Initialization Type', 'initializationType', ''),
+      makeMetricRow('Compiler', 'compiler', ''),
+      makeMetricRow('Parent Simulation ID', 'parentSimulationId', ''),
     ],
     modelSetup: [
-      {
-        label: 'Simulation Type',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'simulationType', '')),
-      },
-      {
-        label: 'Status',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'status', '')),
-      },
-      {
-        label: 'Campaign ID',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'campaignId', '')),
-      },
-      {
-        label: 'Experiment Type ID',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'experimentTypeId', '')),
-      },
+      makeMetricRow('Simulation Type', 'simulationType', ''),
+      makeMetricRow('Status', 'status', ''),
+      makeMetricRow('Campaign ID', 'campaignId', ''),
+      makeMetricRow('Experiment Type ID', 'experimentTypeId', ''),
       {
         label: 'Machine Name',
         values: selectedSimulationIds.map((id) => {
@@ -106,10 +87,7 @@ const CompareSimulations = ({
           return Array.isArray(sim?.variables) && sim.variables.length ? sim.variables : [];
         }),
       },
-      {
-        label: 'Branch',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'branch', '')),
-      },
+      makeMetricRow('Branch', 'branch', ''),
     ],
     timeline: [
       {
@@ -149,18 +127,8 @@ const CompareSimulations = ({
         }),
       },
     ],
-    keyFeatures: [
-      {
-        label: 'Key Features',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'keyFeatures', '')),
-      },
-    ],
-    knownIssues: [
-      {
-        label: 'Known Issues',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'knownIssues', '')),
-      },
-    ],
+    keyFeatures: [makeMetricRow('Key Features', 'keyFeatures', '')],
+    knownIssues: [makeMetricRow('Known Issues', 'knownIssues', '')],
     locations: [
       {
         label: 'Output Path',
@@ -169,61 +137,25 @@ const CompareSimulations = ({
           return outputPath ? [outputPath] : [];
         }),
       },
-      {
-        label: 'Archive Paths',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'archivePaths', [])),
-      },
-      {
-        label: 'Run Script Paths',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'runScriptPaths', [])),
-      },
-      {
-        label: 'Batch Logs',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'batchLogPaths', [])),
-      },
+      makeMetricRow('Archive Paths', 'archivePaths', []),
+      makeMetricRow('Run Script Paths', 'runScriptPaths', []),
+      makeMetricRow('Batch Logs', 'batchLogPaths', []),
     ],
-    diagnostics: [
-      {
-        label: 'Diagnostic Links',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'diagnosticLinks', [])),
-      },
-    ],
-    performance: [
-      {
-        label: 'PACE Links',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'paceLinks', [])),
-      },
-    ],
-    notes: [
-      {
-        label: 'Notes',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'notes', '')),
-      },
-    ],
+    diagnostics: [makeMetricRow('Diagnostic Links', 'diagnosticLinks', [])],
+    performance: [makeMetricRow('PACE Links', 'paceLinks', [])],
+    notes: [makeMetricRow('Notes', 'notesMarkdown', '')],
     versionControl: [
-      {
-        label: 'Repository URL',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'externalRepoUrl', '')),
-      },
-      {
-        label: 'Version/Tag',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'versionTag', '')),
-      },
-      {
-        label: 'Commit Hash',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'gitHash', '')),
-      },
-      {
-        label: 'Branch',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'branch', '')),
-      },
-      {
-        label: 'Branch Time',
-        values: selectedSimulationIds.map((id) => getSimProp(id, 'branchTime', '')),
-      },
+      makeMetricRow('Repository URL', 'externalRepoUrl', ''),
+      makeMetricRow('Version/Tag', 'versionTag', ''),
+      makeMetricRow('Commit Hash', 'gitHash', ''),
+      makeMetricRow('Branch', 'branch', ''),
+      makeMetricRow('Branch Time', 'branchTime', ''),
     ],
   };
 
+  // =========================
+  // State: Order, Headers, Hidden Columns, Drag
+  // =========================
   const [order, setOrder] = useState(selectedSimulationIds.map((_, i) => i));
   const [headers, setHeaders] = useState(simHeaders);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
@@ -238,6 +170,9 @@ const CompareSimulations = ({
   });
   const dragCol = useRef<number | null>(null);
 
+  // =========================
+  // Handlers: Show/Hide/Remove/Drag Columns
+  // =========================
   const handleShow = (hiddenId: string) => {
     setHidden((prev) => prev.filter((id) => id !== hiddenId));
   };
@@ -282,36 +217,27 @@ const CompareSimulations = ({
     dragCol.current = null;
   };
 
+  // =========================
+  // Effects: Sync Hidden, Headers, Order
+  // =========================
   useEffect(() => {
     setHidden((prev) => prev.filter((id) => selectedSimulationIds.includes(id)));
   }, [selectedSimulationIds]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
   }, [hidden]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setHeaders(
       selectedSimulationIds.map((id) => selectedSimulations.find((s) => s.id === id)?.name || id),
     );
     setOrder(selectedSimulationIds.map((_, i) => i));
   }, [selectedSimulationIds, selectedSimulations]);
 
-  if (selectedSimulationIds.length === 0) {
-    return (
-      <div className="max-w-screen-2xl mx-auto p-8 text-center text-gray-600">
-        <p className="text-lg mb-4">No simulations selected for comparison.</p>
-        <a
-          href="/browse"
-          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          Go to Browse Page
-        </a>
-      </div>
-    );
-  }
-
-  // Collapsible section state
+  // =========================
+  // State: Collapsible Sections
+  // =========================
   const defaultExpanded = ['configuration', 'modelSetup', 'timeline'];
   const allSectionKeys = Object.keys(metrics);
   const initialExpandedSections: Record<string, boolean> = {};
@@ -328,6 +254,40 @@ const CompareSimulations = ({
     }));
   };
 
+  // =========================
+  // Differences Highlighting
+  // =========================
+  const rowHasDiffs = (vals: unknown[]): boolean => {
+    if (visibleOrder.length <= 1) return false;
+    const first = norm(vals[visibleOrder[0]]);
+    for (let i = 1; i < visibleOrder.length; i++) {
+      if (norm(vals[visibleOrder[i]]) !== first) return true;
+    }
+    return false;
+  };
+  const [diffsEnabled, setDiffsEnabled] = useState(false);
+
+  // =========================
+  // Derived: Visible Order
+  // =========================
+  const visibleOrder = order.filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]));
+
+  // =================================
+  // Fallback: no simulations selected
+  // =================================
+  if (selectedSimulationIds.length === 0) {
+    return (
+      <div className="max-w-screen-2xl mx-auto p-8 text-center text-gray-600">
+        <p className="text-lg mb-4">No simulations selected for comparison.</p>
+        <a
+          href="/browse"
+          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Go to Browse Page
+        </a>
+      </div>
+    );
+  }
   return (
     <div className="w-full bg-white">
       <div className="mx-auto max-w-[1440px] px-6 py-8">
@@ -338,11 +298,31 @@ const CompareSimulations = ({
             simulations, and expand sections for detailed metrics.
           </p>
         </header>
+
         <CompareToolbar
           simulationCount={selectedSimulationIds.length}
           onBackToBrowse={handleButtonClick}
         />
 
+        {/* Highlight Differences */}
+        <div className="mt-3 mb-2 flex items-center gap-3">
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="h-4 w-4"
+              checked={diffsEnabled}
+              onChange={(e) => setDiffsEnabled(e.target.checked)}
+            />
+            <span className="select-none">Highlight differences</span>
+          </label>
+          {diffsEnabled && (
+            <span className="text-xs text-gray-500">
+              Rows that differ across visible simulations are highlighted.
+            </span>
+          )}
+        </div>
+
+        {/* Show Hidden Simulations  */}
         <section
           aria-label="Show hidden simulations"
           className={`mb-2 flex gap-2 items-center min-h-[2.25rem]${hidden.length === 0 ? ' invisible' : ''}`}
@@ -377,12 +357,11 @@ const CompareSimulations = ({
           )}
         </section>
 
-        {/* Single table container with horizontal scroll */}
+        {/* Table */}
         <div className="overflow-x-auto">
           <div className="min-w-[72rem]">
-            {/* Table header */}
+            {/* Column headers */}
             <div className="flex border-b bg-gray-100 font-semibold text-sm">
-              {/* Empty first column header for formatting */}
               <div className="sticky-col shrink-0 w-64 px-4 py-2 border-r z-10 bg-white"></div>
               {order
                 .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
@@ -473,9 +452,10 @@ const CompareSimulations = ({
                   </div>
                 ))}
             </div>
-            {/* Table body with collapsible sections */}
+
+            {/* Sections + rows */}
             {Object.entries(metrics).map(([sectionKey, rows]) => (
-              <React.Fragment key={sectionKey}>
+              <Fragment key={sectionKey}>
                 <div
                   className={`flex border-t items-center transition-all ${
                     expandedSections[sectionKey]
@@ -514,57 +494,43 @@ const CompareSimulations = ({
 
                 {expandedSections[sectionKey] && (
                   <div id={`section-${sectionKey}`}>
-                    {rows.map((row, rowIdx) => (
-                      <div key={rowIdx} className="flex border-t">
-                        <div className="sticky-col w-64 px-4 py-2 font-medium text-sm border-r bg-white z-10">
-                          {row.label}
-                        </div>
-                        {order
-                          .filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]))
-                          .map((colIdx) => {
+                    {rows.map((row, rowIdx) => {
+                      const isDiff = diffsEnabled && rowHasDiffs(row.values);
+                      return (
+                        <div
+                          key={rowIdx}
+                          className={`flex border-t ${isDiff ? 'bg-amber-50' : ''}`}
+                        >
+                          {/* metric/label cell */}
+                          <div
+                            className={`sticky-col w-64 px-4 py-2 font-medium text-sm border-r bg-white z-10 ${
+                              isDiff ? 'border-l-2 border-amber-400' : ''
+                            }`}
+                          >
+                            {row.label}
+                          </div>
+
+                          {/* values */}
+                          {visibleOrder.map((colIdx) => {
                             const value = row.values[colIdx];
-                            // Render links for locations section
-                            if (sectionKey === 'locations' && Array.isArray(value)) {
-                              return (
-                                <div
-                                  key={colIdx}
-                                  className="flex-1 min-w-[12rem] px-4 py-2 text-sm"
-                                >
-                                  {value.length > 0 ? (
-                                    value.map(
-                                      (linkObj: { url: string; label?: string }, idx: number) => (
-                                        <a
-                                          key={idx}
-                                          href={linkObj.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-blue-600 underline mr-2 break-all"
-                                        >
-                                          {linkObj.label || linkObj.url}
-                                        </a>
-                                      ),
-                                    )
-                                  ) : (
-                                    <span className="text-gray-400">—</span>
-                                  )}
-                                </div>
-                              );
-                            }
                             return (
-                              <div key={colIdx} className="flex-1 min-w-[12rem] px-4 py-2 text-sm">
-                                {Array.isArray(value)
-                                  ? value.join(', ')
-                                  : value || <span className="text-gray-400">—</span>}
+                              <div
+                                key={colIdx}
+                                className="flex-1 min-w-[12rem] px-4 py-2 text-sm break-words"
+                              >
+                                {renderCellValue(value)}
                               </div>
                             );
                           })}
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
-              </React.Fragment>
+              </Fragment>
             ))}
 
+            {/* Comparison AI Floating Widget */}
             <ComparisonAI
               selectedSimulations={selectedSimulations.filter((sim) =>
                 selectedSimulationIds.includes(sim.id),

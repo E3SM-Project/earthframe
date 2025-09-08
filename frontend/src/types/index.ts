@@ -54,6 +54,7 @@ export interface RawSimulation {
   paceLinks: ExternalUrl[];
 
   // Metadata & audit
+  keyFeatures: string | null;
   notesMarkdown?: string | null;
   knownIssues?: string | null;
   annotations: string[];
