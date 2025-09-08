@@ -24,7 +24,6 @@ import type { Simulation } from '@/types/index';
 interface ResultCardProps {
   simulation: Simulation;
   selected: boolean;
-  selectedSimulationIds: Simulation[];
   onSelect: (sim: Simulation) => void;
 }
 
