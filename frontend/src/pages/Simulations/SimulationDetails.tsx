@@ -50,7 +50,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
     {
       id: 'c1',
       author: 'Jane Doe',
-      date: '2024-02-15',
+      date: '2024-02-15T13:45:00Z',
       text: 'The sea-ice diagnostics will be added later.',
     },
   ] as { id: string; author: string; date: string; text: string }[]);
@@ -62,7 +62,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
       {
         id: `c${prev.length + 1}`,
         author: 'You',
-        date: format(new Date(), 'yyyy-MM-dd'),
+        date: new Date().toISOString(),
         text: newComment.trim(),
       },
     ]);
@@ -429,8 +429,12 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
             <h3 className="mb-2 text-sm font-semibold tracking-tight">Comments</h3>
             <div className="space-y-4">
               {comments.map((c) => (
-                <div key={c.id} className="flex gap-3">
-                  <Avatar className="h-8 w-8">
+                <div
+                  key={c.id}
+                  className="flex gap-3 py-4 px-2 rounded transition-all"
+                  style={{ marginBottom: '16px', marginTop: '16px' }}
+                >
+                  <Avatar className="h-8 w-8 mt-1">
                     <AvatarFallback>
                       {c.author
                         .split(' ')
@@ -440,10 +444,10 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                       <span className="font-medium text-foreground">{c.author}</span>
                       <span>•</span>
-                      <span>{format(new Date(c.date), 'MM/dd/yyyy')}</span>
+                      <span>{formatDate(c.date)}</span>
                     </div>
                     <p className="text-sm leading-relaxed">{c.text}</p>
                   </div>
