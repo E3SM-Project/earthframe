@@ -15,12 +15,10 @@ export interface RawSimulation {
   compiler?: string | null;
   parentSimulationId?: string | null;
 
-  // Provenance & submission
-  uploadedBy: string;
-  uploadDate: string;
-  lastModified: string;
-  lastEditedBy: string;
-  lastEditedAt: string;
+  // Timeline
+  modelStartDate: string;
+  modelEndDate: string;
+  calendarStartDate?: string | null;
 
   // Model setup (context)
   simulationType: 'production' | 'master' | 'experimental';
@@ -30,14 +28,18 @@ export interface RawSimulation {
   machineId: string;
   variables: string[];
 
+  // Provenance & submission
+  uploadedBy: string;
+  uploadDate: string;
+  lastModified: string;
+  lastEditedBy: string;
+  lastEditedAt: string;
+
+  // Version Control
   branch?: string | null;
   branchTime?: string | null;
   gitHash?: string | null;
   externalRepoUrl?: string | null;
-
-  modelStartDate: string;
-  modelEndDate: string;
-  calendarStartDate?: string | null;
 
   // Execution & output
   runDate?: string | null;
