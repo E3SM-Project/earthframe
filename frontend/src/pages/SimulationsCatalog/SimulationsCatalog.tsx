@@ -1,6 +1,6 @@
 import { Tooltip } from '@radix-ui/react-tooltip';
+import type { ColumnDef } from '@tanstack/react-table';
 import {
-  ColumnDef,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -56,17 +56,11 @@ const typeColors: Record<Simulation['simulationType'], string> = {
 
 const formatDate = (d?: string) => {
   if (!d) return '—';
+
   const dt = new Date(d);
   if (Number.isNaN(dt.getTime())) return '—';
-  return format(dt, 'yyyy-MM-dd');
-};
 
-// Escape CSV fields (wrap with quotes, double quotes inside)
-const csvEscape = (v: unknown): string => {
-  if (v === undefined || v === null) return '';
-  const s = String(v);
-  if (/["\n,]/.test(s)) return '"' + s.replaceAll('"', '""') + '"';
-  return s;
+  return format(dt, 'yyyy-MM-dd');
 };
 
 const Simulations = ({ simulations }: SimulationProps) => {
@@ -81,7 +75,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
 
   const columns = useMemo<ColumnDef<Simulation>[]>(
     () => [
-      // Name (link)
       {
         accessorKey: 'name',
         header: 'Name',
@@ -96,7 +89,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 260,
       },
-      // Type (badge)
       {
         accessorKey: 'simulationType',
         header: 'Type',
@@ -110,7 +102,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 130,
       },
-      // Status (badge)
       {
         accessorKey: 'status',
         header: 'Status',
@@ -126,11 +117,8 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 130,
       },
-      // Version / Tag
       { accessorKey: 'versionTag', header: 'Version / Tag', size: 180 },
-      // Grid
       { accessorKey: 'gridName', header: 'Grid', size: 110 },
-      // Compset (truncated)
       {
         accessorKey: 'compset',
         header: 'Compset',
@@ -141,14 +129,12 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 180,
       },
-      // Model date range
       {
         id: 'modelDates',
         header: 'Dates (Model)',
         accessorFn: (r) => `${formatDate(r.modelStartDate)} → ${formatDate(r.modelEndDate)}`,
         size: 220,
       },
-      // Machine
       {
         accessorKey: 'machineId',
         header: 'Machine',
@@ -157,7 +143,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 140,
       },
-      // Vars count (with tooltip on hover)
       {
         id: 'vars',
         header: 'Vars',
@@ -185,7 +170,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
         },
         size: 90,
       },
-      // Diagnostics counts
       {
         id: 'diagnostics',
         header: 'Diagnostics',
@@ -208,7 +192,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
         },
         size: 150,
       },
-      // Submitted date
       {
         accessorKey: 'uploadDate',
         header: 'Submitted',
@@ -226,6 +209,7 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 120,
         enableHiding: true,
+        meta: { isAdvance: true },
       },
       {
         accessorKey: 'branch',
@@ -237,6 +221,7 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 140,
         enableHiding: true,
+        meta: { isAdvanced: true },
       },
       {
         accessorKey: 'runDate',
@@ -244,6 +229,7 @@ const Simulations = ({ simulations }: SimulationProps) => {
         cell: ({ getValue }) => formatDate(getValue() as string | undefined),
         size: 140,
         enableHiding: true,
+        meta: { isAdvanced: true },
       },
       {
         accessorKey: 'lastEditedAt',
@@ -255,6 +241,7 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 170,
         enableHiding: true,
+        meta: { isAdvanced: true },
       },
     ],
     [],
@@ -297,78 +284,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
     setSelectedRows(next);
   };
 
-  // Export currently filtered + sorted rows (pre-pagination) with visible columns
-  const exportCsv = () => {
-    const rows = table.getPrePaginationRowModel().rows; // filtered + sorted
-    const visibleCols = table
-      .getAllLeafColumns()
-      .filter((c) => c.getIsVisible())
-      .map((c) => ({ id: c.id, header: String(c.columnDef.header ?? c.id) }));
-
-    // Add explicit selection column? (no)
-    const headers = visibleCols.map((c) => csvEscape(c.header)).join(',');
-
-    const lines = rows.map((r) => {
-      return visibleCols
-        .map((c) => {
-          const o = r.original as Simulation;
-          switch (c.id) {
-            case 'name':
-              return csvEscape(o.name);
-            case 'simulationType':
-              return csvEscape(o.simulationType);
-            case 'status':
-              return csvEscape(o.status);
-            case 'versionTag':
-              return csvEscape(o.versionTag);
-            case 'gridName':
-              return csvEscape(o.gridName);
-            case 'compset':
-              return csvEscape(o.compset);
-            case 'modelDates':
-              return csvEscape(`${formatDate(o.modelStartDate)} → ${formatDate(o.modelEndDate)}`);
-            case 'machineId':
-              return csvEscape(o.machineId);
-            case 'vars':
-              return csvEscape(o.variables?.length ?? 0);
-            case 'diagnostics': {
-              const diag = o.diagnosticLinks?.length ?? 0;
-              const pace = o.paceLinks?.length ?? 0;
-              return csvEscape(`diag:${diag}; pace:${pace}`);
-            }
-            case 'uploadDate':
-              return csvEscape(formatDate(o.uploadDate));
-            case 'gitHash':
-              return csvEscape(o.gitHash?.slice(0, 7) ?? '');
-            case 'branch':
-              return csvEscape(o.branch ?? '');
-            case 'runDate':
-              return csvEscape(formatDate(o.runDate ?? undefined));
-            case 'lastEditedAt':
-              return csvEscape(formatDate(o.lastEditedAt));
-            default: {
-              // Fallback to value via column accessor
-              const val =
-                typeof r.getValue === 'function'
-                  ? r.getValue(c.id)
-                  : (r.original as Simulation)[c.id as keyof Simulation];
-              return csvEscape(val ?? '');
-            }
-          }
-        })
-        .join(',');
-    });
-
-    const csv = [headers, ...lines].join('\n');
-    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `simulations_${format(new Date(), 'yyyyMMdd_HHmmss')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="mx-auto w-full max-w-[1600px] px-8 py-8 space-y-6">
       {/* Header */}
@@ -382,9 +297,6 @@ const Simulations = ({ simulations }: SimulationProps) => {
         <div className="flex items-center gap-3">
           <Button variant="outline" onClick={() => navigate('/upload')}>
             Upload to Catalog
-          </Button>
-          <Button variant="default" onClick={exportCsv}>
-            Export CSV
           </Button>
         </div>
       </div>
@@ -437,7 +349,7 @@ const Simulations = ({ simulations }: SimulationProps) => {
             }
             title="Hide advanced columns (Git, Branch, Run Date, Edited)"
           >
-            Scientist
+            Simple
           </Button>
           <Button
             variant="secondary"
@@ -452,7 +364,7 @@ const Simulations = ({ simulations }: SimulationProps) => {
             }
             title="Show advanced columns (Git, Branch, Run Date, Edited)"
           >
-            Developer
+            Advanced
           </Button>
         </div>
       </div>
@@ -476,12 +388,14 @@ const Simulations = ({ simulations }: SimulationProps) => {
                 </TableHead>
                 {headerGroup.headers.map((header) => {
                   const isName = header.column.id === 'name';
+                  const isAdvanced = header.column.columnDef.meta?.isAdvanced;
                   return (
                     <TableHead
                       key={header.id}
                       className={cn(
                         'whitespace-nowrap',
                         isName && 'sticky left-10 z-20 bg-background border-r',
+                        isAdvanced && columnVisibility[header.column.id] && 'bg-yellow-100',
                       )}
                     >
                       {header.isPlaceholder ? null : (
@@ -532,17 +446,19 @@ const Simulations = ({ simulations }: SimulationProps) => {
                 </TableCell>
                 {row.getVisibleCells().map((cell) => {
                   const isName = cell.column.id === 'name';
+                  const isAdvanced = cell.column.columnDef.meta?.isAdvanced;
                   return (
                     <TableCell
                       key={cell.id}
                       className={cn(
                         'whitespace-nowrap',
                         isName && 'sticky left-10 z-[5] bg-background border-r',
+                        isAdvanced && columnVisibility[cell.column.id] && 'bg-yellow-50',
                       )}
                     >
-                      {cell.column.columnDef.cell
-                        ? (cell.column.columnDef.cell as any)(cell.getContext())
-                        : ((cell.getValue() as any) ?? '—')}
+                      {typeof cell.column.columnDef.cell === 'function'
+                        ? cell.column.columnDef.cell(cell.getContext())
+                        : ((cell.getValue() as unknown) ?? '—')}
                     </TableCell>
                   );
                 })}

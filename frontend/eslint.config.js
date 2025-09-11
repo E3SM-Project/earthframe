@@ -1,16 +1,21 @@
 import js from '@eslint/js';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import prettier from 'eslint-config-prettier';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import prettier from 'eslint-config-prettier';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default [
   // Ignore patterns
   {
-    ignores: ['dist', 'src/components/ui/**', 'src/components/ui/use-toast.ts'],
+    ignores: [
+      'dist',
+      'src/components/ui/**',
+      'src/components/ui/use-toast.ts',
+      'src/components/examples/**' /* auto-generated examples */,
+    ],
   },
 
   // Base JS recommended (flat-ready)

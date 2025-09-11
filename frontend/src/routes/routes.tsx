@@ -6,8 +6,8 @@ import Browse from '@/pages/Browse/Browse';
 import Compare from '@/pages/Compare/Compare';
 import Docs from '@/pages/Docs/Docs';
 import Home from '@/pages/Home/Home';
-import SimulationDetails from '@/pages/Simulations/SimulationDetails';
-import Simulations from '@/pages/Simulations/Simulations';
+import Simulations from '@/pages/SimulationsCatalog/SimulationsCatalog';
+import SimulationDetails from '@/pages/SimulationsCatalog/SimulationsCatalogDetails';
 import Upload from '@/pages/Upload/Upload';
 import type { Simulation } from '@/types/index';
 

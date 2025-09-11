@@ -6,16 +6,18 @@ import { fetchAISimAnalysis } from '@/api/compareAPI';
 import { Button } from '@/components/ui/button';
 import type { Simulation } from '@/types/index';
 
-interface Props {
+interface CompareAIFloatingButtonProps {
   selectedSimulations: Simulation[];
 }
 
-export function ComparisonAI({ selectedSimulations }: Props) {
+export const CompareAIFloatingButton = ({ selectedSimulations }: CompareAIFloatingButtonProps) => {
+  // -------------------- Local State --------------------
   const [aiResult, setAIResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const handleAICompare = async () => {
+  // -------------------- Handlers --------------------
+  const handleButtonClick = async () => {
     setLoading(true);
     setAIResult(null);
     try {
@@ -43,7 +45,7 @@ export function ComparisonAI({ selectedSimulations }: Props) {
         <Button
           onClick={() => {
             setOpen(true);
-            handleAICompare();
+            handleButtonClick();
           }}
           variant="outline"
           size="lg"
@@ -99,7 +101,7 @@ export function ComparisonAI({ selectedSimulations }: Props) {
             <div className="mt-1">Powered by TBD.</div>
           </div>
           <div className="p-4 border-t flex justify-end">
-            <Button onClick={handleAICompare} disabled={loading}>
+            <Button onClick={handleButtonClick} disabled={loading}>
               <span className="flex items-center gap-1">
                 <Sparkles size={16} />
                 Regenerate Insight
@@ -110,4 +112,4 @@ export function ComparisonAI({ selectedSimulations }: Props) {
       )}
     </div>
   );
-}
+};

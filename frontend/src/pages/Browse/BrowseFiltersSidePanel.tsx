@@ -8,17 +8,20 @@ interface FilterPanelProps {
   machineOptions: { value: string; label: string }[];
 }
 
-const FiltersPanel = ({
+const BrowseFiltersSidePanel = ({
   appliedFilters,
   availableFilters,
   onChange,
   machineOptions,
 }: FilterPanelProps) => {
+  // -------------------- Handlers --------------------
   const handleChange = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     const nextValue = Array.isArray(value) ? Array.from(new Set(value)) : value;
+
     onChange({ ...appliedFilters, [key]: nextValue });
   };
 
+  // -------------------- Render --------------------
   return (
     <aside className="w-[360px] max-w-full bg-background border-r p-6 flex flex-col gap-6 min-h-screen">
       {/* Scientific Goal */}
@@ -82,7 +85,6 @@ const FiltersPanel = ({
         />
       </CollapsibleGroup>
 
-      {/* Execution Details */}
       <CollapsibleGroup
         title="Execution Details"
         description="Filter by run status or time information."
@@ -109,4 +111,4 @@ const FiltersPanel = ({
   );
 };
 
-export default FiltersPanel;
+export default BrowseFiltersSidePanel;

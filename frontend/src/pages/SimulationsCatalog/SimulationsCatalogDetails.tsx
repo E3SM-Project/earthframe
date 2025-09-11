@@ -1,7 +1,8 @@
-import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import SimulationStatusBadge from '@/components/shared/SimulationStatusBadge';
+import SimulationTypeBadge from '@/components/shared/SimulationTypeBadge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,9 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import SimulationPathCard from '@/pages/Simulations/SimulationPathCard';
-import SimulationStatusBadge from '@/pages/Simulations/SimulationStatusBadge';
-import SimulationTypeBadge from '@/pages/Simulations/SimulationTypeBadge';
+import SimulationPathCard from '@/pages/SimulationsCatalog/SimulationsCatalogPathCard';
 import type { Simulation } from '@/types/index';
 import { formatDate, getSimulationDuration } from '@/utils/utils';
 

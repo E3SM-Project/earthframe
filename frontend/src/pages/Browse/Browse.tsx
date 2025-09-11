@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { DataTable } from '@/pages/Browse/DataTable';
-import FiltersPanel from '@/pages/Browse/FiltersPanel';
-import ResultCards from '@/pages/Browse/ResultCards';
+import BrowseCardsView from '@/pages/Browse/BrowseCardsView';
+import BrowseFiltersSidePanel from '@/pages/Browse/BrowseFiltersSidePanel';
+import { BrowseTableView } from '@/pages/Browse/BrowseTableView';
 import type { Simulation } from '@/types/index';
 
 export interface FilterState {
@@ -16,7 +16,7 @@ export interface FilterState {
   variables: string[];
 
   // Simulation Context
-  machineId: string[]; // store IDs here
+  machineId: string[];
   compset: string[];
   gridName: string[];
   simulationType: string[];
@@ -24,8 +24,8 @@ export interface FilterState {
 
   // Execution Details
   status: string[];
-  modelStartDate: string; // YYYY-MM-DD
-  modelEndDate: string; // YYYY-MM-DD
+  modelStartDate: string;
+  modelEndDate: string;
 
   // Metadata
   uploadStartDate: string; // ISO Date
@@ -38,26 +38,14 @@ interface BrowseProps {
   setSelectedSimulationIds: (ids: string[]) => void;
 }
 
+const parseDate = (s?: string) => (s ? new Date(s) : undefined);
+
 const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }: BrowseProps) => {
-  // -------------------- Selectors / helpers --------------------
-  const simMachineId = (s: Simulation) =>
-    s.machine?.id ??
-    (typeof (s as { machineId?: string }).machineId === 'string'
-      ? (s as { machineId?: string }).machineId
-      : undefined);
-  const simMachineName = (s: Simulation) => s.machine?.name ?? 'Unknown machine';
+  // -------------------- Router --------------------
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const machineOptions = useMemo(() => {
-    const m = new Map<string, string>();
-    for (const s of simulations) {
-      const id = simMachineId(s);
-      if (id) m.set(id, simMachineName(s));
-    }
-    return Array.from(m, ([value, label]) => ({ value, label }));
-  }, [simulations]);
-
-  const parseDate = (s?: string) => (s ? new Date(s) : undefined);
-  // -------------------- State --------------------
+  // -------------------- Local State --------------------
   const [appliedFilters, setAppliedFilters] = useState<FilterState>({
     campaignId: [],
     experimentTypeId: [],
@@ -76,18 +64,29 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
 
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
-  // -------------------- Router --------------------
-  const location = useLocation();
-  const navigate = useNavigate();
-
   // -------------------- Derived Data --------------------
-  // Build unique selectable values from the dataset
+  const simMachineId = (s: Simulation) =>
+    s.machine?.id ??
+    (typeof (s as { machineId?: string }).machineId === 'string'
+      ? (s as { machineId?: string }).machineId
+      : undefined);
+  const simMachineName = (s: Simulation) => s.machine?.name ?? 'Unknown machine';
+
+  const machineOptions = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const s of simulations) {
+      const id = simMachineId(s);
+      if (id) m.set(id, simMachineName(s));
+    }
+    return Array.from(m, ([value, label]) => ({ value, label }));
+  }, [simulations]);
+
   const availableFilters = useMemo(() => {
     const initial: FilterState = {
       campaignId: [],
       experimentTypeId: [],
       variables: [],
-      machineId: [], // we'll push IDs here
+      machineId: [],
       compset: [],
       gridName: [],
       simulationType: [],
@@ -100,11 +99,9 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     };
 
     for (const sim of simulations) {
-      // machineId → always use the actual ID for logic
       const mid = simMachineId(sim);
       if (mid && !initial.machineId.includes(mid)) initial.machineId.push(mid);
 
-      // Collect the rest generically
       const keys = [
         'campaignId',
         'experimentTypeId',
@@ -136,14 +133,12 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     return initial;
   }, [simulations]);
 
-  // Filter application: IDs for logic, names for UI
   const filteredData = useMemo(() => {
     const startModel = parseDate(appliedFilters.modelStartDate);
     const endModel = parseDate(appliedFilters.modelEndDate);
     const startUpload = parseDate(appliedFilters.uploadStartDate);
     const endUpload = parseDate(appliedFilters.uploadEndDate);
 
-    // Array-driven filter keys and their getters
     const arrayFilterGetters: Record<
       keyof FilterState,
       (rec: Simulation) => string | string[] | undefined
@@ -164,7 +159,6 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     };
 
     return simulations.filter((record) => {
-      // Array-driven filters
       for (const key of Object.keys(arrayFilterGetters) as (keyof FilterState)[]) {
         if (Array.isArray(appliedFilters[key]) && (appliedFilters[key] as string[]).length > 0) {
           const raw = arrayFilterGetters[key](record);
@@ -175,7 +169,6 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
         }
       }
 
-      // Date range filters
       if (startModel || endModel) {
         const recStart = parseDate((record as Simulation).modelStartDate);
         const recEnd = parseDate((record as Simulation).modelEndDate);
@@ -194,40 +187,39 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
   }, [simulations, appliedFilters]);
 
   // -------------------- Effects --------------------
-  // Sync filter state with URL query params
-  const arrayKeys: (keyof FilterState)[] = [
-    'campaignId',
-    'experimentTypeId',
-    'variables',
-    'machineId',
-    'compset',
-    'gridName',
-    'simulationType',
-    'versionTag',
-    'status',
-  ];
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const next: Partial<FilterState> = {};
+    const arrayKeys: (keyof FilterState)[] = [
+      'campaignId',
+      'experimentTypeId',
+      'variables',
+      'machineId',
+      'compset',
+      'gridName',
+      'simulationType',
+      'versionTag',
+      'status',
+    ];
 
-    // FIXME: typescript-eslint issues with any.
     (Object.keys(appliedFilters) as (keyof FilterState)[]).forEach((key) => {
       const value = params.get(key);
       if (value !== null) {
         if (arrayKeys.includes(key)) {
+          // FIXME: Fix below eslint error with any (TS is being difficult).
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           next[key] = value ? (value.split(',') as any) : [];
         } else {
+          // FIXME: Fix below eslint error with any (TS is being difficult).
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           next[key] = value as any;
         }
       }
     });
 
     setAppliedFilters((prev) => ({ ...prev, ...next }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search]);
+  }, [location.search, appliedFilters]);
 
-  // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
 
@@ -240,11 +232,10 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     });
 
     navigate({ search: params.toString() }, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appliedFilters]);
+  }, [appliedFilters, navigate]);
 
   // -------------------- Handlers --------------------
-  const resetFilters = () => {
+  const handleResetFilters = () => {
     setAppliedFilters({
       campaignId: [],
       experimentTypeId: [],
@@ -266,13 +257,14 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
     navigate('/compare');
   };
 
+  // -------------------- Render --------------------
   return (
     <div className="w-full bg-white">
       <div className="mx-auto max-w-[1440px] px-6 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex flex-row w-full gap-6">
             <div className="w-full md:w-[400px] min-w-0 md:min-w-[180px]">
-              <FiltersPanel
+              <BrowseFiltersSidePanel
                 appliedFilters={appliedFilters}
                 availableFilters={availableFilters}
                 onChange={setAppliedFilters}
@@ -334,7 +326,6 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
               </header>
 
               <div className="flex flex-col items-start gap-2">
-                {/* Active Filters Chips */}
                 <div className="flex flex-wrap gap-2">
                   {(
                     Object.entries(appliedFilters) as [keyof FilterState, string[] | string][]
@@ -413,7 +404,6 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
                     }
                     return [];
                   })}
-                  {/* Clear All Filters Button */}
                   {Object.values(appliedFilters).some((v) =>
                     Array.isArray(v) ? v.length > 0 : !!v,
                   ) && (
@@ -421,7 +411,7 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
                       type="button"
                       className="inline-flex items-center px-3 py-1 rounded-full bg-red-100 text-sm text-red-700 border border-red-300 ml-2"
                       aria-label="Clear all filters"
-                      onClick={resetFilters}
+                      onClick={handleResetFilters}
                     >
                       <span className="mr-2 font-medium">Clear All</span>
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -438,7 +428,7 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
               </div>
               <div>
                 {viewMode === 'table' ? (
-                  <DataTable
+                  <BrowseTableView
                     simulations={simulations}
                     filteredData={filteredData}
                     selectedSimulationIds={selectedSimulationIds}
@@ -446,7 +436,7 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
                     handleCompareButtonClick={handleCompareButtonClick}
                   />
                 ) : (
-                  <ResultCards
+                  <BrowseCardsView
                     simulations={simulations}
                     filteredData={filteredData}
                     selectedSimulationIds={selectedSimulationIds}

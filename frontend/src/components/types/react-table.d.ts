@@ -7,5 +7,6 @@ declare module '@tanstack/react-table' {
     sticky?: boolean;
     width?: number;
     position?: 'left' | 'right';
+    isAdvanced?: boolean;
   }
 }

@@ -1,5 +1,5 @@
+import ResultCard from '@/pages/Browse/BrowseCard';
 import BrowseToolbar from '@/pages/Browse/BrowseToolbar';
-import ResultCard from '@/pages/Browse/ResultCard';
 import type { Simulation } from '@/types/index';
 
 interface ResultCardsProps {
@@ -10,7 +10,7 @@ interface ResultCardsProps {
   handleCompareButtonClick: () => void;
 }
 
-const ResultCards = ({
+const BrowseCardsView = ({
   simulations,
   filteredData,
   selectedSimulationIds,
@@ -39,7 +39,7 @@ const ResultCards = ({
             <ResultCard
               simulation={sim}
               selected={selectedSimulationIds.includes(sim.id)}
-              onSelect={() => {
+              handleSelect={() => {
                 if (selectedSimulationIds.includes(sim.id)) {
                   setSelectedSimulationIds(selectedSimulationIds.filter((id) => id !== sim.id));
                 } else {
@@ -54,4 +54,4 @@ const ResultCards = ({
   );
 };
 
-export default ResultCards;
+export default BrowseCardsView;

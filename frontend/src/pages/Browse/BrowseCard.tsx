@@ -14,24 +14,27 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import SimulationStatusBadge from '@/components/shared/SimulationStatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import SimulationStatusBadge from '@/pages/Simulations/SimulationStatusBadge';
 import type { Simulation } from '@/types/index';
 
 interface ResultCardProps {
   simulation: Simulation;
   selected: boolean;
-  onSelect: (sim: Simulation) => void;
+  handleSelect: (sim: Simulation) => void;
 }
 
-const ResultCard = ({ simulation, selected, onSelect }: ResultCardProps) => {
+const ResultCard = ({ simulation, selected, handleSelect }: ResultCardProps) => {
+  // -------------------- Router --------------------
   const navigate = useNavigate();
 
+  // -------------------- Local State --------------------
   const [showAllVariables, setShowAllVariables] = useState(false);
 
+  // -------------------- Derived Data --------------------
   const startStr = simulation.modelStartDate
     ? new Date(simulation.modelStartDate).toISOString().slice(0, 10)
     : 'N/A';
@@ -44,7 +47,7 @@ const ResultCard = ({ simulation, selected, onSelect }: ResultCardProps) => {
       <div className="flex flex-col sm:flex-row items-start gap-4 p-4">
         <Checkbox
           checked={selected}
-          onCheckedChange={() => onSelect(simulation)}
+          onCheckedChange={() => handleSelect(simulation)}
           aria-label="Select for comparison"
           className="mt-1"
           style={{ width: 24, height: 24 }}

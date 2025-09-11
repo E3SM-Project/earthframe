@@ -2,8 +2,8 @@ import { ChevronRight } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { CompareAIFloatingButton } from '@/pages/Compare/CompareAIFloatingButton';
 import CompareToolbar from '@/pages/Compare/CompareToolbar';
-import { ComparisonAI } from '@/pages/Compare/ComparisonAI';
 import { norm, renderCellValue } from '@/pages/Compare/utils';
 import type { Simulation } from '@/types/index';
 import { formatDate, getSimulationDuration } from '@/utils/utils';
@@ -20,20 +20,37 @@ const CompareSimulations = ({
   setSelectedSimulationIds,
   selectedSimulations,
 }: CompareSimulationsProps) => {
-  // =========================
-  // Navigation & Constants
-  // =========================
-  const HIDDEN_KEY = 'compare_hidden_cols';
+  // -------------------- Router --------------------
   const navigate = useNavigate();
   const handleButtonClick = () => navigate('/Browse');
 
-  // =========================
-  // Simulation Headers & Helpers
-  // =========================
+  // -------------------- Global State --------------------
+  const HIDDEN_KEY = 'compare_hidden_cols';
+
+  // -------------------- Local State --------------------
+  const [order, setOrder] = useState(selectedSimulationIds.map((_, i) => i));
+
   const simHeaders = selectedSimulationIds.map((id) => {
     const sim = selectedSimulations.find((s) => s.id === id);
     return sim?.name || id;
   });
+  const [headers, setHeaders] = useState(simHeaders);
+
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const [hidden, setHidden] = useState<string[]>(() => {
+    const stored = localStorage.getItem(HIDDEN_KEY);
+    try {
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const dragCol = useRef<number | null>(null);
+  const [diffsEnabled, setDiffsEnabled] = useState(false);
+
+  // -------------------- Derived Data --------------------
+  const visibleOrder = order.filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]));
 
   const getSimProp = <K extends keyof Simulation>(
     id: string,
@@ -44,9 +61,6 @@ const CompareSimulations = ({
     return (sim?.[prop] ?? fallback) as Simulation[K];
   };
 
-  // =========================
-  // Metrics Construction
-  // =========================
   const makeMetricRow = <T extends keyof Simulation>(
     label: string,
     prop: T,
@@ -55,6 +69,15 @@ const CompareSimulations = ({
     label,
     values: selectedSimulationIds.map((id) => getSimProp(id, prop, fallback)),
   });
+
+  const rowHasDiffs = (vals: unknown[]): boolean => {
+    if (visibleOrder.length <= 1) return false;
+    const first = norm(vals[visibleOrder[0]]);
+    for (let i = 1; i < visibleOrder.length; i++) {
+      if (norm(vals[visibleOrder[i]]) !== first) return true;
+    }
+    return false;
+  };
 
   const metrics = {
     configuration: [
@@ -153,26 +176,33 @@ const CompareSimulations = ({
     ],
   };
 
-  // =========================
-  // State: Order, Headers, Hidden Columns, Drag
-  // =========================
-  const [order, setOrder] = useState(selectedSimulationIds.map((_, i) => i));
-  const [headers, setHeaders] = useState(simHeaders);
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
-  const [hidden, setHidden] = useState<string[]>(() => {
-    const stored = localStorage.getItem(HIDDEN_KEY);
-    try {
-      const parsed = stored ? JSON.parse(stored) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  });
-  const dragCol = useRef<number | null>(null);
+  const defaultExpanded = ['configuration', 'modelSetup', 'timeline'];
+  const allSectionKeys = Object.keys(metrics);
+  const initialExpandedSections: Record<string, boolean> = {};
 
-  // =========================
-  // Handlers: Show/Hide/Remove/Drag Columns
-  // =========================
+  allSectionKeys.forEach((section) => {
+    initialExpandedSections[section] = defaultExpanded.includes(section);
+  });
+  const [expandedSections, setExpandedSections] =
+    useState<Record<string, boolean>>(initialExpandedSections);
+
+  // -------------------- Effects --------------------
+  useEffect(() => {
+    setHidden((prev) => prev.filter((id) => selectedSimulationIds.includes(id)));
+  }, [selectedSimulationIds]);
+
+  useEffect(() => {
+    localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
+  }, [hidden]);
+
+  useEffect(() => {
+    setHeaders(
+      selectedSimulationIds.map((id) => selectedSimulations.find((s) => s.id === id)?.name || id),
+    );
+    setOrder(selectedSimulationIds.map((_, i) => i));
+  }, [selectedSimulationIds, selectedSimulations]);
+
+  // -------------------- Handlers --------------------
   const handleShow = (hiddenId: string) => {
     setHidden((prev) => prev.filter((id) => id !== hiddenId));
   };
@@ -217,36 +247,6 @@ const CompareSimulations = ({
     dragCol.current = null;
   };
 
-  // =========================
-  // Effects: Sync Hidden, Headers, Order
-  // =========================
-  useEffect(() => {
-    setHidden((prev) => prev.filter((id) => selectedSimulationIds.includes(id)));
-  }, [selectedSimulationIds]);
-
-  useEffect(() => {
-    localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
-  }, [hidden]);
-
-  useEffect(() => {
-    setHeaders(
-      selectedSimulationIds.map((id) => selectedSimulations.find((s) => s.id === id)?.name || id),
-    );
-    setOrder(selectedSimulationIds.map((_, i) => i));
-  }, [selectedSimulationIds, selectedSimulations]);
-
-  // =========================
-  // State: Collapsible Sections
-  // =========================
-  const defaultExpanded = ['configuration', 'modelSetup', 'timeline'];
-  const allSectionKeys = Object.keys(metrics);
-  const initialExpandedSections: Record<string, boolean> = {};
-  allSectionKeys.forEach((section) => {
-    initialExpandedSections[section] = defaultExpanded.includes(section);
-  });
-  const [expandedSections, setExpandedSections] =
-    useState<Record<string, boolean>>(initialExpandedSections);
-
   const toggleSection = (sectionKey: string) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -254,27 +254,7 @@ const CompareSimulations = ({
     }));
   };
 
-  // =========================
-  // Differences Highlighting
-  // =========================
-  const rowHasDiffs = (vals: unknown[]): boolean => {
-    if (visibleOrder.length <= 1) return false;
-    const first = norm(vals[visibleOrder[0]]);
-    for (let i = 1; i < visibleOrder.length; i++) {
-      if (norm(vals[visibleOrder[i]]) !== first) return true;
-    }
-    return false;
-  };
-  const [diffsEnabled, setDiffsEnabled] = useState(false);
-
-  // =========================
-  // Derived: Visible Order
-  // =========================
-  const visibleOrder = order.filter((colIdx) => !hidden.includes(selectedSimulationIds[colIdx]));
-
-  // =================================
-  // Fallback: no simulations selected
-  // =================================
+  // -------------------- Render --------------------
   if (selectedSimulationIds.length === 0) {
     return (
       <div className="max-w-screen-2xl mx-auto p-8 text-center text-gray-600">
@@ -288,6 +268,7 @@ const CompareSimulations = ({
       </div>
     );
   }
+
   return (
     <div className="w-full bg-white">
       <div className="mx-auto max-w-[1440px] px-6 py-8">
@@ -531,7 +512,7 @@ const CompareSimulations = ({
             ))}
 
             {/* Comparison AI Floating Widget */}
-            <ComparisonAI
+            <CompareAIFloatingButton
               selectedSimulations={selectedSimulations.filter((sim) =>
                 selectedSimulationIds.includes(sim.id),
               )}

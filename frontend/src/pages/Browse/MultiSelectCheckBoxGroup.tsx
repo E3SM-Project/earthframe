@@ -1,6 +1,5 @@
 import { Checkbox } from '@/components/ui/checkbox';
 
-// Allow options to be either strings or {value,label}
 export type Option = string | { value: string; label: string };
 
 interface MultiSelectCheckboxGroupProps {
