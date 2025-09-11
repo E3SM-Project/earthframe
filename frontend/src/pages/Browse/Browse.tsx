@@ -202,23 +202,18 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
       'status',
     ];
 
-    (Object.keys(appliedFilters) as (keyof FilterState)[]).forEach((key) => {
+    arrayKeys.forEach((key) => {
       const value = params.get(key);
       if (value !== null) {
-        if (arrayKeys.includes(key)) {
-          // FIXME: Fix below eslint error with any (TS is being difficult).
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          next[key] = value ? (value.split(',') as any) : [];
-        } else {
-          // FIXME: Fix below eslint error with any (TS is being difficult).
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          next[key] = value as any;
-        }
+        // FIXME: Fix below eslint error with any (TS is being difficult).
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore: Type 'string | string[]' is not assignable to type '(string[] & string) | undefined'.
+        next[key] = arrayKeys.includes(key) ? (value.split(',') as string[]) : value;
       }
     });
 
     setAppliedFilters((prev) => ({ ...prev, ...next }));
-  }, [location.search, appliedFilters]);
+  }, [location.search]);
 
   useEffect(() => {
     const params = new URLSearchParams();

@@ -1,6 +1,6 @@
+from enum import Enum
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
 from transformers import pipeline
 
 router = APIRouter()
@@ -8,31 +8,110 @@ router = APIRouter()
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 
-class Simulation(BaseModel):
+class Machine(BaseModel):
     id: str
     name: str
-    startDate: str
-    tag: str
-    campaign: str
-    compset: str
-    resolution: str
-    machine: str
-    notes: Optional[str] = None
+    site: str | None = None
+    architecture: str | None = None
+    scheduler: str | None = None
+    gpu: str | None = None
+    notes: str | None = None
+    created_at: str | None = None
+
+
+class SimulationType(str, Enum):
+    PRODUCTION = "production"
+    MASTER = "master"
+    EXPERIMENTAL = "experimental"
+
+
+class Status(str, Enum):
+    COMPLETE = "complete"
+    RUNNING = "running"
+    NOT_STARTED = "not-started"
+    FAILED = "failed"
+
+
+class ExternalUrl(BaseModel):
+    label: str
+    url: str
+
+
+class Simulation(BaseModel):
+    # Configuration
+    id: str
+    name: str
+    caseName: str
+
+    ensembleMember: str | None = None
+    versionTag: str | None = None
+    compset: str | None = None
+    gridName: str | None = None
+    gridResolution: str | None = None
+    initializationType: str | None = None
+    compiler: str | None = None
+    parentSimulationId: str | None = None
+
+    # Timeline
+    modelStartDate: str
+    modelEndDate: str
+    calendarStartDate: str | None = None
+
+    # Model setup (context)
+    simulationType: SimulationType
+    status: Status
+    campaignId: str
+    experimentTypeId: str
+    machineId: str
+    variables: list[str]
+
+    # Provenance & submission
+    uploadedBy: str
+    uploadDate: str
+    lastModified: str
+    lastEditedBy: str
+    lastEditedAt: str
+
+    # Version Control
+    branch: str | None = None
+    branchTime: str | None = None
+    gitHash: str | None = None
+    externalRepoUrl: str | None = None
+
+    # Execution & output
+    runDate: str | None = None
+    outputPath: str | None = None
+    archivePaths: list[str]
+    runScriptPaths: list[str]
+    batchLogPaths: list[str] | None = None
+
+    # Postprocessing & diagnostics
+    postprocessingScriptPath: list[str]
+    diagnosticLinks: ExternalUrl | None = None
+    paceLinks: ExternalUrl | None = None
+
+    # Metadata & audit
+    keyFeatures: str | None = None
+    notesMarkdown: str | None = None
+    knownIssues: str | None = None
+    annotations: list[str]
+
+    machine: Machine
 
 
 class SimulationAnalysisRequest(BaseModel):
-    simulations: List[Simulation]
+    simulations: list[Simulation]
 
 
 def describe_sim(sim: Simulation) -> str:
     return (
         f"{sim.name} [{sim.id}]: "
-        f"Tag: {sim.tag}, Campaign: {sim.campaign}, Compset: {sim.compset}, "
-        f"Resolution: {sim.resolution}, Machine: {sim.machine}, Notes: {sim.notes or 'n/a'}"
+        f"Tag: {sim.versionTag}, Campaign: {sim.campaignId}, Compset: {sim.compset}, "
+        f"Resolution: {sim.gridResolution}, Machine: {sim.machineId}, Notes: {str(sim.notesMarkdown) if sim.notesMarkdown else 'n/a'}"
     )
 
 
-def summarize_chunks(simulations: List[str], chunk_size: int = 4) -> str:
+def summarize_chunks(simulations: list[str], chunk_size: int = 4) -> str:
     chunks = [
         simulations[i : i + chunk_size] for i in range(0, len(simulations), chunk_size)
     ]

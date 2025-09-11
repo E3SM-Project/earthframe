@@ -7,6 +7,8 @@ export interface RawSimulation {
   id: string;
   name: string;
   caseName: string;
+
+  ensembleMember?: string | null;
   versionTag?: string | null;
   compset?: string | null;
   gridName?: string | null;
