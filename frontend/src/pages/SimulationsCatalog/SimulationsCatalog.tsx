@@ -209,7 +209,7 @@ const Simulations = ({ simulations }: SimulationProps) => {
         ),
         size: 120,
         enableHiding: true,
-        meta: { isAdvance: true },
+        meta: { isAdvanced: true },
       },
       {
         accessorKey: 'branch',
