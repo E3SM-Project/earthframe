@@ -588,8 +588,16 @@ export default function Upload() {
               <textarea
                 className="mt-1 w-full rounded-md border px-3 py-2"
                 name="batchLogPaths"
-                value={form.batchLogPaths ?? ''}
-                onChange={handleChange}
+                value={form.batchLogPaths?.join('\n') ?? ''}
+                onChange={e =>
+                  setForm(p => ({
+                    ...p,
+                    batchLogPaths: e.target.value
+                      .split('\n')
+                      .map(s => s.trim())
+                      .filter(Boolean),
+                  }))
+                }
                 rows={2}
                 placeholder="/autolog/sim/run-19345.log"
               />
