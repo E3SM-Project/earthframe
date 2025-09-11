@@ -87,8 +87,8 @@ class Simulation(BaseModel):
 
     # Postprocessing & diagnostics
     postprocessingScriptPath: list[str]
-    diagnosticLinks: ExternalUrl | None = None
-    paceLinks: ExternalUrl | None = None
+    diagnosticLinks: list[ExternalUrl] = []
+    paceLinks: list[ExternalUrl] = []
 
     # Metadata & audit
     keyFeatures: str | None = None
