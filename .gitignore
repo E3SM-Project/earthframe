@@ -7,10 +7,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node / build
 node_modules
 dist
 dist-ssr
 *.local
+
+# Allow public and mock JSON (needed for Vercel mock data)
+!public/
+!public/mock/
+!public/mock/*.json
+!public/mock/**/*.json
 
 # Editor directories and files
 .vscode/*
@@ -61,5 +68,7 @@ coverage.xml
 dmypy.json
 
 # Pydantic
+# Ignore stray JSON files by default, but not the frontend mocks
 *.json
-
+!public/mock/*.json
+!public/mock/**/*.json
