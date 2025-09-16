@@ -156,7 +156,7 @@ const Home = ({ simulations }: HomeProps) => {
               <span className="font-semibold text-lg">Step 1: Explore Curated Simulations</span>
             </div>
             <p className="text-muted-foreground text-sm mb-4">
-              Explore simuations by scientific goal, simulation context, and execution details.
+              Explore simulations by scientific goal, simulation context, and execution details.
             </p>
             <Button asChild variant="default" className="self-start">
               <Link to="/Browse">Browse Simulations</Link>
