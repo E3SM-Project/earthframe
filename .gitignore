@@ -13,12 +13,6 @@ dist
 dist-ssr
 *.local
 
-# Allow public and mock JSON (needed for Vercel mock data)
-!public/
-!public/mock/
-!public/mock/*.json
-!public/mock/**/*.json
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
