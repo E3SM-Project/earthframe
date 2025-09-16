@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-interface TokenInputProps {
+interface FormTokenInputProps {
   values: string[];
   setValues: (vals: string[]) => void;
   placeholder?: string;
@@ -10,7 +10,7 @@ const FormTokenInput = ({
   values,
   setValues,
   placeholder = 'Type and press Enter',
-}: TokenInputProps) => {
+}: FormTokenInputProps) => {
   // -------------------- Local State --------------------
   const [draft, setDraft] = useState('');
 

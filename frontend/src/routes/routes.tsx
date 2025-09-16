@@ -7,7 +7,7 @@ import Compare from '@/pages/Compare/Compare';
 import Docs from '@/pages/Docs/Docs';
 import Home from '@/pages/Home/Home';
 import SimulationDetails from '@/pages/SimulationsCatalog/SimulationDetails';
-import Simulations from '@/pages/SimulationsCatalog/SimulationsCatalog';
+import SimulationsCatalogProps from '@/pages/SimulationsCatalog/SimulationsCatalog';
 import Upload from '@/pages/Upload/Upload';
 import type { Simulation } from '@/types/index';
 
@@ -62,7 +62,7 @@ const createRoutes = ({
         />
       ),
     },
-    { path: '/simulations', element: <Simulations simulations={simulations} /> },
+    { path: '/simulations', element: <SimulationsCatalogProps simulations={simulations} /> },
     // Details page now fetches by :id (no need to pass list)
     { path: '/simulations/:id', element: <SimulationDetailsRoute /> },
     {

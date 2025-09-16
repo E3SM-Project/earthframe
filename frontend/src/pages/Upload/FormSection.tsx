@@ -1,6 +1,6 @@
 import { CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react';
 
-interface SectionProps {
+interface FormSectionProps {
   title: string;
   isOpen: boolean;
   onToggle: () => void;
@@ -16,7 +16,7 @@ const FormSection = ({
   requiredCount,
   satisfiedCount,
   children,
-}: SectionProps) => {
+}: FormSectionProps) => {
   const done = requiredCount && satisfiedCount !== undefined && satisfiedCount >= requiredCount;
 
   return (

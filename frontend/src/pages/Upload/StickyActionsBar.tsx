@@ -1,10 +1,10 @@
-interface StickyActionsProps {
+interface StickyActionsBar {
   disabled?: boolean;
   onSaveDraft: () => void;
   onNext: () => void;
 }
 
-const StickyActions = ({ disabled, onSaveDraft, onNext }: StickyActionsProps) => {
+const StickyActionsBar = ({ disabled, onSaveDraft, onNext }: StickyActionsBar) => {
   return (
     <div className="sticky bottom-0 inset-x-0 border-t bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
@@ -33,4 +33,4 @@ const StickyActions = ({ disabled, onSaveDraft, onNext }: StickyActionsProps) =>
   );
 };
 
-export default StickyActions;
+export default StickyActionsBar;

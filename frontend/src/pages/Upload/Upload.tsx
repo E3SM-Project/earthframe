@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import FormSection from '@/pages/Upload/FormSection';
 import FormTokenInput from '@/pages/Upload/FormTokenInput';
-import StickyActions from '@/pages/Upload/StickyActionBar';
+import StickyActionsBar from '@/pages/Upload/StickyActionsBar';
 import { RawSimulation } from '@/types';
 
 // -------------------- Types & Interfaces --------------------
@@ -696,7 +696,7 @@ const Upload = () => {
           </div>
         </FormSection>
 
-        <StickyActions
+        <StickyActionsBar
           disabled={!allValid}
           onSaveDraft={() => console.log('Save draft', formWithVars, { tags })}
           onNext={() => {
