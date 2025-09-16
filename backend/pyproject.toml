@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "fastapi-backend"
+version = "0.1.0"
+description = "FastAPI backend for the simulation comparison web app"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "app" }]  # if your code lives in app/
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+uvicorn = { extras = ["standard"], version = "^0.30.1" }
+python-dotenv = "^1.0.1"
+
+# Optional (uncomment if needed)
+# sqlalchemy = "^2.0.30"
+# alembic = "^1.13.1"
+# python-jose = { extras = ["cryptography"], version = "^3.3.0" }
+# passlib = { extras = ["bcrypt"], version = "^1.7.4" }
+# python-multipart = "^0.0.9"
+# fastapi-users = "^12.1.3"
+transformers = "^4.53.1"
+sentence-transformers = "^5.0.0"
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+ruff = "^0.4.4"
+torch = "^2.7.1"
+pytest = "^7.4.2"
+ipykernel = "^6.28.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
