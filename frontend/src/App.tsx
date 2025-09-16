@@ -6,30 +6,31 @@ import { useSimulations } from '@/api/simulations';
 import NavBar from '@/components/layout/NavBar';
 import { AppRoutes } from '@/routes/routes';
 
-export default function App() {
-  const simulations = useSimulations();
-
+const App = () => {
+  // -------------------- Constants --------------------
   const LOCAL_STORAGE_KEY = 'selectedSimulationIds';
 
+  // -------------------- Local State --------------------
+  const queryClient = useMemo(() => new QueryClient(), []);
+
+  // Fetch simulations data using custom hook.
+  const simulations = useSimulations();
+
   const [selectedSimulationIds, setSelectedSimulationIds] = useState<string[]>(() => {
-    // Initialize from localStorage
     const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   });
-
-  // Save to localStorage whenever selectedSimulationIds changes
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedSimulationIds));
-  }, [selectedSimulationIds]);
 
   const selectedSimulations = useMemo(
     () => (simulations.data ?? []).filter((item) => selectedSimulationIds.includes(item.id)),
     [simulations.data, selectedSimulationIds],
   );
+  // -------------------- Effects --------------------
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedSimulationIds));
+  }, [selectedSimulationIds]);
 
-  // Create a QueryClient instance
-  const queryClient = useMemo(() => new QueryClient(), []);
-
+  // -------------------- Render --------------------
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -43,4 +44,6 @@ export default function App() {
       </BrowserRouter>
     </QueryClientProvider>
   );
-}
+};
+
+export default App;
