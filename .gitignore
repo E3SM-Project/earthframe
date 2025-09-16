@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node / build
 node_modules
 dist
 dist-ssr
@@ -61,5 +62,5 @@ coverage.xml
 dmypy.json
 
 # Pydantic
-*.json
-
+# Ignore stray JSON files by default, but not the frontend mocks
+backend/**/*.json
