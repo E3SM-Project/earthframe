@@ -19,7 +19,7 @@ body:
       description: Briefly describe the planning task.
       placeholder: e.g., Define project milestones
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: details
@@ -28,7 +28,7 @@ body:
       description: Provide a detailed description of the task, including objectives, stakeholders, and any relevant context.
       placeholder: Describe the task in detail...
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: deliverables
