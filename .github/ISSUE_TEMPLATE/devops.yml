@@ -12,15 +12,6 @@ body:
 
         Please provide details about the DevOps task or improvement.
 
-  - type: input
-    id: summary
-    attributes:
-      label: Summary
-      description: Briefly describe the DevOps task.
-      placeholder: e.g., Set up CI/CD pipeline for project
-    validations:
-      required: true
-
   - type: textarea
     id: details
     attributes:
