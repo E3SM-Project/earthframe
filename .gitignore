@@ -69,6 +69,4 @@ dmypy.json
 
 # Pydantic
 # Ignore stray JSON files by default, but not the frontend mocks
-*.json
-!public/mock/*.json
-!public/mock/**/*.json
+backend/**/*.json
