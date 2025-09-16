@@ -79,7 +79,7 @@ const formatDate = (d?: string) => {
   return format(dt, 'yyyy-MM-dd');
 };
 
-const SimulationsCatalogProps = ({ simulations }: SimulationsCatalogProps) => {
+const SimulationsCatalog = ({ simulations }: SimulationsCatalogProps) => {
   const [globalFilter, setGlobalFilter] = useState('');
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
   const [sorting, setSorting] = useState<SortingState>([
@@ -515,4 +515,4 @@ const SimulationsCatalogProps = ({ simulations }: SimulationsCatalogProps) => {
   );
 };
 
-export default SimulationsCatalogProps;
+export default SimulationsCatalog;
