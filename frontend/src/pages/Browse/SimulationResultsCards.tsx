@@ -1,8 +1,8 @@
-import ResultCard from '@/pages/Browse/BrowseCard';
 import BrowseToolbar from '@/pages/Browse/BrowseToolbar';
+import SimulationResultCard from '@/pages/Browse/SimulationResultCard';
 import type { Simulation } from '@/types/index';
 
-interface ResultCardsProps {
+interface SimulationResultCards {
   simulations: Simulation[];
   filteredData: Simulation[];
   selectedSimulationIds: string[];
@@ -10,13 +10,13 @@ interface ResultCardsProps {
   handleCompareButtonClick: () => void;
 }
 
-const BrowseCardsView = ({
+const SimulationResultCards = ({
   simulations,
   filteredData,
   selectedSimulationIds,
   setSelectedSimulationIds,
   handleCompareButtonClick,
-}: ResultCardsProps) => {
+}: SimulationResultCards) => {
   const isCompareButtonDisabled = selectedSimulationIds.length < 2;
 
   return (
@@ -36,7 +36,7 @@ const BrowseCardsView = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredData.map((sim) => (
           <div key={sim.id} className="h-full">
-            <ResultCard
+            <SimulationResultCard
               simulation={sim}
               selected={selectedSimulationIds.includes(sim.id)}
               handleSelect={() => {
@@ -54,4 +54,4 @@ const BrowseCardsView = ({
   );
 };
 
-export default BrowseCardsView;
+export default SimulationResultCards;

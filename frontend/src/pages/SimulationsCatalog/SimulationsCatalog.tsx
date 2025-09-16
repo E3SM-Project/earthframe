@@ -37,10 +37,12 @@ import { TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui
 import { cn } from '@/lib/utils';
 import type { Simulation } from '@/types/index';
 
+// -------------------- Types & Interfaces --------------------
 interface SimulationProps {
   simulations: Simulation[];
 }
 
+// -------------------- Pure Helpers --------------------
 const statusColors: Record<string, string> = {
   running: 'bg-blue-100 text-blue-800',
   complete: 'bg-green-100 text-green-800',
@@ -54,6 +56,20 @@ const typeColors: Record<Simulation['simulationType'], string> = {
   experimental: 'border-amber-600 text-amber-700',
 };
 
+/**
+ * Formats a given date string into the 'yyyy-MM-dd' format.
+ * If the input is undefined or an invalid date, it returns a placeholder ('—').
+ *
+ * @param d - The date string to format. Can be undefined.
+ * @returns The formatted date string in 'yyyy-MM-dd' format, or '—' if the input is invalid.
+ *
+ * @example
+ * ```typescript
+ * formatDate('2023-10-05'); // Returns '2023-10-05'
+ * formatDate(undefined);    // Returns '—'
+ * formatDate('invalid');    // Returns '—'
+ * ```
+ */
 const formatDate = (d?: string) => {
   if (!d) return '—';
 

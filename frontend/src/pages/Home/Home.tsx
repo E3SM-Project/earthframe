@@ -2,7 +2,7 @@ import { Earth } from 'lucide-react'; // Or use your own SVG if you have one
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
-import NewSimsTable from '@/pages/Home/NewSimsTable';
+import LatestSimulationsTable from '@/pages/Home/LatestSimulationsTable';
 import VariableCard from '@/pages/Home/VariableCard';
 import type { Simulation } from '@/types/index';
 
@@ -219,7 +219,7 @@ const Home = ({ simulations }: HomeProps) => {
             Newly submitted simulations appear here for quick access.
           </p>
           <div className="bg-white border border-muted rounded-xl shadow p-6">
-            <NewSimsTable latestSimulations={latestSimulations} />
+            <LatestSimulationsTable latestSimulations={latestSimulations} />
             <div className="flex justify-center mt-4">
               <Button asChild variant="default">
                 <Link to="/Browse">View All Simulations</Link>

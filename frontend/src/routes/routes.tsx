@@ -6,8 +6,8 @@ import Browse from '@/pages/Browse/Browse';
 import Compare from '@/pages/Compare/Compare';
 import Docs from '@/pages/Docs/Docs';
 import Home from '@/pages/Home/Home';
+import SimulationDetails from '@/pages/SimulationsCatalog/SimulationDetails';
 import Simulations from '@/pages/SimulationsCatalog/SimulationsCatalog';
-import SimulationDetails from '@/pages/SimulationsCatalog/SimulationsCatalogDetails';
 import Upload from '@/pages/Upload/Upload';
 import type { Simulation } from '@/types/index';
 
@@ -17,6 +17,7 @@ interface RoutesProps {
   setSelectedSimulationIds: (ids: string[]) => void;
   selectedSimulations: Simulation[];
 }
+
 const SimulationDetailsRoute = () => {
   const { id = '' } = useParams();
   const location = useLocation() as { state?: { seed?: Simulation } };

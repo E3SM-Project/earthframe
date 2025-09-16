@@ -2,24 +2,24 @@ import { ChevronRight } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { CompareAIFloatingButton } from '@/pages/Compare/CompareAIFloatingButton';
+import { AIFloatingButton } from '@/pages/Compare/AIFloatingButton';
 import CompareToolbar from '@/pages/Compare/CompareToolbar';
 import { norm, renderCellValue } from '@/pages/Compare/utils';
 import type { Simulation } from '@/types/index';
 import { formatDate, getSimulationDuration } from '@/utils/utils';
 
-interface CompareSimulationsProps {
+interface CompareProps {
   simulations: Simulation[];
   selectedSimulationIds: string[];
   setSelectedSimulationIds: (ids: string[]) => void;
   selectedSimulations: Simulation[];
 }
 
-const CompareSimulations = ({
+const Compare = ({
   selectedSimulationIds,
   setSelectedSimulationIds,
   selectedSimulations,
-}: CompareSimulationsProps) => {
+}: CompareProps) => {
   // -------------------- Router --------------------
   const navigate = useNavigate();
   const handleButtonClick = () => navigate('/Browse');
@@ -512,7 +512,7 @@ const CompareSimulations = ({
             ))}
 
             {/* Comparison AI Floating Widget */}
-            <CompareAIFloatingButton
+            <AIFloatingButton
               selectedSimulations={selectedSimulations.filter((sim) =>
                 selectedSimulationIds.includes(sim.id),
               )}
@@ -524,4 +524,4 @@ const CompareSimulations = ({
   );
 };
 
-export default CompareSimulations;
+export default Compare;

@@ -21,13 +21,13 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { Simulation } from '@/types/index';
 
-interface ResultCardProps {
+interface SimulationResultCard {
   simulation: Simulation;
   selected: boolean;
   handleSelect: (sim: Simulation) => void;
 }
 
-const ResultCard = ({ simulation, selected, handleSelect }: ResultCardProps) => {
+const SimulationResultCard = ({ simulation, selected, handleSelect }: SimulationResultCard) => {
   // -------------------- Router --------------------
   const navigate = useNavigate();
 
@@ -380,4 +380,4 @@ const ResultCard = ({ simulation, selected, handleSelect }: ResultCardProps) => 
   );
 };
 
-export default ResultCard;
+export default SimulationResultCard;

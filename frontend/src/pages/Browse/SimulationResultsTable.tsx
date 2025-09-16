@@ -39,7 +39,7 @@ import type { Simulation } from '@/types/index';
 // Max number of rows that can be selected at once.
 const MAX_SELECTION = 5;
 
-interface BrowseTable {
+interface SimulationResultsTable {
   simulations: Simulation[];
   filteredData: Simulation[];
   selectedSimulationIds: string[];
@@ -294,13 +294,13 @@ const getStickyLeftOffset = (
   return left;
 };
 
-export const BrowseTableView = ({
+const SimulationResultsTable = ({
   simulations,
   filteredData,
   selectedSimulationIds,
   setSelectedSimulationIds,
   handleCompareButtonClick,
-}: BrowseTable) => {
+}: SimulationResultsTable) => {
   // -------------------- Local State --------------------
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -503,3 +503,5 @@ export const BrowseTableView = ({
     </div>
   );
 };
+
+export default SimulationResultsTable;

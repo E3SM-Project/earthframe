@@ -25,11 +25,11 @@ const simulationTypeIcon = (sim: Simulation) => {
   );
 };
 
-interface NewSimTableProps {
+interface LatestSimulationsTableProps {
   latestSimulations: Simulation[];
 }
 
-export const NewSimsTable = ({ latestSimulations }: NewSimTableProps) => {
+const LatestSimulationsTable = ({ latestSimulations }: LatestSimulationsTableProps) => {
   const table = useReactTable({
     data: latestSimulations,
     columns: tableColumns,
@@ -144,4 +144,4 @@ const tableColumns: ColumnDef<Simulation>[] = [
   },
 ];
 
-export default NewSimsTable;
+export default LatestSimulationsTable;

@@ -1,154 +1,37 @@
-import { CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import FormSection from '@/pages/Upload/FormSection';
+import FormTokenInput from '@/pages/Upload/FormTokenInput';
+import StickyActions from '@/pages/Upload/StickyActionBar';
 import { RawSimulation } from '@/types';
 
+// -------------------- Types & Interfaces --------------------
+type OpenKey =
+  | 'configuration'
+  | 'modelSetup'
+  | 'versionControl'
+  | 'paths'
+  | 'docs'
+  | 'review'
+  | null;
+
+// -------------------- Pure Helpers --------------------
 /**
- * Minimal inline “token” input (chips) for comma/Enter-separated values.
- * No external deps; keeps MVP scope.
+ * Counts the number of valid (non-null and non-undefined) fields in an array.
+ *
+ * @param fields - An array of fields that can be strings, null, or undefined.
+ * @returns The count of valid fields in the array.
  */
-function TokenInput({
-  values,
-  setValues,
-  placeholder = 'Type and press Enter',
-}: {
-  values: string[];
-  setValues: (vals: string[]) => void;
-  placeholder?: string;
-}) {
-  const [draft, setDraft] = useState('');
+const countValidfields = (fields: (string | null | undefined)[]) =>
+  fields.reduce((count, field) => (field ? count + 1 : count), 0);
 
-  const addToken = (v: string) => {
-    const val = v.trim();
-    if (!val) return;
-    if (!values.includes(val)) setValues([...values, val]);
-    setDraft('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addToken(draft);
-    } else if (e.key === 'Backspace' && !draft && values.length) {
-      e.preventDefault();
-      setValues(values.slice(0, -1));
-    }
-  };
-
-  return (
-    <div className="flex min-h-10 items-center flex-wrap gap-2 rounded-md border border-gray-300 px-2 py-2 focus-within:ring-2 focus-within:ring-gray-900/10">
-      {values.map((v) => (
-        <span
-          key={v}
-          className="inline-flex items-center gap-1 rounded-full border bg-gray-50 px-2 py-0.5 text-xs"
-        >
-          {v}
-          <button
-            type="button"
-            className="opacity-60 hover:opacity-100"
-            onClick={() => setValues(values.filter((x) => x !== v))}
-            aria-label={`Remove ${v}`}
-          >
-            ✕
-          </button>
-        </span>
-      ))}
-      <input
-        className="flex-1 min-w-[12ch] bg-transparent outline-none text-sm"
-        value={draft}
-        placeholder={values.length ? '' : placeholder}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={() => addToken(draft)}
-        onKeyDown={handleKeyDown}
-      />
-    </div>
-  );
-}
-
-/**
- * Section shell with header + progress and chevrons.
- */
-function Section({
-  title,
-  isOpen,
-  onToggle,
-  requiredCount,
-  satisfiedCount,
-  children,
-}: {
-  title: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  requiredCount?: number;
-  satisfiedCount?: number;
-  children: React.ReactNode;
-}) {
-  const done = requiredCount && satisfiedCount !== undefined && satisfiedCount >= requiredCount;
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-      <button
-        type="button"
-        className="w-full text-left px-5 py-3 bg-gray-50/80 backdrop-blur flex items-center justify-between border-b"
-        onClick={onToggle}
-      >
-        <div className="flex items-center gap-3">
-          {isOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
-          <span className="font-semibold">{title}</span>
-          {requiredCount ? (
-            <span className="text-xs text-muted-foreground">
-              ({Math.min(satisfiedCount ?? 0, requiredCount)} of {requiredCount} required)
-            </span>
-          ) : null}
-        </div>
-        {done ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : null}
-      </button>
-      {isOpen ? <div className="px-5 py-4">{children}</div> : null}
-    </div>
-  );
-}
-
-/**
- * Sticky action bar at bottom.
- */
-function StickyActions({
-  disabled,
-  onSaveDraft,
-  onNext,
-}: {
-  disabled?: boolean;
-  onSaveDraft: () => void;
-  onNext: () => void;
-}) {
-  return (
-    <div className="sticky bottom-0 inset-x-0 border-t bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          Tip: You can collapse completed sections to stay focused.
-        </p>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="border px-4 py-2 rounded-md text-sm hover:bg-gray-50"
-            onClick={onSaveDraft}
-          >
-            Save draft
-          </button>
-          <button
-            type="button"
-            disabled={disabled}
-            className="bg-gray-900 text-white px-4 py-2 rounded-md text-sm disabled:opacity-50"
-            onClick={onNext}
-          >
-            Save & Continue
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// --- Form ---
+// The number of required fields per section to track progress.
+const REQUIRED_FIELDS = {
+  config: 4,
+  model: 2,
+  version: 2,
+  paths: 2,
+};
 
 const initialState: RawSimulation = {
   // Configuration
@@ -211,49 +94,56 @@ const initialState: RawSimulation = {
   machine: {},
 };
 
-type OpenKey =
-  | 'configuration'
-  | 'modelSetup'
-  | 'versionControl'
-  | 'paths'
-  | 'docs'
-  | 'review'
-  | null;
-
-export default function Upload() {
+const Upload = () => {
+  // -------------------- Local State --------------------
   const [open, setOpen] = useState<OpenKey>('configuration');
   const [form, setForm] = useState<RawSimulation>(initialState);
 
-  // Local-only UI state
   const [variables, setVariables] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [diagLinks, setDiagLinks] = useState<{ label: string; url: string }[]>([]);
   const [paceLinks, setPaceLinks] = useState<{ label: string; url: string }[]>([]);
 
-  // keep RawSimulation.variables synchronized
+  // -------------------- Derived Data --------------------
   const formWithVars = useMemo(() => ({ ...form, variables }), [form, variables]);
 
-  // Simple computed “required satisfied” counts per section
-  const configReq = 4; // name, status, campaignId, experimentTypeId
-  const configSat =
-    (form.name ? 1 : 0) +
-    (form.status && form.status !== 'not-started' ? 1 : 0) +
-    (form.campaignId ? 1 : 0) +
-    (form.experimentTypeId ? 1 : 0);
+  const configSat = useMemo(() => {
+    const fields = [
+      form.name,
+      form.status && form.status !== 'not-started' ? form.status : null,
+      form.campaignId,
+      form.experimentTypeId,
+    ];
+    return countValidfields(fields);
+  }, [form.name, form.status, form.campaignId, form.experimentTypeId]);
 
-  const modelReq = 2; // machineId, compiler (if you want strict, adjust)
-  const modelSat = (form.machineId ? 1 : 0) + (form.compiler ? 1 : 0);
+  const modelSat = useMemo(() => {
+    const fields = [form.machineId, form.compiler];
+    return countValidfields(fields);
+  }, [form.machineId, form.compiler]);
 
-  const versionReq = 2; // branch, gitHash
-  const versionSat = (form.branch ? 1 : 0) + (form.gitHash ? 1 : 0);
+  const versionSat = useMemo(() => {
+    const fields = [form.branch, form.gitHash];
+    return countValidfields(fields);
+  }, [form.branch, form.gitHash]);
 
-  const pathsReq = 3; // outputPath, runScriptPaths
-  const pathsSat =
-    (form.outputPath ? 1 : 0) +
-    (Array.isArray(form.runScriptPaths) && form.runScriptPaths.length ? 1 : 0);
+  const pathsSat = useMemo(() => {
+    const fields = [
+      form.outputPath,
+      Array.isArray(form.runScriptPaths) && form.runScriptPaths.length ? 'valid' : null,
+    ];
+    return countValidfields(fields);
+  }, [form.outputPath, form.runScriptPaths]);
 
-  const allValid = configSat >= configReq && modelSat >= modelReq && versionSat >= versionReq;
+  const allValid = useMemo(() => {
+    return (
+      configSat >= REQUIRED_FIELDS.config &&
+      modelSat >= REQUIRED_FIELDS.model &&
+      versionSat >= REQUIRED_FIELDS.version
+    );
+  }, [configSat, modelSat, versionSat]);
 
+  // -------------------- Handlers --------------------
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
@@ -263,7 +153,6 @@ export default function Upload() {
 
   const toggle = (k: OpenKey) => setOpen((prev) => (prev === k ? null : k));
 
-  // helpers for links
   const addDiag = () => setDiagLinks([...diagLinks, { label: '', url: '' }]);
   const setDiag = (i: number, field: 'label' | 'url', v: string) => {
     const next = diagLinks.slice();
@@ -271,6 +160,7 @@ export default function Upload() {
     setDiagLinks(next);
     setForm((p) => ({ ...p, diagnosticLinks: next }));
   };
+
   const addPace = () => setPaceLinks([...paceLinks, { label: '', url: '' }]);
   const setPace = (i: number, field: 'label' | 'url', v: string) => {
     const next = paceLinks.slice();
@@ -279,6 +169,17 @@ export default function Upload() {
     setForm((p) => ({ ...p, paceLinks: next }));
   };
 
+  const handleBatchLogPathsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setForm((p) => ({
+      ...p,
+      batchLogPaths: e.target.value
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    }));
+  };
+
+  // -------------------- Render --------------------
   return (
     <div className="w-full min-h-[calc(100vh-64px)] bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
@@ -289,12 +190,11 @@ export default function Upload() {
           </p>
         </header>
 
-        {/* Configuration */}
-        <Section
+        <FormSection
           title="Configuration"
           isOpen={open === 'configuration'}
           onToggle={() => toggle('configuration')}
-          requiredCount={configReq}
+          requiredCount={REQUIRED_FIELDS.config}
           satisfiedCount={configSat}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -358,7 +258,7 @@ export default function Upload() {
                 <span className="text-xs text-muted-foreground ml-1">(optional)</span>
               </label>
               <div className="mt-1">
-                <TokenInput
+                <FormTokenInput
                   values={variables}
                   setValues={setVariables}
                   placeholder="ts, pr, huss…"
@@ -374,18 +274,20 @@ export default function Upload() {
                 Tags <span className="text-xs text-muted-foreground ml-1">(optional)</span>
               </label>
               <div className="mt-1">
-                <TokenInput values={tags} setValues={setTags} placeholder="ocean, ne30, q1-2024…" />
+                <FormTokenInput
+                  values={tags}
+                  setValues={setTags}
+                  placeholder="ocean, ne30, q1-2024…"
+                />
               </div>
             </div>
           </div>
-        </Section>
-
-        {/* Model Setup */}
-        <Section
+        </FormSection>
+        <FormSection
           title="Model Setup"
           isOpen={open === 'modelSetup'}
           onToggle={() => toggle('modelSetup')}
-          requiredCount={modelReq}
+          requiredCount={REQUIRED_FIELDS.model}
           satisfiedCount={modelSat}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -438,14 +340,12 @@ export default function Upload() {
               />
             </div>
           </div>
-        </Section>
-
-        {/* Version Control */}
-        <Section
+        </FormSection>
+        <FormSection
           title="Version Control"
           isOpen={open === 'versionControl'}
           onToggle={() => toggle('versionControl')}
-          requiredCount={versionReq}
+          requiredCount={REQUIRED_FIELDS.version}
           satisfiedCount={versionSat}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -497,13 +397,12 @@ export default function Upload() {
               />
             </div>
           </div>
-        </Section>
-        {/* Data Paths & Scripts */}
-        <Section
+        </FormSection>
+        <FormSection
           title="Data Paths & Scripts"
           isOpen={open === 'paths'}
           onToggle={() => toggle('paths')}
-          requiredCount={pathsReq}
+          requiredCount={REQUIRED_FIELDS.paths}
           satisfiedCount={pathsSat}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -589,24 +488,14 @@ export default function Upload() {
                 className="mt-1 w-full rounded-md border px-3 py-2"
                 name="batchLogPaths"
                 value={form.batchLogPaths?.join('\n') ?? ''}
-                onChange={e =>
-                  setForm(p => ({
-                    ...p,
-                    batchLogPaths: e.target.value
-                      .split('\n')
-                      .map(s => s.trim())
-                      .filter(Boolean),
-                  }))
-                }
+                onChange={handleBatchLogPathsChange}
                 rows={2}
                 placeholder="/autolog/sim/run-19345.log"
               />
             </div>
           </div>
-        </Section>
-
-        {/* Documentation & Notes */}
-        <Section
+        </FormSection>
+        <FormSection
           title="Documentation & Notes"
           isOpen={open === 'docs'}
           onToggle={() => toggle('docs')}
@@ -703,10 +592,8 @@ export default function Upload() {
               />
             </div>
           </div>
-        </Section>
-
-        {/* Review & Submit */}
-        <Section
+        </FormSection>
+        <FormSection
           title="Review & Submit"
           isOpen={open === 'review'}
           onToggle={() => toggle('review')}
@@ -807,9 +694,8 @@ export default function Upload() {
               Submit Simulation
             </button>
           </div>
-        </Section>
+        </FormSection>
 
-        {/* Sticky actions */}
         <StickyActions
           disabled={!allValid}
           onSaveDraft={() => console.log('Save draft', formWithVars, { tags })}
@@ -822,4 +708,6 @@ export default function Upload() {
       </div>
     </div>
   );
-}
+};
+
+export default Upload;

@@ -13,21 +13,17 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import SimulationPathCard from '@/pages/SimulationsCatalog/SimulationsCatalogPathCard';
+import SimulationPathCard from '@/pages/SimulationsCatalog/SimulationPathCard';
 import type { Simulation } from '@/types/index';
 import { formatDate, getSimulationDuration } from '@/utils/utils';
 
-// You likely already have this type elsewhere in your app
-export interface ExternalUrl {
-  label: string;
-  url: string;
-}
-
+// -------------------- Types & Interfaces --------------------
 interface Props {
   simulation: Simulation;
-  canEdit?: boolean; // admin privilege
+  canEdit?: boolean; // TODO: integate admin or write privilege (authentication/authorization)
 }
 
+// -------------------- Child Components --------------------
 const FieldRow = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="grid grid-cols-12 items-center gap-2">
     <Label className="col-span-3 md:col-span-2 text-xs text-muted-foreground">{label}</Label>
@@ -39,7 +35,9 @@ const ReadonlyInput = ({ value, className }: { value?: string; className?: strin
   <Input value={value || '—'} readOnly className={cn('h-8 text-sm', className)} />
 );
 
-export default function SimulationDetails({ simulation, canEdit = false }: Props) {
+// -------------------- Main Component --------------------
+const SimulationDetails = ({ simulation, canEdit = false }: Props) => {
+  // -------------------- Local State --------------------
   const [activeTab, setActiveTab] = useState('summary');
   const [notes, setNotes] = useState(simulation.notesMarkdown || '');
 
@@ -54,6 +52,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
     },
   ] as { id: string; author: string; date: string; text: string }[]);
 
+  // -------------------- Handlers --------------------
   const addComment = () => {
     if (!newComment.trim()) return;
     setComments((prev) => [
@@ -68,6 +67,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
     setNewComment('');
   };
 
+  // -------------------- Render --------------------
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 py-8 space-y-6">
       {/* Title + Meta */}
@@ -103,7 +103,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
         </div>
       </div>
 
-      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="summary">Summary</TabsTrigger>
@@ -111,10 +110,8 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
           <TabsTrigger value="versionControl">Version Control</TabsTrigger>
         </TabsList>
 
-        {/* SUMMARY TAB */}
         <TabsContent value="summary" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Configuration (left) */}
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Configuration</CardTitle>
@@ -149,8 +146,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                 </FieldRow>
               </CardContent>
             </Card>
-
-            {/* Model Setup (Context) */}
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Model Setup</CardTitle>
@@ -216,7 +211,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               </CardContent>
             </Card>
           </div>
-
           <Card className="lg:col-span-2">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Timeline</CardTitle>
@@ -251,10 +245,7 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               )}
             </CardContent>
           </Card>
-
-          {/* Diagnostics & Performance (PACE) links */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Diagnostics & Performance Card */}
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
@@ -262,7 +253,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Diagnostics Links */}
                 <div className="mb-4">
                   <Label className="mb-1 block text-sm">Diagnostics</Label>
                   {simulation.diagnosticLinks?.length ? (
@@ -302,7 +292,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                     </div>
                   )}
                 </div>
-                {/* Performance Links */}
                 <div>
                   <Label className="mb-1 block text-sm">Performance</Label>
                   {simulation.paceLinks?.length ? (
@@ -344,13 +333,11 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
                 </div>
               </CardContent>
             </Card>
-            {/* Provenance */}
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Provenance</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {/* Upload row */}
                 <div className="flex items-center gap-2">
                   <Label className="text-xs text-muted-foreground min-w-[100px]">Upload:</Label>
                   <span className="text-sm">
@@ -399,8 +386,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               </CardContent>
             </Card>
           </div>
-
-          {/* Notes */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Notes</CardTitle>
@@ -422,8 +407,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
               </div>
             </CardContent>
           </Card>
-
-          {/* Comments */}
           <div>
             <h3 className="mb-2 text-sm font-semibold tracking-tight">Comments</h3>
             <div className="space-y-4">
@@ -467,8 +450,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
             </div>
           </div>
         </TabsContent>
-
-        {/* OUTPUTS & LOGS TAB */}
         <TabsContent value="outputs" className="space-y-6">
           <SimulationPathCard
             title="Output Path"
@@ -491,8 +472,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
             emptyText="No batch logs available."
           />
         </TabsContent>
-
-        {/* VERSION CONTROL TAB */}
         <TabsContent value="versionControl" className="space-y-6">
           <Card>
             <CardHeader className="pb-2">
@@ -528,4 +507,6 @@ export default function SimulationDetails({ simulation, canEdit = false }: Props
       </Tabs>
     </div>
   );
-}
+};
+
+export default SimulationDetails;

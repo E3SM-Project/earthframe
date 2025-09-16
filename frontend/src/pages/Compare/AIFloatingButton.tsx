@@ -6,11 +6,11 @@ import { fetchAISimAnalysis } from '@/api/compareAPI';
 import { Button } from '@/components/ui/button';
 import type { Simulation } from '@/types/index';
 
-interface CompareAIFloatingButtonProps {
+interface AIFloatingButton {
   selectedSimulations: Simulation[];
 }
 
-export const CompareAIFloatingButton = ({ selectedSimulations }: CompareAIFloatingButtonProps) => {
+export const AIFloatingButton = ({ selectedSimulations }: AIFloatingButton) => {
   // -------------------- Local State --------------------
   const [aiResult, setAIResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

@@ -2,13 +2,43 @@ import { clsx } from 'clsx';
 import { format } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
 
-export function cn(...inputs: unknown[]) {
-  return twMerge(clsx(inputs));
-}
+export const cn = (...inputs: unknown[]) => twMerge(clsx(inputs));
 
+/**
+ * Formats a given date into an ISO-like string with the format 'yyyy-MM-dd HH:mm:ss'.
+ *
+ * @param date - The date to format. Can be a string, number, or Date object.
+ * @returns A formatted date string in the 'yyyy-MM-dd HH:mm:ss' format.
+ *
+ * @example
+ * ```typescript
+ * const formattedDate = formatDate(new Date('2023-10-05T14:48:00.000Z'));
+ * console.log(formattedDate); // Output: '2023-10-05 14:48:00'
+ * ```
+ */
 export const formatDate = (date: string | number | Date): string =>
   format(new Date(date), 'yyyy-MM-dd HH:mm:ss');
 
+/**
+ * Calculates the duration between two dates and returns it as a human-readable string.
+ * The duration is expressed in years, months, days, hours, or minutes, depending on the difference.
+ *
+ * @param modelStartDate - The start date of the simulation. Can be a string, number, or Date object.
+ * @param modelEndDate - The end date of the simulation. Can be a string, number, or Date object.
+ * @returns A string representing the duration between the two dates in the largest appropriate unit.
+ *
+ * @example
+ * ```typescript
+ * const duration1 = getSimulationDuration('2022-01-01', '2023-01-01');
+ * console.log(duration1); // "1 year"
+ *
+ * const duration2 = getSimulationDuration('2023-01-01', '2023-02-15');
+ * console.log(duration2); // "1 month"
+ *
+ * const duration3 = getSimulationDuration('2023-01-01T00:00:00', '2023-01-01T12:00:00');
+ * console.log(duration3); // "12 hours"
+ * ```
+ */
 export const getSimulationDuration = (
   modelStartDate: string | number | Date,
   modelEndDate: string | number | Date,

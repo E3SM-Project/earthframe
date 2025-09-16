@@ -4,11 +4,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import BrowseCardsView from '@/pages/Browse/BrowseCardsView';
 import BrowseFiltersSidePanel from '@/pages/Browse/BrowseFiltersSidePanel';
-import { BrowseTableView } from '@/pages/Browse/BrowseTableView';
+import SimulationResultCards from '@/pages/Browse/SimulationResultsCards';
+import SimulationResultsTable from '@/pages/Browse/SimulationResultsTable';
 import type { Simulation } from '@/types/index';
 
+// -------------------- Types & Interfaces --------------------
 export interface FilterState {
   // Scientific Goal
   campaignId: string[];
@@ -38,6 +39,7 @@ interface BrowseProps {
   setSelectedSimulationIds: (ids: string[]) => void;
 }
 
+// -------------------- Pure Helpers --------------------
 const parseDate = (s?: string) => (s ? new Date(s) : undefined);
 
 const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }: BrowseProps) => {
@@ -423,7 +425,7 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
               </div>
               <div>
                 {viewMode === 'table' ? (
-                  <BrowseTableView
+                  <SimulationResultsTable
                     simulations={simulations}
                     filteredData={filteredData}
                     selectedSimulationIds={selectedSimulationIds}
@@ -431,7 +433,7 @@ const Browse = ({ simulations, selectedSimulationIds, setSelectedSimulationIds }
                     handleCompareButtonClick={handleCompareButtonClick}
                   />
                 ) : (
-                  <BrowseCardsView
+                  <SimulationResultCards
                     simulations={simulations}
                     filteredData={filteredData}
                     selectedSimulationIds={selectedSimulationIds}
