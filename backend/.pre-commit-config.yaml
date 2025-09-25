@@ -29,4 +29,4 @@ repos:
       rev: v1.18.2
       hooks:
           - id: mypy
-            args: ["--config=pyproject.toml"]
+            args: ["--config=backend/pyproject.toml"]
