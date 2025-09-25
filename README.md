@@ -1,7 +1,3 @@
-Got it — since your **backend** and **frontend** each have their own `README.md`, the root-level one should stay minimal, just giving context and pointing contributors to the right subdirectories. Here’s a clean draft:
-
----
-
 # EarthFrame
 
 EarthFrame is a platform for managing and comparing Earth system simulation metadata, with a focus on **E3SM** (Energy Exascale Earth System Model) reference simulations.
