@@ -9,13 +9,15 @@ packages = [{ include = "app" }]  # if your code lives in app/
 
 [tool.poetry.dependencies]
 python = "^3.11"
+alembic = "^1.13.2"
 fastapi = "^0.111.0"
-uvicorn = { extras = ["standard"], version = "^0.30.1" }
+psycopg = {extras = ["binary"], version = "^3.2.1"}
+pydantic = "^2.8.2"
+pydantic-settings = "^2.4.0"
 python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.34"
+uvicorn = { extras = ["standard"], version = "^0.30.1" }
 
-# Optional (uncomment if needed)
-# sqlalchemy = "^2.0.30"
-# alembic = "^1.13.1"
 # python-jose = { extras = ["cryptography"], version = "^3.3.0" }
 # passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 # python-multipart = "^0.0.9"
