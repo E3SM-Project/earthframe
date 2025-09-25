@@ -61,7 +61,3 @@ coverage.xml
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pydantic
-# Ignore stray JSON files by default, but not the frontend mocks
-backend/**/*.json
