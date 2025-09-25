@@ -2,24 +2,25 @@
 
 EarthFrame is a platform for managing and comparing Earth system simulation metadata, with a focus on **E3SM** (Energy Exascale Earth System Model) reference simulations.
 
-This repository contains the full project, organized into backend and frontend applications.
+The goal of EarthFrame is to provide researchers with tools to:
+
+- Store and organize simulation metadata
+- Browse and visualize simulation details
+- Compare runs side-by-side
+- Surface diagnostics and key information for analysis
 
 ---
 
-## Structure
+## Repository Structure
 
-```
+```bash
 .
 ├── backend/     # FastAPI, PostgreSQL, SQLAlchemy, Alembic, Pydantic
-├── frontend/    # Web app (shadcn, Next.js/React)
+├── frontend/    # Web app (Next.js/React with shadcn)
 └── README.md    # This file
 ```
 
----
-
-## Getting Started
-
-Each component has its own setup instructions:
+Each component has its own README with setup instructions:
 
 - [Backend README](./backend/README.md)
 - [Frontend README](./frontend/README.md)
@@ -28,8 +29,10 @@ Each component has its own setup instructions:
 
 ## Development
 
-- Use **Poetry** for Python dependency management (backend).
-- Follow **GitHub Issues** for feature tracking.
+- Python dependencies are managed with **Poetry** (backend).
+- Use **GitHub Issues** for feature requests and tracking.
 - Contributions should include tests and documentation updates.
 
-<!-- ADD LICENSE -->
+---
+
+<!-- Add License -->
