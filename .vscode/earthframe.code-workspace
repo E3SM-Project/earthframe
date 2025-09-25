@@ -1,6 +1,14 @@
 {
   "folders": [
-    { "name": "root", "path": ".." }
+    { "name": "root", "path": ".." },
+    {
+      "name": "Backend",
+      "path": "../backend"
+    },
+    {
+      "name": "Frontend",
+      "path": "../frontend"
+    }
   ],
   "settings": {
     "editor.formatOnSave": true,
