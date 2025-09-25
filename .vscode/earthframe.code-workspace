@@ -1,5 +1,7 @@
 {
-  "folders": [{ "path": ".." }],
+  "folders": [
+    { "name": "root", "path": ".." }
+  ],
   "settings": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "dbaeumer.vscode-eslint", // Use ESLint as the formatter
@@ -18,7 +20,6 @@
     "debug.javascript.unmapMissingSources": true,
     "npm.packageManager": "pnpm"
   },
-
   "tasks": {
     "version": "2.0.0",
     "tasks": [
