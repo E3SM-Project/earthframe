@@ -1,7 +1,7 @@
-from .artifact import ArtifactIn, ArtifactOut
-from .link import ExternalLinkIn, ExternalLinkOut
-from .machine import MachineCreate, MachineOut
-from .simulation import SimulationCreate, SimulationOut
+from app.schemas.artifact import ArtifactIn, ArtifactOut
+from app.schemas.link import ExternalLinkIn, ExternalLinkOut
+from app.schemas.machine import MachineCreate, MachineOut
+from app.schemas.simulation import SimulationCreate, SimulationOut
 
 __all__ = [
     "MachineCreate",

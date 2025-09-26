@@ -1,10 +1,9 @@
-# Import models so Alembic autogenerate can see them
-from .artifact import Artifact
-from .link import ExternalLink
-from .machine import Machine
-from .simulation import Simulation
-from .status import Status
-from .variable import SimulationVariable, Variable
+from app.models.artifact import Artifact
+from app.models.link import ExternalLink
+from app.models.machine import Machine
+from app.models.simulation import Simulation
+from app.models.status import Status
+from app.models.variable import SimulationVariable, Variable
 
 __all__ = [
     "Machine",

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Integer, String
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -14,7 +16,12 @@ if TYPE_CHECKING:
 class Artifact(Base, IDMixin, TimestampMixin):
     __tablename__ = "artifacts"
 
-    simulation_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    simulation_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("simulations.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
 
     # outputPath, archivePath, runScriptPath, postprocessingScriptPath
     kind: Mapped[str] = mapped_column(String(50))
@@ -24,5 +31,7 @@ class Artifact(Base, IDMixin, TimestampMixin):
     size_bytes: Mapped[Optional[int]] = mapped_column(Integer)
 
     simulation: Mapped[Simulation] = relationship(
-        back_populates="artifacts", primaryjoin="Artifact.simulation_id==Simulation.id"
+        back_populates="artifacts",
+        primaryjoin="Artifact.simulation_id==Simulation.id",
+        passive_deletes=True,
     )
