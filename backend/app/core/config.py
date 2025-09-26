@@ -9,19 +9,23 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
+    # General application configuration
+    # ----------------------------------------
+    env: str = "development"
+    port: int = 8000
+
     # Frontend
     # ----------------------------------------
     frontend_origin: AnyHttpUrl = "http://localhost:5173"
 
-    # FastAPI config (Server/runtime)
-    # ----------------------------------------
-    env: str = "development"  # reads ENV
-    port: int = 8000  # reads PORT
-
-    # Database URL (same values as db/.env)
+    # Database configuration
     # ----------------------------------------
     database_url: str = (
         "postgresql+psycopg://earthframe:earthframe@localhost:5432/earthframe"
+    )
+    # Used only for tests; must include "test" in the path.
+    test_database_url: str = (
+        "postgresql+psycopg://earthframe:earthframe@localhost:5432/earthframe_test"
     )
 
 

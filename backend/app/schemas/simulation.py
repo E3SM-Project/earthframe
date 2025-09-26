@@ -1,94 +1,97 @@
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from app.schemas.artifact import ArtifactIn, ArtifactOut
 from app.schemas.link import ExternalLinkIn, ExternalLinkOut
+from app.schemas.utils import to_camel
 
 
 class SimulationCreate(BaseModel):
-    # required (camelCase aliases preserved)
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,  # allow both snake_case + camelCase input
+    )
+
+    # required
     name: str
     compset: str
-    compSetAlias: str = Field(alias="compSetAlias")
-    gridName: str = Field(alias="gridName")
-    gridResolution: str = Field(alias="gridResolution")
-    initializationType: str = Field(alias="initializationType")
-    simulationType: str = Field(alias="simulationType")
+    comp_set_alias: str
+    grid_name: str
+    grid_resolution: str
+    initialization_type: str
+    simulation_type: str
     status: str
-    machineId: UUID = Field(alias="machineId")
-    modelStartDate: datetime = Field(alias="modelStartDate")
+    machine_id: UUID
+    model_start_date: datetime
 
     # optional
-    caseName: Optional[str] = None
-    versionTag: Optional[str] = None
-    gitHash: Optional[str] = None
-    parentSimulationId: Optional[UUID] = None
-    campaignId: Optional[str] = None
-    experimentTypeId: Optional[str] = None
-    groupName: Optional[str] = None
-    simulationEndDate: Optional[datetime] = None
-    totalYears: Optional[float] = None
-    runStartDate: Optional[datetime] = None
-    runEndDate: Optional[datetime] = None
-    compiler: Optional[str] = None
-    notesMarkdown: Optional[str] = None
-    knownIssues: Optional[str] = None
-    branch: Optional[str] = None
-    externalRepoUrl: Optional[str] = None
-    uploadedBy: Optional[str] = None
-    uploadDate: Optional[datetime] = None
-    lastModified: Optional[datetime] = None
-    lastEditedBy: Optional[str] = None
-    lastEditedAt: Optional[datetime] = None
+    case_name: str | None = None
+    version_tag: str | None = None
+    git_hash: str | None = None
+    parent_simulation_id: UUID | None = None
+    campaign_id: str | None = None
+    experiment_type_id: str | None = None
+    group_name: str | None = None
+    simulation_end_date: datetime | None = None
+    total_years: float | None = None
+    run_start_date: datetime | None = None
+    run_end_date: datetime | None = None
+    compiler: str | None = None
+    notes_markdown: str | None = None
+    known_issues: str | None = None
+    branch: str | None = None
+    external_repo_url: str | None = None
+    uploaded_by: str | None = None
+    upload_date: datetime | None = None
+    last_modified: datetime | None = None
+    last_edited_by: str | None = None
+    last_edited_at: datetime | None = None
     extra: dict = {}
 
-    # child collections (optional)
     artifacts: list[ArtifactIn] | None = None
     links: list[ExternalLinkIn] | None = None
 
-    model_config = ConfigDict(populate_by_name=True)
-
 
 class SimulationOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=to_camel, populate_by_name=True
+    )
 
     id: UUID
     name: str
     compset: str
-    compSetAlias: str
-    gridName: str
-    gridResolution: str
-    initializationType: str
-    simulationType: str
+    comp_set_alias: str
+    grid_name: str
+    grid_resolution: str
+    initialization_type: str
+    simulation_type: str
     status: str
-    machineId: UUID
-    modelStartDate: datetime
+    machine_id: UUID
+    model_start_date: datetime
 
-    # optionals echoed
-    caseName: Optional[str] = None
-    versionTag: Optional[str] = None
-    gitHash: Optional[str] = None
-    parentSimulationId: Optional[UUID] = None
-    campaignId: Optional[str] = None
-    experimentTypeId: Optional[str] = None
-    groupName: Optional[str] = None
-    simulationEndDate: Optional[datetime] = None
-    totalYears: Optional[float] = None
-    runStartDate: Optional[datetime] = None
-    runEndDate: Optional[datetime] = None
-    compiler: Optional[str] = None
-    notesMarkdown: Optional[str] = None
-    knownIssues: Optional[str] = None
-    branch: Optional[str] = None
-    externalRepoUrl: Optional[str] = None
-    uploadedBy: Optional[str] = None
-    uploadDate: Optional[datetime] = None
-    lastModified: Optional[datetime] = None
-    lastEditedBy: Optional[str] = None
-    lastEditedAt: Optional[datetime] = None
+    case_name: str | None = None
+    version_tag: str | None = None
+    git_hash: str | None = None
+    parent_simulation_id: UUID | None = None
+    campaign_id: str | None = None
+    experiment_type_id: str | None = None
+    group_name: str | None = None
+    simulation_end_date: datetime | None = None
+    total_years: float | None = None
+    run_start_date: datetime | None = None
+    run_end_date: datetime | None = None
+    compiler: str | None = None
+    notes_markdown: str | None = None
+    known_issues: str | None = None
+    branch: str | None = None
+    external_repo_url: str | None = None
+    uploaded_by: str | None = None
+    upload_date: datetime | None = None
+    last_modified: datetime | None = None
+    last_edited_by: str | None = None
+    last_edited_at: datetime | None = None
     extra: dict = {}
 
     created_at: datetime

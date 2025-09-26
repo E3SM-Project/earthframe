@@ -5,13 +5,13 @@ description = "EarthFrame backend for the simulation comparison web app"
 authors = ["Tom Vo <vo13@llnl.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{ include = "app" }]  # if your code lives in app/
+packages = [{ include = "app" }]                                         # if your code lives in app/
 
 [tool.poetry.dependencies]
 python = "^3.11"
 alembic = "^1.13.2"
 fastapi = "^0.111.0"
-psycopg = {extras = ["binary"], version = "^3.2.1"}
+psycopg = { extras = ["binary"], version = "^3.2.1" }
 pydantic = "^2.8.2"
 pydantic-settings = "^2.4.0"
 python-dotenv = "^1.0.1"
@@ -30,6 +30,7 @@ sentence-transformers = "^5.0.0"
 # update pre-commit hooks with `pre-commit autoupdate`.
 ipykernel = "6.30.1"
 pytest = "7.4.2"
+pytest-cov = "7.0.0"
 torch = "2.7.1"
 ruff = "0.13.2"
 pre-commit = "4.3.0"
@@ -93,6 +94,10 @@ max-complexity = 10
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.ruff.per-file-ignores]
+# FastAPI’s use of Depends(...) in defaults is safe and idiomatic. Ignore B008 (do not call a method in argument defaults) in router files.
+"app/api/routers/*.py" = ["B008"]
 
 [tool.pytest.ini_options]
 # Docs: https://docs.pytest.org/en/7.2.x/reference/customize.html#configuration

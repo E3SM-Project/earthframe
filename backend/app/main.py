@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import router
+from app.api.routers import ai, machines, simulations
 from app.core.config import settings
 
-app = FastAPI(title="FastAPI Backend")
+app = FastAPI(title="EarthFrame API")
 
 # CORS
+# ---------------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.frontend_origin],
@@ -15,4 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router, prefix="/api")
+# FastAPI
+# ---------------------------------
+app.include_router(ai.router)
+app.include_router(simulations.router)
+app.include_router(machines.router)
