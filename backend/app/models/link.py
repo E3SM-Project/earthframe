@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
-from .common import IDMixin, TimestampMixin
+from .mixins import IDMixin, TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.simulation import Simulation

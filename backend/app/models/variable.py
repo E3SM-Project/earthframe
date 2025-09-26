@@ -16,7 +16,7 @@ class Variable(Base):
     name: Mapped[str] = mapped_column(String(100), primary_key=True)
     description: Mapped[str | None] = mapped_column(String(300))
 
-    simulations: Mapped[list["Simulation"]] = relationship(
+    simulations: Mapped[list[Simulation]] = relationship(
         secondary="simulation_variables", back_populates="variables"
     )
 

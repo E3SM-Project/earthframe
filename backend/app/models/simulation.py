@@ -8,13 +8,13 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.models.common import IDMixin, TimestampMixin
+from app.models.mixins import IDMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from .artifact import Artifact
-    from .link import ExternalLink
-    from .machine import Machine
-    from .variable import Variable
+    from app.models.artifact import Artifact
+    from app.models.link import ExternalLink
+    from app.models.machine import Machine
+    from app.models.variable import Variable
 
 
 class Simulation(Base, IDMixin, TimestampMixin):
