@@ -11,7 +11,7 @@
     }
   ],
   "settings": {
-    "debug.javascript.unmapMissingSources": true
+    "debug.javascript.unmapMissingSources": true,
   },
   "tasks": {
     "version": "2.0.0",

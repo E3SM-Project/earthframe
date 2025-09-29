@@ -37,7 +37,7 @@ class TestCreateSimulation:
         assert len(data["links"]) == 1
 
         # Test function directly
-        simulation_create = SimulationCreate(**payload)
+        simulation_create = SimulationCreate(**payload)  # type: ignore
         simulation = create_simulation(simulation_create, db)
         assert simulation.name == payload["name"]
         assert len(simulation.artifacts) == 1

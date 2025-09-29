@@ -20,7 +20,7 @@ class TestCreateMachine:
         assert data["description"] == payload["description"]
 
         # Test the actual function
-        machine_create = MachineCreate(**payload)
+        machine_create = MachineCreate(**payload)  # type: ignore
         machine = create_machine(machine_create, db)
         assert machine.name == payload["name"]
         assert machine.description == payload["description"]
@@ -39,7 +39,7 @@ class TestCreateMachine:
 
         # Test the actual function
         try:
-            machine_create = MachineCreate(**payload)
+            machine_create = MachineCreate(**payload)  # type: ignore
             create_machine(machine_create, db)
         except ValueError as e:
             assert str(e) == "Machine with this name already exists"

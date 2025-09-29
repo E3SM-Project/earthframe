@@ -16,13 +16,14 @@ class Settings(BaseSettings):
 
     # Frontend
     # ----------------------------------------
-    frontend_origin: AnyHttpUrl = "http://localhost:5173"
+    frontend_origin: AnyHttpUrl = AnyHttpUrl("http://localhost:5173")
 
     # Database configuration (must be supplied via .env)
     # --------------------------------------------------------
-    database_url: str
+    database_url: str = "postgresql://user:password@localhost:5432/defaultdb"
+
     # Used only for tests; must include "test" in the path.
-    test_database_url: str
+    test_database_url: str = "postgresql://user:password@localhost:5432/defaultdb_test"
 
 
 settings = Settings()
