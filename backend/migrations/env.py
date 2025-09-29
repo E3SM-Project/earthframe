@@ -1,4 +1,3 @@
-# migrations/env.py
 from __future__ import annotations
 
 import os
@@ -9,8 +8,11 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app import models  # noqa: F401  # import all models so Alembic sees them
+from app._logger import _setup_custom_logger
 from app.core.config import settings
 from app.db.base import Base
+
+logger = _setup_custom_logger(__name__)
 
 # --- Ensure project is importable (backend root = parent of 'app') ---
 CURRENT_DIR = os.path.dirname(__file__)
@@ -27,8 +29,10 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Set DB URL dynamically from settings (env/.env)
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# Only set URL if it hasn't already been overridden (e.g., by test code)
+if not config.get_main_option("sqlalchemy.url"):
+    config.set_main_option("sqlalchemy.url", settings.database_url)
+
 
 target_metadata = Base.metadata
 
@@ -49,12 +53,13 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    """Run migrations in 'online' mode."""
-    configuration = config.get_section(config.config_ini_section) or {}
-    configuration["sqlalchemy.url"] = settings.database_url
+    """Run migrations in 'online' mode'"""
+    # Don't override sqlalchemy.url here — it may already be set externally
+    # (e.g., by tests)
+    url = config.get_main_option("sqlalchemy.url")
 
     connectable = engine_from_config(
-        configuration,
+        {"sqlalchemy.url": url},
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
         future=True,
@@ -69,6 +74,7 @@ def run_migrations_online():
         )
 
         with context.begin_transaction():
+            logger.info("[env.py] 🚀 Running migrations for:", url)
             context.run_migrations()
 
 

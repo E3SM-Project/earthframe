@@ -1,4 +1,3 @@
-# conftest.py
 import os
 from urllib.parse import urlparse
 
@@ -10,9 +9,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from app._logger import _setup_custom_logger
 from app.api.deps import get_db
 from app.core.config import settings
 from app.main import app
+
+logger = _setup_custom_logger(__name__)
 
 TEST_DB_URL = settings.test_database_url
 ALEMBIC_INI_PATH = "alembic.ini"
@@ -37,7 +39,6 @@ def setup_test_db():
         This function is a generator and is intended to be used as a fixture
         or context manager for setting up and tearing down the test database.
     """
-
     # Make DATABASE_URL available to the app in case it reads from env.
     os.environ["DATABASE_URL"] = TEST_DB_URL
 
@@ -80,7 +81,7 @@ def _create_test_database():
     >>> _create_test_database()
     [pytest setup] Created database: test_db_name
     """
-    db_name, user, password = _get_db_name_user_and_password_from_url(TEST_DB_URL)
+    db_name, user, password, _, _ = _parse_db_url(TEST_DB_URL)
 
     conn = psycopg.connect(
         dbname="postgres",
@@ -95,24 +96,24 @@ def _create_test_database():
     cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (db_name,))
     if not cur.fetchone():
         cur.execute(f'CREATE DATABASE "{db_name}"')
-        print(f"[pytest setup] Created database: {db_name}")
+        logger.info(f"[pytest setup] Created test database: {db_name}")
     else:
-        print(f"[pytest setup] Using existing test database: {db_name}")
+        logger.info(f"[pytest setup] Using existing test database: {db_name}")
 
     cur.close()
     conn.close()
 
 
-def _get_db_name_user_and_password_from_url(
-    db_url: str,
-) -> tuple[str, str | None, str | None]:
+def _parse_db_url(db_url: str) -> tuple[str, str | None, str | None, str, int]:
     parsed = urlparse(db_url)
 
     db_name = parsed.path.lstrip("/")
     user = parsed.username
     password = parsed.password
+    host = parsed.hostname or "localhost"
+    port = parsed.port or 5432
 
-    return db_name, user, password
+    return db_name, user, password, host, port
 
 
 def _run_migrations():
