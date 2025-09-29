@@ -23,7 +23,7 @@ class Simulation(Base, IDMixin, TimestampMixin):
     # Required core (from screenshot)
     name: Mapped[str] = mapped_column(String(200), index=True)
     compset: Mapped[str] = mapped_column(String(120))
-    comp_set_alias: Mapped[str] = mapped_column(String(120))
+    compset_alias: Mapped[str] = mapped_column(String(120))
     grid_name: Mapped[str] = mapped_column(String(200))  # long name
     grid_resolution: Mapped[str] = mapped_column(String(50))
     initialization_type: Mapped[str] = mapped_column(String(50))

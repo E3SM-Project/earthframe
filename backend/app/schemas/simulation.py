@@ -17,7 +17,7 @@ class SimulationCreate(BaseModel):
     # required
     name: str
     compset: str
-    comp_set_alias: str
+    compset_alias: str
     grid_name: str
     grid_resolution: str
     initialization_type: str
