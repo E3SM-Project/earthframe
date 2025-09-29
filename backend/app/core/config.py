@@ -18,15 +18,11 @@ class Settings(BaseSettings):
     # ----------------------------------------
     frontend_origin: AnyHttpUrl = "http://localhost:5173"
 
-    # Database configuration
-    # ----------------------------------------
-    database_url: str = (
-        "postgresql+psycopg://earthframe:earthframe@localhost:5432/earthframe"
-    )
+    # Database configuration (must be supplied via .env)
+    # --------------------------------------------------------
+    database_url: str
     # Used only for tests; must include "test" in the path.
-    test_database_url: str = (
-        "postgresql+psycopg://earthframe:earthframe@localhost:5432/earthframe_test"
-    )
+    test_database_url: str
 
 
 settings = Settings()
