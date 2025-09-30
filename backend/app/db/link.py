@@ -11,7 +11,7 @@ from app.db.base import Base
 from .mixins import IDMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from app.models.simulation import Simulation
+    from app.db.simulation import Simulation
 
 
 class ExternalLink(Base, IDMixin, TimestampMixin):

@@ -8,23 +8,24 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.models.mixins import IDMixin, TimestampMixin
+from app.db.mixins import IDMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from app.models.artifact import Artifact
-    from app.models.link import ExternalLink
-    from app.models.machine import Machine
-    from app.models.variable import Variable
+    from app.db.artifact import Artifact
+    from app.db.link import ExternalLink
+    from app.db.machine import Machine
+    from app.db.variable import Variable
 
 
 class Simulation(Base, IDMixin, TimestampMixin):
     __tablename__ = "simulations"
 
-    # Required core (from screenshot)
-    name: Mapped[str] = mapped_column(String(200), index=True)
+    # Required core fields.
+    name: Mapped[str] = mapped_column(String(200), index=True, unique=True)
+    case_name: Mapped[str] = mapped_column(String(200), index=True, unique=True)
     compset: Mapped[str] = mapped_column(String(120))
     compset_alias: Mapped[str] = mapped_column(String(120))
-    grid_name: Mapped[str] = mapped_column(String(200))  # long name
+    grid_name: Mapped[str] = mapped_column(String(200))
     grid_resolution: Mapped[str] = mapped_column(String(50))
     initialization_type: Mapped[str] = mapped_column(String(50))
     simulation_type: Mapped[str] = mapped_column(String(50))
@@ -37,7 +38,6 @@ class Simulation(Base, IDMixin, TimestampMixin):
     model_start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     # Optional context / provenance
-    case_name: Mapped[str | None] = mapped_column(String(200))
     version_tag: Mapped[str | None] = mapped_column(String(100))
     git_hash: Mapped[str | None] = mapped_column(String(64), index=True)
     parent_simulation_id: Mapped[UUID | None] = mapped_column(

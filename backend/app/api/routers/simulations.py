@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
-from app.models.artifact import Artifact
-from app.models.link import ExternalLink
-from app.models.simulation import Simulation
+from app.db.artifact import Artifact
+from app.db.link import ExternalLink
+from app.db.simulation import Simulation
 from app.schemas import SimulationCreate, SimulationOut
 
 router = APIRouter(prefix="/simulations", tags=["Simulations"])

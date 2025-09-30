@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 if TYPE_CHECKING:
-    from app.models.simulation import Simulation
+    from app.db.simulation import Simulation
 
 
 class Variable(Base):

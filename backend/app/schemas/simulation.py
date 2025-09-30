@@ -9,13 +9,12 @@ from app.schemas.utils import to_camel
 
 
 class SimulationCreate(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        populate_by_name=True,  # allow both snake_case + camelCase input
-    )
+    # Allow both snake_case + camelCase input.
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     # required
     name: str
+    case_name: str
     compset: str
     compset_alias: str
     grid_name: str
@@ -27,7 +26,6 @@ class SimulationCreate(BaseModel):
     model_start_date: datetime
 
     # optional
-    case_name: str | None = None
     version_tag: str | None = None
     git_hash: str | None = None
     parent_simulation_id: UUID | None = None
@@ -61,6 +59,7 @@ class SimulationOut(BaseModel):
 
     id: UUID
     name: str
+    case_name: str
     compset: str
     comp_set_alias: str
     grid_name: str
@@ -71,7 +70,6 @@ class SimulationOut(BaseModel):
     machine_id: UUID
     model_start_date: datetime
 
-    case_name: str | None = None
     version_tag: str | None = None
     git_hash: str | None = None
     parent_simulation_id: UUID | None = None
