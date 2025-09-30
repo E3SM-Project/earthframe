@@ -1,10 +1,10 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from app.schemas.base import CamelInModel, CamelOutModel
 
 
-class MachineCreate(BaseModel):
+class MachineCreate(CamelInModel):
     name: str
     site: str
     architecture: str
@@ -13,8 +13,7 @@ class MachineCreate(BaseModel):
     notes: str | None = None
 
 
-class MachineOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class MachineOut(CamelOutModel):
     id: UUID
     name: str
     site: str

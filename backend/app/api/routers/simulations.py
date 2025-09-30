@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.api.deps import get_db
 from app.db.artifact import Artifact
@@ -14,66 +14,59 @@ router = APIRouter(prefix="/simulations", tags=["Simulations"])
 
 @router.post("", response_model=SimulationOut, status_code=status.HTTP_201_CREATED)
 def create_simulation(payload: SimulationCreate, db: Session = Depends(get_db)):
-    """
-    Create a new simulation and store it in the database.
+    try:
+        # 1) Create the base Simulation
+        sim = Simulation(
+            **payload.model_dump(
+                by_alias=False,
+                exclude={"artifacts", "links"},
+                exclude_unset=True,
+            )
+        )
+        db.add(sim)
+        db.flush()  # needed to get sim.id
 
-    Parameters
-    ----------
-    payload : SimulationCreate
-        The data required to create a new simulation, including optional artifacts
-        and external links.
-    db : Session, optional
-        The database session dependency, by default provided by `Depends(get_db)`.
+        # 2) Related rows (batch insert if present)
+        if payload.artifacts:
+            db.add_all(
+                [
+                    Artifact(
+                        simulation_id=sim.id, **artifact.model_dump(by_alias=False)
+                    )
+                    for artifact in payload.artifacts
+                ]
+            )
+        if payload.links:
+            db.add_all(
+                [
+                    ExternalLink(
+                        simulation_id=sim.id, **link.model_dump(by_alias=False)
+                    )
+                    for link in payload.links
+                ]
+            )
 
-    Returns
-    -------
-    Simulation
-        The newly created simulation object with its associated data.
+        # 3) Commit once
+        db.commit()
 
-    Notes
-    -----
-    - The function first creates a `Simulation` object and assigns it an ID.
-    - If artifacts are provided in the payload, they are added to the database
-      and associated with the simulation.
-    - If external links are provided in the payload, they are added to the database
-      and associated with the simulation.
-    - The database transaction is committed, and the simulation object is refreshed
-      before being returned.
-    """
-    sim = Simulation(
-        **payload.model_dump(exclude={"artifacts", "links"}, by_alias=True)
+    except Exception:
+        db.rollback()
+        raise
+
+    # 4) Reload with relations eagerly loaded (safe for serialization)
+    sim_reload = db.get(
+        Simulation,
+        sim.id,
+        options=(
+            selectinload(Simulation.artifacts),
+            selectinload(Simulation.links),
+        ),
     )
-    db.add(sim)
+    if sim_reload is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
 
-    # Assign sim.id by flushing to the DB.
-    db.flush()
-
-    # Add any provided artifacts to the database.
-    if payload.artifacts:
-        for a in payload.artifacts:
-            artifact_obj = Artifact(
-                simulation_id=sim.id,
-                kind=a.kind,
-                uri=a.uri,
-                label=a.label,
-            )
-            db.add(artifact_obj)
-
-    # Add any provided links to the database.
-    if payload.links:
-        for link in payload.links:
-            link_obj = ExternalLink(
-                simulation_id=sim.id,
-                link_type=link.link_type,
-                url=link.url,
-                label=link.label,
-            )
-            db.add(link_obj)
-
-    db.commit()
-    db.refresh(sim)
-
-    return sim
+    # 5) Serialize now (explicit makes debugging crystal clear)
+    return SimulationOut.model_validate(sim_reload, from_attributes=True)
 
 
 @router.get("", response_model=list[SimulationOut])

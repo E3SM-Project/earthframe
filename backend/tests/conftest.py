@@ -6,6 +6,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
+from psycopg.rows import tuple_row
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -42,10 +43,70 @@ def setup_test_db():
     # Make DATABASE_URL available to the app in case it reads from env.
     os.environ["DATABASE_URL"] = TEST_DB_URL
 
+    # Ensure a clean state by dropping any existing test database.
+    _drop_test_database()
     _create_test_database()
     _run_migrations()
 
-    yield
+    try:
+        yield
+    finally:
+        _drop_test_database()
+
+
+def _drop_test_database():
+    """Drops the test database after the test session ends.
+
+    This function ensures that the test database is cleaned up
+    and removed once all tests have completed.
+
+    Notes
+    -----
+    - This function assumes that the `TEST_DB_URL` contains the connection
+        string for the test database.
+    - The function requires the `psycopg` library for PostgreSQL database interaction.
+    """
+    logger.info("[pytest teardown] Tearing down test database...")
+
+    TEST_DB_URL = os.environ["DATABASE_URL"]  # or import your constant
+    db_name, user, password, host, port = _parse_db_url(TEST_DB_URL)
+
+    # Connect to a maintenance DB to manage/drop the test DB.
+    with psycopg.connect(
+        dbname="postgres",
+        user=user,
+        password=password,
+        host=host,
+        port=port,
+        autocommit=True,
+    ) as admin_conn:
+        with admin_conn.cursor(row_factory=tuple_row) as cur:
+            # Detect server version
+            cur.execute("SHOW server_version_num;")
+            (server_version_num,) = cur.fetchone()
+            server_version_num = int(server_version_num)
+
+            if server_version_num >= 150000:
+                # PostgreSQL 15+ supports FORCE
+                cur.execute(f'DROP DATABASE IF EXISTS "{db_name}" WITH (FORCE);')
+                logger.info(
+                    f"[pytest teardown] Dropped test database with FORCE: {db_name}"
+                )
+            else:
+                # Pre-15: terminate connections, then drop
+                # 1) Terminate connections to the target DB
+                cur.execute(
+                    """
+                    SELECT pg_terminate_backend(pid)
+                    FROM pg_stat_activity
+                    WHERE datname = %s
+                      AND pid <> pg_backend_pid();
+                    """,
+                    (db_name,),
+                )
+                # 2) Drop the database
+                cur.execute(f'DROP DATABASE IF EXISTS "{db_name}";')
+                logger.info(f"[pytest teardown] Dropped test database: {db_name}")
 
 
 def _create_test_database():

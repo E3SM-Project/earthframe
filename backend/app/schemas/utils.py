@@ -1,4 +1,4 @@
-def to_camel(string: str) -> str:
+def to_camel_case(string: str) -> str:
     """Convert a snake_case string to camelCase.
 
     This function is particularly useful when working with Pydantic models,
@@ -41,7 +41,25 @@ def to_camel(string: str) -> str:
     >>> model.dict(by_alias=True)
     {'exampleField': 'value', 'anotherField': 42}
     """
-
     parts = string.split("_")
 
-    return parts[0] + "".join(word.capitalize() for word in parts[1:])
+    return parts[0] + "".join(p.title() for p in parts[1:])
+
+
+def to_snake_case(camel_str: str) -> str:
+    """
+    Convert a CamelCase string to snake_case.
+
+    Parameters
+    ----------
+    camel_str : str
+        The input string in CamelCase format.
+
+    Returns
+    -------
+    str
+        The converted string in snake_case format.
+    """
+    return "".join(["_" + c.lower() if c.isupper() else c for c in camel_str]).lstrip(
+        "_"
+    )

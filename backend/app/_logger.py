@@ -3,17 +3,40 @@
 import logging
 
 # Logging module setup
-log_format = (
+LOG_FORMAT = (
     "%(asctime)s [%(levelname)s]: %(filename)s(%(funcName)s:%(lineno)s) >> %(message)s"
 )
-logging.basicConfig(format=log_format, filemode="w", level=logging.INFO)
+LOG_LEVEL = logging.INFO
 
-# Console handler setup
+# Add a console handler to display warnings in the console. This is useful
+# for when other package loggers raise warnings.
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
-logFormatter = logging.Formatter(log_format)
-console_handler.setFormatter(logFormatter)
+console_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 logging.getLogger().addHandler(console_handler)
+
+
+def _setup_root_logger():
+    """Configures the root logger.
+
+    This function sets up the root logger with a predefined format and log level.
+    It also enables capturing of warnings issued by the `warnings` module and
+    redirects them to the logging system.
+
+    Notes
+    -----
+    - The `force=True` parameter ensures that any existing logging configuration
+      is overridden.
+    - The file handler is added dynamically to the root logger later in the
+      ``Run`` class once the log file path is known.
+    """
+    logging.basicConfig(
+        format=LOG_FORMAT,
+        level=LOG_LEVEL,
+        force=True,
+    )
+
+    logging.captureWarnings(True)
 
 
 def _setup_custom_logger(name, propagate=True) -> logging.Logger:

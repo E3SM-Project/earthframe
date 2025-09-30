@@ -7,7 +7,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app import models  # noqa: F401  # import all models so Alembic sees them
+from app import db  # noqa: F401  # import all SQLALchemy models so Alembic sees them
 from app._logger import _setup_custom_logger
 from app.core.config import settings
 from app.db.base import Base

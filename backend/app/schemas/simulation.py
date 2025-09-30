@@ -1,17 +1,14 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import Field
 
 from app.schemas.artifact import ArtifactIn, ArtifactOut
+from app.schemas.base import CamelInModel, CamelOutModel
 from app.schemas.link import ExternalLinkIn, ExternalLinkOut
-from app.schemas.utils import to_camel
 
 
-class SimulationCreate(BaseModel):
-    # Allow both snake_case + camelCase input.
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class SimulationCreate(CamelInModel):
     # required
     name: str
     case_name: str
@@ -52,16 +49,13 @@ class SimulationCreate(BaseModel):
     links: list[ExternalLinkIn] | None = None
 
 
-class SimulationOut(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True, alias_generator=to_camel, populate_by_name=True
-    )
-
+class SimulationOut(CamelOutModel):
+    # Required fields.
     id: UUID
     name: str
     case_name: str
     compset: str
-    comp_set_alias: str
+    compset_alias: str
     grid_name: str
     grid_resolution: str
     initialization_type: str
@@ -70,6 +64,7 @@ class SimulationOut(BaseModel):
     machine_id: UUID
     model_start_date: datetime
 
+    # Optional fields.
     version_tag: str | None = None
     git_hash: str | None = None
     parent_simulation_id: UUID | None = None
@@ -95,5 +90,5 @@ class SimulationOut(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    artifacts: list[ArtifactOut] = []
-    links: list[ExternalLinkOut] = []
+    artifacts: list[ArtifactOut] = Field(default_factory=list)
+    links: list[ExternalLinkOut] = Field(default_factory=list)

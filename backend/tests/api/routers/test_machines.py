@@ -1,103 +1,157 @@
 from uuid import uuid4
 
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.routers.machines import create_machine, get_machine, list_machines
-from app.models.machine import Machine
+from app.db.machine import Machine
 from app.schemas.machine import MachineCreate
 
 
 class TestCreateMachine:
     def test_create_machine_success(self, client, db: Session):
-        payload = {"name": "Machine A", "description": "Test machine"}
-
-        # Test the API endpoint
-        r = client.post("/machines", json=payload)
-        assert r.status_code == 201
-
-        data = r.json()
-        assert data["name"] == payload["name"]
-        assert data["description"] == payload["description"]
+        payload = {
+            "name": "Machine A",
+            "site": "Site A",
+            "architecture": "x86_64",
+            "scheduler": "SLURM",
+            "gpu": True,
+            "notes": "Test machine",
+        }
 
         # Test the actual function
         machine_create = MachineCreate(**payload)  # type: ignore
         machine = create_machine(machine_create, db)
-        assert machine.name == payload["name"]
-        assert machine.description == payload["description"]
+
+        for key in payload:
+            assert getattr(machine, key) == payload[key]
+
+        # Test the API endpoint
+        payload2 = {
+            "name": "Machine F",
+            "site": "Site F",
+            "architecture": "ARM",
+            "scheduler": "Kubernetes",
+            "gpu": False,
+            "notes": "Another test machine",
+        }
+
+        res = client.post("/machines", json=payload2)
+
+        assert res.status_code == 201
+        data = res.json()
+
+        for key in payload:
+            assert data[key] == payload2[key]
 
     def test_create_machine_duplicate_name(self, db: Session, client):
         # Seed an existing machine
-        db.add(Machine(name="Machine B", description="Existing machine"))
+        db.add(
+            Machine(
+                name="Machine B",
+                site="Site B",
+                architecture="x86_64",
+                scheduler="PBS",
+                gpu=False,
+                notes="Existing machine",
+            )
+        )
         db.commit()
 
-        payload = {"name": "Machine B", "description": "Duplicate machine"}
-
-        # Test the API endpoint
-        r = client.post("/machines", json=payload)
-        assert r.status_code == 400
-        assert r.json()["detail"] == "Machine with this name already exists"
+        payload = {
+            "name": "Machine B",
+            "site": "Site C",
+            "architecture": "ARM",
+            "scheduler": "SLURM",
+            "gpu": True,
+            "notes": "Duplicate machine",
+        }
 
         # Test the actual function
         try:
             machine_create = MachineCreate(**payload)  # type: ignore
             create_machine(machine_create, db)
-        except ValueError as e:
-            assert str(e) == "Machine with this name already exists"
+        except HTTPException as e:
+            assert str(e) == "400: Machine with this name already exists"
+
+        # Test the API endpoint
+        res = client.post("/machines", json=payload)
+        assert res.status_code == 400
+        assert res.json()["detail"] == "Machine with this name already exists"
 
 
 class TestListMachines:
     def test_list_machines(self, db: Session, client):
-        db.add_all(
-            [
-                Machine(name="Machine C", description="First machine"),
-                Machine(name="Machine D", description="Second machine"),
-            ]
-        )
-        db.commit()
-
-        # Test the API endpoint
-        r = client.get("/machines")
-        assert r.status_code == 200
-        data = r.json()
-
-        # Don’t rely on DB ordering unless your API guarantees it
-        names = {m["name"] for m in data}
-        assert names == {"Machine C", "Machine D"}
+        # FIXME: Need to ensure DB is isolated between tests. Otherwise
+        # this test may fail if other tests have added machines.
+        expected_machines = {
+            "aurora",
+            "frontier",
+            "anvil",
+            "polaris",
+            "andes",
+            "perlmutter",
+            "compy",
+            "chrysalis",
+            "Machine A",
+            "Machine B",
+            "Machine F",
+        }
 
         # Test the actual function
         machines = list_machines(db)
-        machine_names = {m.name for m in machines}
-        assert machine_names == {"Machine C", "Machine D"}
+        result = {m.name for m in machines}
+
+        assert result == expected_machines
+        print(result)
+
+        # Test the API endpoint
+        res = client.get("/machines")
+        assert res.status_code == 200
+        data = res.json()
+
+        # Don’t rely on DB ordering.
+        result_api = {m["name"] for m in data}
+        assert result_api == expected_machines
 
 
 class TestGetMachine:
     def test_get_machine_success(self, db: Session, client):
-        machine = Machine(name="Machine E", notes="Test machine")
-        db.add(machine)
+        expected = Machine(
+            name="Machine E",
+            site="Site E",
+            architecture="x86_64",
+            scheduler="SLURM",
+            gpu=True,
+            notes="Test machine",
+        )
+        db.add(expected)
         db.commit()
-        db.refresh(machine)
-
-        # Test the API endpoint
-        r = client.get(f"/machines/{machine.id}")
-        assert r.status_code == 200
-
-        data = r.json()
-        assert data["name"] == machine.name
-        assert data["description"] == machine.notes
+        db.refresh(expected)
 
         # Test the actual function
-        fetched_machine = get_machine(machine.id, db)
-        assert fetched_machine.name == machine.name
-        assert fetched_machine.notes == machine.notes
+        result = get_machine(expected.id, db)
+        assert result.name == expected.name
+        assert result.notes == expected.notes
+
+        # Test the API endpoint
+        res = client.get(f"/machines/{expected.id}")
+        assert res.status_code == 200
+
+        result_api = res.json()
+        assert result_api["name"] == expected.name
+        assert result_api["notes"] == expected.notes
 
     def test_get_machine_not_found(self, client, db: Session):
         random_id = uuid4()
 
-        # Test the API endpoint
-        r = client.get(f"/machines/{random_id}")
-        assert r.status_code == 404
-        assert r.json()["detail"] == "Machine not found"
-
         # Test the actual function
-        fetched_machine = get_machine(random_id, db)
-        assert fetched_machine is None
+        try:
+            get_machine(random_id, db)
+        except HTTPException as e:
+            assert str(e) == "404: Machine not found"
+
+        # Test the API endpoint
+        res = client.get(f"/machines/{random_id}")
+        assert res.status_code == 404
+        assert res.json()["detail"] == "Machine not found"
