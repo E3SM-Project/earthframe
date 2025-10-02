@@ -1,11 +1,28 @@
-from dotenv import load_dotenv
-import os
-
-load_dotenv()  # Load .env file
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings:
-    FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
+
+    # General application configuration
+    # ----------------------------------------
+    env: str = "development"
+    port: int = 8000
+
+    # Frontend
+    # ----------------------------------------
+    frontend_origin: AnyHttpUrl = AnyHttpUrl("http://localhost:5173")
+
+    # Database configuration (must be supplied via .env)
+    # --------------------------------------------------------
+    database_url: str = "postgresql://user:password@localhost:5432/defaultdb"
+
+    # Used only for tests; must include "test" in the path.
+    test_database_url: str = "postgresql://user:password@localhost:5432/defaultdb_test"
 
 
 settings = Settings()

@@ -1,40 +1,122 @@
 [tool.poetry]
-name = "fastapi-backend"
+name = "earthframe-backend"
 version = "0.1.0"
-description = "FastAPI backend for the simulation comparison web app"
-authors = ["Your Name <you@example.com>"]
-license = "MIT"
+description = "EarthFrame backend for the E3SM project"
+authors = ["Tom Vo <vo13@llnl.com>"]
+license = "Apache-2.0"
 readme = "README.md"
-packages = [{ include = "app" }]  # if your code lives in app/
+packages = [{ include = "app" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Earth System Science",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+alembic = "^1.13.2"
 fastapi = "^0.111.0"
-uvicorn = { extras = ["standard"], version = "^0.30.1" }
+psycopg = { extras = ["binary"], version = "^3.2.1" }
+pydantic = "^2.8.2"
+pydantic-settings = "^2.4.0"
 python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.34"
+uvicorn = { extras = ["standard"], version = "^0.30.1" }
 
-# Optional (uncomment if needed)
-# sqlalchemy = "^2.0.30"
-# alembic = "^1.13.1"
-# python-jose = { extras = ["cryptography"], version = "^3.3.0" }
-# passlib = { extras = ["bcrypt"], version = "^1.7.4" }
-# python-multipart = "^0.0.9"
-# fastapi-users = "^12.1.3"
 transformers = "^4.53.1"
 sentence-transformers = "^5.0.0"
 
 [tool.poetry.group.dev.dependencies]
-isort = "^5.13.2"
-ruff = "^0.4.4"
-torch = "^2.7.1"
-pytest = "^7.4.2"
-ipykernel = "^6.28.0"
+# Run `pre-commit autoupdate` to update these versions
+# in the pre-commit hooks and align the versions here.
+ipykernel = "6.30.1"
+pytest = "7.4.2"
+pytest-cov = "7.0.0"
+factory_boy = "3.3.3"
+torch = "2.7.1"
+ruff = "0.13.2"
+pre-commit = "4.3.0"
+mypy = "1.18.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".ipynb_checkpoints",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pyenv",
+  ".pytest_cache",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  ".vscode",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "docs",
+  "node_modules",
+  "site-packages",
+  "venv",
+]
+
+[tool.ruff.lint]
+# E4 - whitespace
+# E7 - multiple-statements
+# E9 - trailing-whitespace
+# F - Enable Pyflakes
+# B - Enable flake8-bugbear
+# W - Enable pycodestyle
+# C901 - complex-structure
+# D - Enable flake8-docstrings
+# I - Enable isort
+# E - Enable pycodestyle errors
+select = ["E4", "E7", "E9", "F", "B", "W", "C901", "I", "E"]
+
+# E501 - line-too-long
+ignore = ["E501"]
+
+[tool.ruff.lint.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 5.
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+# FastAPI’s use of Depends(...) in defaults is safe and idiomatic. Ignore B008 (do not call a method in argument defaults) in router files.
+"app/api/routers/*.py" = ["B008"]
+
 [tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q"
-testpaths = ["tests"]
+# Docs: https://docs.pytest.org/en/7.2.x/reference/customize.html#configuration
+junit_family = "xunit2"
+addopts = "--cov=app --cov-report term --cov-report html:tests_coverage_reports/htmlcov --cov-report xml:tests_coverage_reports/coverage.xml -s"
+python_files = ["tests.py", "test_*.py"]
+
+[tool.mypy]
+# Docs: https://mypy.readthedocs.io/en/stable/config_file.html
+python_version = "3.13"
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
