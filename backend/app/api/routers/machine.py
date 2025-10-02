@@ -68,7 +68,6 @@ def list_machines(db: Session = Depends(get_db)):
     list
         A list of `Machine` objects retrieved from the database.
     """
-
     machines = db.query(Machine).order_by(Machine.name.asc()).all()
 
     return machines
