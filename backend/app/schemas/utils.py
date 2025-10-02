@@ -1,3 +1,6 @@
+import re
+
+
 def to_camel_case(string: str) -> str:
     """Convert a snake_case string to camelCase.
 
@@ -60,6 +63,4 @@ def to_snake_case(camel_str: str) -> str:
     str
         The converted string in snake_case format.
     """
-    return "".join(["_" + c.lower() if c.isupper() else c for c in camel_str]).lstrip(
-        "_"
-    )
+    return re.sub(r"([A-Z])", r"_\1", camel_str).lower().lstrip("_")
