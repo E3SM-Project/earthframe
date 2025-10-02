@@ -20,7 +20,7 @@ class TestMachineCreate:
         machine = MachineCreate(**data)  # type: ignore
 
         # Assert
-        assert machine.dict() == data
+        assert machine.model_dump() == data
 
     def test_machine_create_defaults(self):
         # Arrange
@@ -57,7 +57,7 @@ class TestMachineOut:
         machine = MachineOut(**data)  # type: ignore
 
         # Assert
-        assert machine.dict() == data
+        assert machine.model_dump() == data
 
     def test_machine_out_optional_notes(self):
         # Arrange
