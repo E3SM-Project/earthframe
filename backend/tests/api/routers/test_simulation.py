@@ -4,7 +4,7 @@ import pytest
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.routers.simulations import (
+from app.api.routers.simulation import (
     create_simulation,
     get_simulation,
     list_simulations,
