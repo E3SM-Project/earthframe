@@ -82,8 +82,6 @@ class TestCreateMachine:
 
 class TestListMachines:
     def test_list_machines(self, db: Session, client):
-        # FIXME: Need to ensure DB is isolated between tests. Otherwise
-        # this test may fail if other tests have added machines.
         expected_machines = {
             "aurora",
             "frontier",
@@ -93,9 +91,6 @@ class TestListMachines:
             "perlmutter",
             "compy",
             "chrysalis",
-            "Machine A",
-            "Machine B",
-            "Machine F",
         }
 
         # Test the actual function

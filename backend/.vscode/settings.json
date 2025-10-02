@@ -3,6 +3,7 @@
   // Editor settings
   // ===================
   "editor.formatOnSave": true,
+
   // ===================
   // Python settings
   // ===================
@@ -17,11 +18,15 @@
     }
   },
   "python.defaultInterpreterPath": ".venv/bin/python",
+
+  // ===================
   // Type checking
-  // ---------------------------
+  // ===================
   "mypy-type-checker.args": ["--config=pyproject.toml"],
-  // Testing
-  // ---------------------------
+
+  // ===================
+  // Testing settings
+  // ===================
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   // NOTE: Debugger doesn't work if pytest-cov is enabled, so set "--no-cov"

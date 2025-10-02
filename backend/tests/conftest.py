@@ -7,7 +7,7 @@ from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
 from psycopg.rows import tuple_row
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event  # NEW: import event for savepoint restart
 from sqlalchemy.orm import Session, sessionmaker
 
 from app._logger import _setup_custom_logger
@@ -22,7 +22,62 @@ ALEMBIC_INI_PATH = "alembic.ini"
 
 # Set up the SQLAlchemy engine and sessionmaker for testing
 engine = create_engine(TEST_DB_URL, future=True)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# NOTE (unchanged comment): We keep a Sessionmaker here, but we will bind it per-test
+# to a single connection that's inside a transaction to ensure isolation.
+TestingSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, expire_on_commit=False, future=True
+)
+
+
+@pytest.fixture(scope="session")
+def _connection():
+    # Keep a single physical connection open for the whole test session (fast).
+    # Tests will run inside per-test transactions on this connection.
+    with engine.connect() as conn:
+        yield conn
+
+
+@pytest.fixture(scope="function")
+def db(_connection) -> Session:
+    """
+    Provides a new SQLAlchemy session for each test.
+
+    This fixture sets up a fresh database session for every test, ensuring
+    isolation and allowing direct access to the test database for assertions.
+
+    Yields
+    ------
+    Session
+        A SQLAlchemy session connected to the test database.
+
+    Notes
+    -----
+    The session is automatically closed after the test completes.
+    """
+    # Begin an outer transaction for this test, and start a SAVEPOINT (nested).
+    # This ensures that any commits inside the test are contained and rolled back.
+    outer_tx = _connection.begin()
+    nested_tx = _connection.begin_nested()
+
+    # Bind the Session to the shared connection (inside the transaction).
+    session: Session = TestingSessionLocal(bind=_connection)
+
+    # After each nested transaction ends (e.g., after a commit),
+    # automatically start a new SAVEPOINT so the Session remains usable.
+    @event.listens_for(session, "after_transaction_end")
+    def _restart_savepoint(sess, txn):
+        if txn.nested and not txn._parent.nested:
+            _connection.begin_nested()
+
+    try:
+        yield session
+    finally:
+        # Roll back everything done in the test and close the session.
+        session.close()
+
+        # Safe to call rollback even if already ended.
+        nested_tx.rollback()
+        outer_tx.rollback()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -186,32 +241,7 @@ def _run_migrations():
     command.upgrade(alembic_cfg, "head")
 
 
-@pytest.fixture
-def db() -> Session:
-    """
-    Provides a new SQLAlchemy session for each test.
-
-    This fixture sets up a fresh database session for every test, ensuring
-    isolation and allowing direct access to the test database for assertions.
-
-    Yields
-    ------
-    Session
-        A SQLAlchemy session connected to the test database.
-
-    Notes
-    -----
-    The session is automatically closed after the test completes.
-    """
-    session = TestingSessionLocal()
-
-    try:
-        yield session
-    finally:
-        session.close()
-
-
-@pytest.fixture
+@pytest.fixture(scope="function")
 def client(db: Session):
     """Sets up a FastAPI TestClient with a database dependency override.
 
@@ -240,9 +270,11 @@ def client(db: Session):
 
     def override_get_db():
         try:
+            # NEW: Do not close the session here; the db fixture finalizer will
+            # handle closing and rolling back the transaction/savepoint.
             yield db
         finally:
-            db.close()
+            pass
 
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
