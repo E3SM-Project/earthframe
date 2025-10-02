@@ -98,7 +98,6 @@ class TestListMachines:
         result = {m.name for m in machines}
 
         assert result == expected_machines
-        print(result)
 
         # Test the API endpoint
         res = client.get("/machines")
