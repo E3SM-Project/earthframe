@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
+from app.api.deps import get_db, transaction
 from app.db.machine import Machine
 from app.schemas import MachineCreate, MachineOut
 
@@ -44,9 +44,10 @@ def create_machine(payload: MachineCreate, db: Session = Depends(get_db)):
 
     new_machine = Machine(**payload.model_dump())
 
-    db.add(new_machine)
-    db.commit()
-    db.refresh(new_machine)
+    with transaction(db):
+        db.add(new_machine)
+        db.flush()
+        db.commit()
 
     return new_machine
 
