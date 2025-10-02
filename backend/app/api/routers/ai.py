@@ -50,7 +50,7 @@ def _describe_sim(sim: SimulationOut) -> str:
     Generate a string description of a simulation using its metadata.
     """
     return (
-        f"Name: {sim.name}, Case Name: {sim.case_name}]: "
+        f"Name: {sim.name}, Case Name: {sim.case_name}: "
         f"Tag: {sim.version_tag}, Campaign: {sim.campaign_id}, Compset: {sim.compset}, "
         f"Resolution: {sim.grid_resolution}, Machine: {sim.machine_id}, Notes: {sim.notes_markdown or 'n/a'}"
     )
