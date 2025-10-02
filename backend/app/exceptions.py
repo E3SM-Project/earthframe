@@ -19,8 +19,7 @@ logger = _setup_custom_logger(__name__)
 
 
 def register_exception_handlers(app: FastAPI) -> None:
-    """
-    Register exception handlers for the FastAPI application.
+    """Register exception handlers for the FastAPI application.
 
     This function sets up custom exception handlers for SQLAlchemy errors,
     FlushError, and Pydantic ValidationError to provide consistent and
@@ -40,8 +39,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def handle_sqlalchemy_error(
         _: FastAPI, e: sa_exc.SQLAlchemyError
     ) -> JSONResponse:
-        """
-        Handle SQLAlchemy errors and return appropriate JSON responses.
+        """Handle SQLAlchemy errors and return appropriate JSON responses.
 
         Parameters
         ----------
@@ -61,8 +59,7 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(FlushError)
     async def handle_flush_error(_: FastAPI, e: FlushError) -> JSONResponse:
-        """
-        Handle FlushError and return appropriate JSON responses.
+        """Handle FlushError and return appropriate JSON responses.
 
         Parameters
         ----------
@@ -107,8 +104,7 @@ def register_exception_handlers(app: FastAPI) -> None:
 
 
 def map_sa_exception(e: Exception) -> tuple[int, str]:
-    """
-    Map a SQLAlchemy exception to an HTTP status code and error message.
+    """Map a SQLAlchemy exception to an HTTP status code and error message.
 
     This function takes a SQLAlchemy exception and returns a tuple containing
     an appropriate HTTP status code and a user-friendly error message.
@@ -133,14 +129,14 @@ def map_sa_exception(e: Exception) -> tuple[int, str]:
         return 503, "Database unavailable; try again."
     elif isinstance(e, sa_exc.DBAPIError):
         code = 503 if getattr(e, "connection_invalidated", False) else 500
+
         return code, "Database error."
 
     return 500, "Unexpected server error."
 
 
 def pg_detail(e: sa_exc.IntegrityError) -> tuple[int, str]:
-    """
-    Extract PostgreSQL-specific details from an IntegrityError.
+    """Extract PostgreSQL-specific details from an IntegrityError.
 
     This function inspects the PostgreSQL error code (pgcode) from the
     IntegrityError and returns an appropriate HTTP status code and error message.

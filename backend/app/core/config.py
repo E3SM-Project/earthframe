@@ -1,4 +1,3 @@
-# app/core/config.py
 from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

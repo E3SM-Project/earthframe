@@ -25,7 +25,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Register routers
+    # Register routers.
     app.include_router(ai.router)
     app.include_router(simulation.router)
     app.include_router(machine.router)

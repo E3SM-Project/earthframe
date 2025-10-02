@@ -22,8 +22,9 @@ ALEMBIC_INI_PATH = "alembic.ini"
 
 # Set up the SQLAlchemy engine and sessionmaker for testing
 engine = create_engine(TEST_DB_URL, future=True)
-# NOTE (unchanged comment): We keep a Sessionmaker here, but we will bind it per-test
-# to a single connection that's inside a transaction to ensure isolation.
+
+# NOTE: Keep a Sessionmaker here, but bind it per-test to a single connection
+# that's inside a transaction to ensure isolation.
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, expire_on_commit=False, future=True
 )
@@ -165,8 +166,7 @@ def _drop_test_database():
 
 
 def _create_test_database():
-    """
-    Ensures the existence of a test database for use during testing.
+    """Ensures the existence of a test database for use during testing.
 
     This function connects to the PostgreSQL server, checks if the test database
     specified in the `TEST_DB_URL` already exists, and creates it if it does not.
@@ -270,7 +270,7 @@ def client(db: Session):
 
     def override_get_db():
         try:
-            # NEW: Do not close the session here; the db fixture finalizer will
+            # Do not close the session here; the db fixture finalizer will
             # handle closing and rolling back the transaction/savepoint.
             yield db
         finally:

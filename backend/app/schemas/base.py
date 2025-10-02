@@ -4,18 +4,18 @@ from app.schemas.utils import to_camel_case
 
 
 class CamelInModel(BaseModel):
-    # Requests: only accept camelCase
+    # Requests: only accept camelCase.
+    # Set validate_by_name=False to prevent snake_case input.
+    # Set from_attributes=False to prevent ORM input.
     model_config = ConfigDict(
-        alias_generator=to_camel_case,
-        populate_by_name=False,  # camelCase-only input
-        from_attributes=False,  # not needed for requests
+        alias_generator=to_camel_case, validate_by_name=False, from_attributes=False
     )
 
 
 class CamelOutModel(BaseModel):
-    # Responses: read from ORM attributes (snake_case)
+    # Responses: read from ORM attributes (snake_case).
+    # Set validate_by_name=True to allow snake_case input.
+    # Set from_attributes=True to allow ORM input.
     model_config = ConfigDict(
-        alias_generator=to_camel_case,
-        populate_by_name=True,  # allow population by field name
-        from_attributes=True,  # ORM objects
+        alias_generator=to_camel_case, validate_by_name=True, from_attributes=True
     )

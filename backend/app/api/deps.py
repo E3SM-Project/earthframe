@@ -1,4 +1,3 @@
-# deps.py
 from collections.abc import Generator
 from contextlib import contextmanager
 
