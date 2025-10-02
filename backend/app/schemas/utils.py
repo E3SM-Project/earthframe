@@ -19,9 +19,9 @@ def to_camel_case(string: str) -> str:
 
     Examples
     --------
-    >>> to_camel("example_string")
+    >>> to_camel_case("example_string")
     'exampleString'
-    >>> to_camel("another_example")
+    >>> to_camel_case("another_example")
     'anotherExample'
 
     Usage in Pydantic

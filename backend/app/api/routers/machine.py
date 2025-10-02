@@ -47,7 +47,6 @@ def create_machine(payload: MachineCreate, db: Session = Depends(get_db)):
     with transaction(db):
         db.add(new_machine)
         db.flush()
-        db.commit()
 
     return new_machine
 

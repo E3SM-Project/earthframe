@@ -7,7 +7,7 @@ from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
 from psycopg.rows import tuple_row
-from sqlalchemy import create_engine, event  # NEW: import event for savepoint restart
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 
 from app._logger import _setup_custom_logger

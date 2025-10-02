@@ -53,8 +53,6 @@ def create_simulation(payload: SimulationCreate, db: Session = Depends(get_db)):
         db.add(sim)
         # Flush the session to persist the simulation object and generate its ID
         db.flush()
-        # Commit the transaction to save the changes to the database
-        db.commit()
 
     return SimulationOut.model_validate(sim, from_attributes=True)
 
