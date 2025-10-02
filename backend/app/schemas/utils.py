@@ -35,7 +35,7 @@ def to_camel_case(string: str) -> str:
     ...     another_field: int
     ...
     ...     class Config:
-    ...         alias_generator = to_camel
+    ...         alias_generator = to_camel_case
     ...         allow_population_by_field_name = True
     >>> model = ExampleModel(example_field="value", another_field=42)
     >>> model.dict(by_alias=True)
