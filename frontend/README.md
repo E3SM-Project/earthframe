@@ -44,6 +44,7 @@ Changes to components, styles, or configuration apply instantly in your browser.
   - [Example Workflow](#example-workflow)
 
 - [Expanding the ESLint Configuration](#expanding-the-eslint-configuration)
+- [License](#license)
 
 ---
 
@@ -155,3 +156,7 @@ export default tseslint.config({
   },
 });
 ```
+
+## License
+
+For license information, see the [root LICENSE file](../LICENSE).
