@@ -33,36 +33,15 @@ The API will be live at **[http://127.0.0.1:8000](http://127.0.0.1:8000)**, with
 ## Table of Contents
 
 - [Setup Instructions](#setup-instructions)
-
-  - [1. Install Poetry](#1-install-poetry)
-  - [2. Install Dependencies](#2-install-dependencies)
-  - [3. Activate the Poetry Shell (optional)](#3-activate-the-poetry-shell-optional)
-
 - [🧰 Makefile Commands](#-makefile-commands)
-
-  - [Using the Makefile](#using-the-makefile)
-  - [🔧 Setup & Environment](#-setup--environment)
-  - [🚀 Development Server](#-development-server)
-  - [🗄️ Database Migrations (Alembic)](#️-database-migrations-alembic)
-  - [🧹 Code Quality](#-code-quality)
-  - [🆘 Miscellaneous](#-miscellaneous)
-  - [Example Workflow](#example-workflow)
-
 - [Startup](#startup)
-
-  - [1. Run FastAPI Application](#1-run-fastapi-application)
-  - [2. API Documentation](#2-api-documentation)
-
 - [Tech Stack Overview](#tech-stack-overview)
-
-  - [Core Libraries](#core-libraries)
-  - [Typical Flow](#typical-flow)
-  - [Notes](#notes)
-
 - [Managing the Backend](#managing-the-backend)
 
   - [Editing Models and Schemas](#editing-models-and-schemas)
+  - [PostgreSQL Database Setup](#postgresql-database-setup)
 
+- [Containerization and Deployment](#containerization-and-deployment)
 - [License](#license)
 
 ---
@@ -88,7 +67,19 @@ cd /Users/vo13/repositories/earthframe/backend
 poetry install
 ```
 
-### 3. Activate the Poetry Shell (optional)
+### 3. Create a Local Environment File
+
+A template file is provided for convenience:
+
+```bash
+cp .env.example .env
+```
+
+Then, edit `.env` to ensure the settings match your local development environment — particularly the `DATABASE_URL` if running PostgreSQL locally.
+
+> ⚠️ Never commit your `.env` file — it may contain secrets or local overrides.
+
+### 4. Activate the Poetry Shell (optional)
 
 ```bash
 poetry shell
@@ -101,7 +92,6 @@ poetry shell
 ### Using the Makefile
 
 To simplify development, this project includes a `Makefile` that wraps common commands (e.g., starting the server, running migrations, linting code).
-You can always list available commands with:
 
 ```bash
 make help
@@ -147,43 +137,19 @@ All commands run inside the Poetry environment automatically.
 | ----------- | ------------------------------------------------------ | -------------------------------------- |
 | `make help` | Display all available commands and short descriptions. | _(Printed directly from the Makefile)_ |
 
-### Example Workflow
-
-```bash
-# 1. Install dependencies
-make install
-
-# 2. Start the FastAPI server with live reload
-make reload
-
-# 3. Make model changes and generate a migration
-make migrate m="Add user model"
-
-# 4. Apply migrations
-make upgrade
-
-# 5. Check and fix code style
-make lint
-make format
-```
-
 ---
 
 ## Startup
 
 ### 1. Run FastAPI Application
 
-You can start the FastAPI server using [uvicorn](https://www.uvicorn.org/):
-
 ```bash
 poetry run uvicorn app.main:app --reload
 ```
 
-The API will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
+API available at [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ### 2. API Documentation
-
-Once running, access the interactive docs at:
 
 - Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - ReDoc: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
@@ -192,43 +158,18 @@ Once running, access the interactive docs at:
 
 ## Tech Stack Overview
 
-This backend uses the following core libraries:
+- **FastAPI** — Web framework for async Python APIs.
+- **Pydantic** — Data validation and serialization.
+- **SQLAlchemy** — ORM and database toolkit.
+- **Alembic** — Schema migrations.
+- **Poetry** — Dependency management and packaging.
 
-### Core Libraries
+**Typical Flow:**
 
-- **FastAPI** — the web framework.
-  Handles routing, request/response lifecycle, dependency injection, security, and OpenAPI documentation.
-
-  - **Directory**: `backend/app`
-
-- **Pydantic** — data validation & serialization.
-  Defines models for request bodies, responses, and configuration. Ensures type safety and (de)serialization to/from JSON.
-
-  - **Directory**: `backend/app/models`
-
-- **SQLAlchemy** — database ORM & toolkit.
-  Provides a high-level interface to define tables/entities, compose queries, and manage sessions/transactions.
-
-  - **Directory**: `backend/app/db`
-
-- **Alembic** — schema migrations for SQLAlchemy.
-  Keeps the database schema versioned and synchronized across environments.
-
-  - **Directory**: `backend/migrations`
-
-### Typical Flow
-
-1. **Client request** → handled by FastAPI endpoint.
-2. **Pydantic model** validates and parses the request payload.
-3. **SQLAlchemy** session is used to query or update the database.
-4. Results are mapped into a **Pydantic response model** and returned.
-5. **Alembic migrations** are applied when the database schema evolves.
-
-### Notes
-
-- Keep **Pydantic models** (API schemas) separate from **SQLAlchemy models** (database schemas).
-- Manage **SQLAlchemy sessions** per request to avoid leaks.
-- Review **Alembic migrations** before applying, even if autogenerated.
+1. FastAPI endpoint handles a request.
+2. Pydantic validates input/output.
+3. SQLAlchemy queries the database.
+4. Alembic manages schema versioning.
 
 ---
 
@@ -236,40 +177,106 @@ This backend uses the following core libraries:
 
 ### Editing Models and Schemas
 
-1. **Modify SQLAlchemy Models**
+1. Modify SQLAlchemy models (`backend/app/models`).
+2. Update Pydantic schemas (`backend/app/schemas`).
+3. Generate and apply Alembic migrations:
 
-   - Navigate to `backend/app/models` and update or add new models.
-
-2. **Update Pydantic Schemas**
-
-   - Navigate to `backend/app/schemas` and update or create new Pydantic schemas.
-
-3. **Generate and Apply Alembic Migrations**
-
-   - Generate a new migration:
-
-     ```bash
-     poetry run alembic revision --autogenerate -m "Describe your migration"
-     ```
-
-   - Review the migration script under `backend/migrations/versions`.
-   - Apply the migration:
-
-     ```bash
-     poetry run alembic upgrade head
-     ```
-
-4. **Test Changes**
-
-   - Run the FastAPI application and test the endpoints.
+   ```bash
+   poetry run alembic revision --autogenerate -m "Describe your migration"
+   poetry run alembic upgrade head
+   ```
 
 ---
 
-**Notes:**
+## PostgreSQL Database Setup
 
-- Always review autogenerated migrations for accuracy before applying.
-- Ensure the DB connection URL is configured correctly in `alembic.ini` or environment variables.
-- Test database changes in a staging environment before deploying to production.
+To set up a local PostgreSQL database using Docker:
+
+### 1. Run the PostgreSQL Container
+
+```bash
+docker run --name earthframe-db \
+  -e POSTGRES_USER=earthframe \
+  -e POSTGRES_PASSWORD=earthframe \
+  -e POSTGRES_DB=earthframe \
+  -v earthframe_pgdata:/var/lib/postgresql/data \
+  -p 5432:5432 \
+  -d postgres:16
+```
+
+**Explanation:**
+
+- `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` define credentials and the default DB.
+- `-v earthframe_pgdata:/var/lib/postgresql/data` ensures data persists between restarts.
+- `-p 5432:5432` maps the port for local access.
+- `postgres:16` pins a stable version and avoids breaking changes from future major releases.
+
+### 2. Verify the Database is Running
+
+```bash
+docker ps
+```
+
+If you don’t see the container, check logs:
+
+```bash
+docker logs earthframe-db
+```
+
+### 3. Connect to the Database
+
+Using `psql`:
+
+```bash
+psql -h localhost -U earthframe -d earthframe
+```
+
+Or through a GUI like TablePlus / DBeaver:
+
+- Host: `127.0.0.1`
+- Port: `5432`
+- User: `earthframe`
+- Password: `earthframe`
+- Database: `earthframe`
+
+### 4. Update the Application Configuration
+
+In `.env`:
+
+```env
+DATABASE_URL=postgresql+psycopg://earthframe:earthframe@localhost:5432/earthframe
+```
+
+> 💡 If using async SQLAlchemy, change to `postgresql+asyncpg://`.
+
+### 5. Run Migrations
+
+```bash
+make upgrade
+```
+
+This applies all migrations and initializes the schema.
+
+---
+
+## 🐳 Containerization and Deployment
+
+EarthFrame’s backend and database will soon be **fully containerized** to simplify deployment.
+A `docker-compose.yml` will define:
+
+- The FastAPI backend
+- The PostgreSQL service
+- Shared volumes and environment configuration
+
+This will enable a single-command setup like:
+
+```bash
+docker compose up -d
+```
+
+Stay tuned — containerization scripts will be added in an upcoming release.
+
+---
 
 ## License
 
