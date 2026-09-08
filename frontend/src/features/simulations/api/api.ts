@@ -4,6 +4,10 @@ import type { CaseOut, SimulationCreate, SimulationOut } from '@/types';
 export const SIMULATIONS_URL = '/simulations';
 export const CASES_URL = '/cases';
 
+interface PaceExperimentOut {
+  experimentId: string | null;
+}
+
 export const createSimulation = async (data: SimulationCreate): Promise<SimulationOut> => {
   const res = await api.post<SimulationOut>(SIMULATIONS_URL, data);
 
@@ -24,6 +28,14 @@ export const getSimulationById = async (id: string): Promise<SimulationOut> => {
   });
 
   return res.data;
+};
+
+export const resolvePaceExperimentId = async (executionId: string): Promise<string | null> => {
+  const res = await api.get<PaceExperimentOut>(`${SIMULATIONS_URL}/pace/experiment-id`, {
+    params: { execution_id: executionId },
+  });
+
+  return res.data.experimentId;
 };
 
 export const listCases = async (url: string = CASES_URL): Promise<CaseOut[]> => {

@@ -322,6 +322,18 @@ class SimulationSummaryOut(CamelOutBaseModel):
     ]
 
 
+class PaceExperimentOut(CamelOutBaseModel):
+    """PACE experiment lookup result."""
+
+    experiment_id: Annotated[
+        str | None,
+        Field(
+            None,
+            description="PACE experiment ID resolved from an execution ID, when found.",
+        ),
+    ]
+
+
 class CaseOut(CamelOutBaseModel):
     """Schema for representing a Case with nested simulation summaries."""
 

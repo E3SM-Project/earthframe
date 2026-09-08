@@ -1,4 +1,8 @@
+import logging
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -11,6 +15,7 @@ from app.features.ingestion.models import Ingestion
 from app.features.simulation.models import Artifact, Case, ExternalLink, Simulation
 from app.features.simulation.schemas import (
     CaseOut,
+    PaceExperimentOut,
     SimulationCreate,
     SimulationOut,
     SimulationSummaryOut,
@@ -20,6 +25,12 @@ from app.features.user.models import User
 
 simulation_router = APIRouter(prefix="/simulations", tags=["Simulations"])
 case_router = APIRouter(prefix="/cases", tags=["Cases"])
+logger = logging.getLogger(__name__)
+
+PACE_LOOKUP_TIMEOUT_SECONDS = 3
+PACE_SPECIFIC_SEARCH_URL = (
+    "https://pace.ornl.gov/ajax/specificSearch/lid:{execution_id}/expid"
+)
 
 
 @case_router.get(
@@ -342,6 +353,40 @@ def list_simulations(
 
     sims = query.order_by(Simulation.created_at.desc()).all()
     return [_simulation_to_out(s) for s in sims]
+
+
+@simulation_router.get(
+    "/pace/experiment-id",
+    response_model=PaceExperimentOut,
+    responses={
+        200: {"description": "PACE experiment lookup completed."},
+    },
+)
+def resolve_pace_experiment_id(
+    execution_id: str = Query(..., min_length=1),
+) -> PaceExperimentOut:
+    """Resolve a PACE experiment ID from a simulation execution ID."""
+    url = PACE_SPECIFIC_SEARCH_URL.format(execution_id=quote(execution_id, safe=""))
+    request = urllib.request.Request(url)
+
+    try:
+        with urllib.request.urlopen(
+            request, timeout=PACE_LOOKUP_TIMEOUT_SECONDS
+        ) as response:
+            experiment_id = response.read().decode("utf-8").strip()
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as exc:
+        logger.warning(
+            "PACE experiment lookup failed for execution ID %s: %s", execution_id, exc
+        )
+        return PaceExperimentOut(experiment_id=None)
+
+    if not experiment_id.isdigit():
+        logger.warning(
+            "PACE returned an invalid experiment ID for execution ID %s", execution_id
+        )
+        return PaceExperimentOut(experiment_id=None)
+
+    return PaceExperimentOut(experiment_id=experiment_id)
 
 
 @simulation_router.get(

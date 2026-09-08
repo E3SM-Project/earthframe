@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { SimulationPathCard } from '@/features/simulations/components/SimulationPathCard';
 import { SimulationTypeBadge } from '@/features/simulations/components/SimulationTypeBadge';
+import { usePaceExperiment } from '@/features/simulations/hooks/usePaceExperiment';
 import { cn } from '@/lib/utils';
 import type { SimulationOut } from '@/types';
 import { formatDate, getSimulationDuration } from '@/utils/utils';
@@ -55,6 +56,13 @@ export const SimulationDetailsView = ({
 }: SimulationDetailsViewProps) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [notes, setNotes] = useState(simulation.notesMarkdown || '');
+  const { experimentId: paceExperimentId, loading: isPaceLoading } = usePaceExperiment(
+    simulation.executionId,
+  );
+  const paceSearchUrl = `https://pace.ornl.gov/search/${encodeURIComponent(simulation.executionId)}`;
+  const paceUrl = paceExperimentId
+    ? `https://pace.ornl.gov/exp-details/${paceExperimentId}`
+    : paceSearchUrl;
 
   // Temporary local-only comments
   const [newComment, setNewComment] = useState('');
@@ -238,9 +246,7 @@ export const SimulationDetailsView = ({
                     </table>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No configuration differences.
-                  </p>
+                  <p className="text-sm text-muted-foreground">No configuration differences.</p>
                 )}
               </CardContent>
             </Card>
@@ -386,6 +392,24 @@ export const SimulationDetailsView = ({
               </div>
             </CardHeader>
             <CardContent>
+              {simulation.executionId && (
+                <div className="mb-6">
+                  <Label className="mb-1 block text-sm">PACE</Label>
+                  {isPaceLoading ? (
+                    <p className="text-sm text-muted-foreground">Checking PACE...</p>
+                  ) : (
+                    <a
+                      className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+                      href={paceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {paceExperimentId ? 'Open in PACE' : 'Search in PACE'}
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label className="mb-1 block text-sm">Diagnostics</Label>

@@ -1,4 +1,6 @@
+import urllib.error
 from contextlib import nullcontext
+from email.message import Message
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
@@ -618,6 +620,65 @@ class TestListSimulations:
         assert len(data) == 1
         assert data[0]["caseName"] == "combo_case"
         assert data[0]["caseGroup"] == "combo_group"
+
+
+class TestResolvePaceExperimentId:
+    def test_returns_experiment_id_from_pace(self, client) -> None:
+        response = MagicMock()
+        response.read.return_value = b"214043"
+
+        with patch("app.features.simulation.api.urllib.request.urlopen") as urlopen:
+            urlopen.return_value.__enter__.return_value = response
+
+            res = client.get(
+                f"{API_BASE}/simulations/pace/experiment-id",
+                params={"execution_id": "52448807.260505-035011"},
+            )
+
+        assert res.status_code == 200
+        assert res.json() == {"experimentId": "214043"}
+        request = urlopen.call_args.args[0]
+        assert request.full_url.endswith("lid:52448807.260505-035011/expid")
+        assert urlopen.call_args.kwargs["timeout"] == 3
+
+    def test_returns_no_experiment_id_for_invalid_pace_response(self, client) -> None:
+        response = MagicMock()
+        response.read.return_value = b"not-found"
+
+        with patch("app.features.simulation.api.urllib.request.urlopen") as urlopen:
+            urlopen.return_value.__enter__.return_value = response
+
+            res = client.get(
+                f"{API_BASE}/simulations/pace/experiment-id",
+                params={"execution_id": "52448807.260505-035011"},
+            )
+
+        assert res.status_code == 200
+        assert res.json() == {"experimentId": None}
+
+    @pytest.mark.parametrize(
+        "error",
+        [
+            urllib.error.HTTPError(
+                "https://pace.ornl.gov", 500, "error", Message(), None
+            ),
+            urllib.error.URLError("network unavailable"),
+            TimeoutError(),
+        ],
+    )
+    def test_returns_no_experiment_id_when_pace_is_unavailable(
+        self, client, error
+    ) -> None:
+        with patch(
+            "app.features.simulation.api.urllib.request.urlopen", side_effect=error
+        ):
+            res = client.get(
+                f"{API_BASE}/simulations/pace/experiment-id",
+                params={"execution_id": "52448807.260505-035011"},
+            )
+
+        assert res.status_code == 200
+        assert res.json() == {"experimentId": None}
 
 
 class TestGetSimulation:
