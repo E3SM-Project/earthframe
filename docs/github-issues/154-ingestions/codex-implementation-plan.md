@@ -52,7 +52,7 @@ only:
 - set `STATE_PATH`
 - require `SIMBOARD_API_BASE_URL`
 - require `SIMBOARD_API_TOKEN`
-- call `python -m app.scripts.ingestion.hpc_archive_ingestor`
+- call `python -m app.scripts.ingestion.hpc_upload_archive_ingestor`
 
 The shared Python ingestor should own:
 
@@ -122,8 +122,9 @@ sample data validation.
 
 1. Confirm with @rljacob that Chrysalis is the highest-value first site.
 2. Preserve current Perlmutter/NERSC behavior.
-3. Add generic `hpc_archive_ingestor` entrypoint that delegates to existing
-   scanner/state/retry/logging logic.
+3. Use the generic `hpc_upload_archive_ingestor` entrypoint, which reuses the
+   existing scanner, state, retry, and logging logic for remote upload-based
+   ingestion.
 4. Add Chrysalis Jenkins wrapper.
 5. Validate Chrysalis with dry-run and capped ingest.
 6. Move Chrysalis to scheduled Jenkins only after state, counts, failure status,

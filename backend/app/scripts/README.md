@@ -171,18 +171,13 @@ MACHINE_NAME=perlmutter \
 uv run python -m app.scripts.ingestion.nersc_archive_ingestor
 ```
 
-#### NERSC Wrapper
+#### NERSC Site Launcher
 
-`backend/app/scripts/ingestion/sites/nersc.sh`:
-
-- Activates `backend/.venv`
-- Sets the documented NERSC staging and archive roots
-- Defaults to `SCAN_MODE=archive`
-- Defaults to `DRY_RUN=true`
-- Runs `python -m app.scripts.ingestion.nersc_archive_ingestor`
-
-Override `SCAN_MODE`, `DRY_RUN`, or another supported variable in the calling
-environment or cron entry when a different behavior is required.
+Use `sites/site_ingestion_launcher.sh nersc <staging|archive>` for host-side
+NERSC collection. The launcher loads `sites/nersc.config` and runs
+`python -m app.scripts.ingestion.nersc_archive_ingestor`. Override `SCAN_MODE`,
+`DRY_RUN`, or another supported variable in the calling environment or cron
+entry when a different behavior is required.
 
 ### HPC Upload Archive Ingestion
 
@@ -209,19 +204,6 @@ The common ingestion environment variables and archive rules apply.
 - Browser and manual uploads continue to use
   `/api/v1/ingestions/from-upload`. This runner does not call that endpoint.
 
-## HPC Upload Archive Ingestor
-
-The scheduler-agnostic HPC upload archive ingestor is the preferred entrypoint for
-site wrappers. It currently delegates to the existing NERSC archive ingestor,
-preserving Perlmutter behavior while giving non-NERSC schedulers a stable shared
-command.
-
-Example:
-
-```bash
-uv run python -m app.scripts.ingestion.hpc_upload_archive_ingestor
-```
-
 ### Site Collection Launcher
 
 `app/scripts/ingestion/sites/site_ingestion_launcher.sh` is the host-side
@@ -233,9 +215,12 @@ app/scripts/ingestion/sites/site_ingestion_launcher.sh nersc staging
 app/scripts/ingestion/sites/site_ingestion_launcher.sh chrysalis archive
 ```
 
-Each site config defines its machine name, archive roots, working and repository
-paths, Python environment file, token export file, API base URL, archive lower
-bound, and ingestor module. The launcher defaults to `DRY_RUN=true` with
+Each site config defines its machine name, archive roots, Python environment
+file, token export file, API base URL, archive lower bound, and ingestor module.
+Set `SIMBOARD_ROOT` to a shared operational directory containing
+`repository/simboard` and `operations`; the launcher derives the backend and
+working paths from it. A site config may instead set `SIMBOARD_MODULES` and
+`SIMBOARD_WORKDIR` explicitly before using either variable. The launcher defaults to `DRY_RUN=true` with
 `DRY_RUN_USE_REMOTE_STATE=true`, so it loads API credentials and performs
 read-only state validation. Set `DRY_RUN_USE_REMOTE_STATE=false` for a
 credential-free offline scan. Set `DRY_RUN=false` only after validating archive
@@ -244,6 +229,15 @@ access, token storage, network egress, and candidate counts. A capped
 
 Site configs are operational inputs. Keep credentials in their referenced,
 protected files rather than committing them to a config file.
+
+### Cron Setup
+
+Copy `sites/crontab.example` outside the repository, set `SIMBOARD_ROOT` to the
+shared operational directory, and install the adjusted file with `crontab`.
+The example schedules staging scans every 15 minutes and archive scans daily at
+12:00 UTC. The token file referenced by the site config must be readable only by
+the account that runs the scheduled job and export `SIMBOARD_API_TOKEN` when
+sourced. Keep token values out of the repository and crontab.
 
 ## NERSC Archive Ingestor
 
