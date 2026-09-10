@@ -105,6 +105,62 @@ def test_hpc_runner_does_not_import_nersc_entrypoint() -> None:
     assert "app.scripts.ingestion.nersc_archive_ingestor" not in runner_source
 
 
+def test_run_ingestor_offline_dry_run_logs_startup_configuration(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    archive_root = tmp_path / "archive"
+    (archive_root / "case_a" / "100.1-1").mkdir(parents=True)
+    logged_events: list[tuple[str, dict[str, Any]]] = []
+
+    def fake_log_event(event: str, fields: dict[str, Any] | None = None) -> None:
+        logged_events.append((event, {} if fields is None else fields))
+
+    monkeypatch.setattr(upload_ingestor_module, "_log_event", fake_log_event)
+    monkeypatch.setattr(discovery_module, "_log_event", fake_log_event)
+    monkeypatch.setattr(
+        upload_ingestor_module,
+        "_build_endpoint_url",
+        lambda *_: pytest.fail("offline dry run must not build ingestion endpoint"),
+    )
+    monkeypatch.setattr(
+        upload_ingestor_module,
+        "_fetch_ingestion_state",
+        lambda *_args, **_kwargs: pytest.fail(
+            "offline dry run must not fetch API state"
+        ),
+    )
+
+    config = IngestorConfig(
+        api_base_url="",
+        api_token="",
+        archive_root=archive_root,
+        machine_name="chrysalis",
+        dry_run=True,
+        dry_run_use_remote_state=False,
+        max_cases_per_run=None,
+        max_attempts=1,
+        request_timeout_seconds=30,
+    )
+
+    assert _run_ingestor(config, metadata_locator=lambda *_: {}) == 0
+    startup_events = [
+        (event, fields)
+        for event, fields in logged_events
+        if event.startswith("startup_configuration_")
+    ]
+    assert startup_events[0] == ("startup_configuration_begin", {})
+    assert startup_events[1] == (
+        "startup_configuration_api",
+        {
+            "api_base_url": "",
+            "endpoint_url": "",
+            "state_endpoint_url": "",
+        },
+    )
+    assert startup_events[-1] == ("startup_configuration_end", {})
+
+
 def test_create_case_archive_packages_single_case_dir(tmp_path: Path) -> None:
     case_dir = tmp_path / "case_a"
     execution_dir = case_dir / "100.1-1"
@@ -610,18 +666,32 @@ def test_run_ingestor_dry_run_does_not_upload(
     monkeypatch.setattr(
         upload_ingestor_module,
         "_fetch_ingestion_state",
-        lambda *args, **kwargs: _fresh_state(),
+        lambda *_args, **_kwargs: pytest.fail("dry run must not fetch API state"),
+    )
+    monkeypatch.setattr(
+        upload_ingestor_module,
+        "_build_endpoint_url",
+        lambda *_: pytest.fail("dry run must not build upload endpoint"),
+    )
+    monkeypatch.setattr(
+        upload_ingestor_module,
+        "_fetch_archive_checkpoints",
+        lambda *_args, **_kwargs: pytest.fail(
+            "dry run must not fetch archive checkpoints"
+        ),
     )
 
     config = IngestorConfig(
-        api_base_url="http://backend:8000",
-        api_token="token",
+        api_base_url="",
+        api_token="",
         archive_root=archive_root,
         machine_name="perlmutter",
         dry_run=True,
+        dry_run_use_remote_state=False,
         max_cases_per_run=None,
         max_attempts=1,
         request_timeout_seconds=30,
+        scan_mode="archive",
     )
 
     exit_code = _run_ingestor(
@@ -785,7 +855,7 @@ def test_run_ingestor_returns_failure_when_state_fetch_fails(
     assert any(event == "state_fetch_failed" for event, _ in logged_events)
 
 
-def test_run_ingestor_fetches_archive_checkpoints_before_state(
+def test_run_ingestor_default_dry_run_fetches_archive_checkpoints_before_state(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
@@ -863,7 +933,7 @@ def test_run_ingestor_returns_failure_when_checkpoint_fetch_fails(
         api_token="token",
         archive_root=archive_root,
         machine_name="perlmutter",
-        dry_run=True,
+        dry_run=False,
         max_cases_per_run=None,
         max_attempts=1,
         request_timeout_seconds=30,

@@ -14,6 +14,41 @@ Before running a script:
 2. Confirm that the target database or API is accessible.
 3. Activate the correct local, staging, or production environment.
 
+Scripts are organized by domain:
+
+```text
+scripts/
+├── ingestion/
+│   ├── archive_client.py
+│   ├── archive_discovery.py
+│   ├── archive_ingestor_core.py
+│   ├── archive_layout.py
+│   ├── archive_workflow.py
+│   ├── diagnostics_archives.py
+│   ├── diagnostics_link_scanner.py
+│   ├── hpc_upload_archive_ingestor.py
+│   ├── nersc_archive_ingestor.py
+│   ├── sites/
+│   │   ├── lcrc-diagnostics-scanner.sh
+│   │   ├── nersc-diagnostics-scanner.sh
+│   │   ├── site_ingestion_launcher.sh
+│   │   ├── chrysalis.config
+│   │   └── nersc.config
+│   └── v3_data/
+│       ├── __init__.py
+│       ├── lcrc-v3.env.example
+│       ├── lcrc_v3.sh
+│       ├── lcrc_v3_archive_ingestor.py
+│       └── lcrc_v3_hpss_linker.py
+├── db/
+│   ├── seed.py
+│   ├── rollback_seed.py
+│   └── catalog.json
+└── users/
+    ├── create_admin_account.py
+    └── provision_service_account.py
+```
+
 Scripts may depend on:
 
 - Application configuration from `app.core.config`
@@ -29,6 +64,7 @@ imports, configuration loading, and environment behavior.
 python -m app.scripts.db.seed
 python -m app.scripts.db.rollback_seed
 python -m app.scripts.users.create_admin_account
+python -m app.scripts.ingestion.hpc_upload_archive_ingestor
 python -m app.scripts.ingestion.nersc_archive_ingestor
 python -m app.scripts.ingestion.v3_data.lcrc_v3_archive_ingestor
 python -m app.scripts.ingestion.v3_data.lcrc_v3_hpss_linker
@@ -140,18 +176,13 @@ MACHINE_NAME=perlmutter \
 uv run python -m app.scripts.ingestion.nersc_archive_ingestor
 ```
 
-#### NERSC Wrapper
+#### NERSC Site Launcher
 
-`backend/app/scripts/ingestion/sites/nersc.sh`:
-
-- Activates `backend/.venv`
-- Sets the documented NERSC staging and archive roots
-- Defaults to `SCAN_MODE=archive`
-- Defaults to `DRY_RUN=true`
-- Runs `python -m app.scripts.ingestion.nersc_archive_ingestor`
-
-Override `SCAN_MODE`, `DRY_RUN`, or another supported variable in the calling
-environment or cron entry when a different behavior is required.
+Use `sites/site_ingestion_launcher.sh nersc <staging|archive>` for host-side
+NERSC collection. The launcher loads `sites/nersc.config` and runs
+`python -m app.scripts.ingestion.nersc_archive_ingestor`. Override `SCAN_MODE`,
+`DRY_RUN`, or another supported variable in the calling environment or cron
+entry when a different behavior is required.
 
 ### HPC Upload Archive Ingestion
 
@@ -178,7 +209,42 @@ The common ingestion environment variables and archive rules apply.
 - Browser and manual uploads continue to use
   `/api/v1/ingestions/from-upload`. This runner does not call that endpoint.
 
-### Diagnostics Provenance Scanner
+### Site Collection Launcher
+
+`app/scripts/ingestion/sites/site_ingestion_launcher.sh` is the host-side
+launcher for site collection. It loads `sites/<site>.config`, then selects the
+configured Python ingestor. Use it as:
+
+```bash
+app/scripts/ingestion/sites/site_ingestion_launcher.sh nersc staging
+app/scripts/ingestion/sites/site_ingestion_launcher.sh chrysalis archive
+```
+
+Each site config defines its machine name, archive roots, Python environment
+file, token export file, API base URL, archive lower bound, and ingestor module.
+Set `SIMBOARD_ROOT` to a shared operational directory containing
+`repository/simboard` and `operations`; the launcher derives the backend and
+working paths from it. A site config may instead set `SIMBOARD_MODULES` and
+`SIMBOARD_WORKDIR` explicitly before using either variable. The launcher defaults to `DRY_RUN=true` with
+`DRY_RUN_USE_REMOTE_STATE=true`, so it loads API credentials and performs
+read-only state validation. Set `DRY_RUN_USE_REMOTE_STATE=false` for a
+credential-free offline scan. Set `DRY_RUN=false` only after validating archive
+access, token storage, network egress, and candidate counts. A capped
+`MAX_CASES_PER_RUN` value limits real ingestion but still persists results.
+
+Site configs are operational inputs. Keep credentials in their referenced,
+protected files rather than committing them to a config file.
+
+### Cron Setup
+
+Copy `sites/crontab.example` outside the repository, set `SIMBOARD_ROOT` to the
+shared operational directory, and install the adjusted file with `crontab`.
+The example schedules staging scans every 15 minutes and archive scans daily at
+12:00 UTC. The token file referenced by the site config must be readable only by
+the account that runs the scheduled job and export `SIMBOARD_API_TOKEN` when
+sourced. Keep token values out of the repository and crontab.
+
+## NERSC Diagnostics Link Scanner
 
 #### When to Use It
 
@@ -198,65 +264,26 @@ backend/app/scripts/ingestion/sites/nersc-diagnostics-scanner.sh
 
 After reviewing the logs, run or schedule it with `DRY_RUN=false` and provide:
 
+- `MACHINE_NAME` (required; `perlmutter` for this wrapper)
 - `SIMBOARD_API_BASE_URL`
 - `SIMBOARD_API_TOKEN`
-- `MACHINE_NAME=perlmutter`
 
-#### Run It at LCRC
+`SIMBOARD_API_BASE_URL` defaults to the development API URL in the wrapper, but
+set it explicitly for non-development runs. The scanner reads the reviewed
+static registry rather than archive scan-mode or archive-root settings.
 
-Use `sites/lcrc-diagnostics-scanner.sh` with `MACHINE_NAME=chrysalis`.
+## One-Time Chrysalis E3SM v3 Archive Backfill
 
-`MACHINE_NAME` is required for every invocation. The wrappers do not assign a
-default machine.
+`v3_data/lcrc_v3_archive_ingestor.py` is a targeted remote-upload backfill for
+simulations stored on LCRC Chrysalis and listed in
+the [E3SM v3 simulation table](https://docs.e3sm.org/e3sm_data_docs/_build/html/v3/CoupledSystem/simulation_data/simulation_table.html).
+It uses a static copy of the table's `Simulation` values, matches archive case
+directory leaf names exactly, forces archive scanning from `2024-01`, and
+reuses the HPC upload runner's discovery, validation, deduplication, packaging,
+and `/api/v1/ingestions/from-hpc-upload` request logic.
 
-#### Operational Behavior
-
-- Dry runs require no API URL or token and emit one candidate event per
-  discovered link.
-- Structured events cover startup configuration, discovery, candidate
-  selection, state lookups, retry outcomes, and completion.
-- Credentials are never logged.
-- Failed or not-ready candidates are retried during the next run.
-- Archive roots and public URLs come only from `diagnostics_archives.py`.
-
-#### Required Filesystem Access
-
-The scanner account needs read and traverse access to:
-
-- `production/`
-- `development/`
-- Provenance settings
-- Published output
-
-Refresh registry entries from Mache `[web_portal]` configuration only through a
-reviewed code change. Do not add archive-path environment overrides.
-
-## One-Time E3SM v3 Backfills
-
-### Chrysalis Archive Backfill
-
-#### Purpose
-
-`v3_data/lcrc_v3_archive_ingestor.py` performs a targeted remote-upload backfill
-for simulations stored on LCRC Chrysalis and listed in the
-[E3SM v3 simulation table](https://docs.e3sm.org/e3sm_data_docs/_build/html/v3/CoupledSystem/simulation_data/simulation_table.html).
-
-The runner:
-
-- Uses a static copy of the table's `Simulation` values.
-- Matches archive case-directory leaf names exactly.
-- Forces archive scanning to start at `2024-01`.
-- Reuses the HPC upload runner's discovery, validation, deduplication,
-  packaging, and `/api/v1/ingestions/from-hpc-upload` request logic.
-- Records uploads under machine `chrysalis`.
-
-Run the module on Chrysalis, where the source case directories are readable and
-the SimBoard deployment is externally reachable.
-
-#### Prepare Configuration
-
-Copy the committed template outside the repository, restrict its permissions,
-and replace its placeholders:
+For this one-time backfill, copy the committed template outside the repository,
+secure it, replace its placeholders, then run a dry run:
 
 ```bash
 mkdir -p ~/.config/simboard
@@ -377,24 +404,3 @@ After review, apply the links and rerun the dry run to confirm idempotency:
 python -m app.scripts.ingestion.v3_data.lcrc_v3_hpss_linker --apply
 python -m app.scripts.ingestion.v3_data.lcrc_v3_hpss_linker
 ```
-
-Use a saved table source when outbound documentation access is unavailable:
-
-```bash
-python -m app.scripts.ingestion.v3_data.lcrc_v3_hpss_linker \
-  --source-file /path/to/simulation_table.html
-```
-
-## Development Guidelines
-
-When adding a script:
-
-- Keep business logic in `app.features.*` or service modules.
-- Keep the script focused on configuration, database-session setup, and calls
-  into the service layer.
-- Avoid duplicating application logic.
-- Make operations idempotent where possible.
-
-These scripts support development workflows, controlled administrative
-operations, and environment setup. If operational complexity grows, consolidate
-them behind a structured CLI entry point.
