@@ -16,7 +16,7 @@ equivalent native-runner access exist. Without access, implementation cannot
 validate archive paths, scheduler behavior, token storage, network egress, or
 metadata layout. These sites remain documented as future candidates only.
 
-Primary source: `/Users/vo13/Downloads/EPG-PACE Collection and Upload Reference-280426-174740.pdf`.
+Primary source: https://e3sm.atlassian.net/wiki/spaces/EPG/pages/5477335106/PACE+Collection+and+Upload+Reference
 
 Supporting GitHub sources:
 
@@ -49,7 +49,6 @@ only:
 - load site-specific modules or Python environment when needed
 - set `MACHINE_NAME`
 - set `PERF_ARCHIVE_ROOT`
-- set `STATE_PATH`
 - require `SIMBOARD_API_BASE_URL`
 - require `SIMBOARD_API_TOKEN`
 - call `python -m app.scripts.ingestion.hpc_upload_archive_ingestor`
@@ -70,7 +69,7 @@ Standardize these parts:
 
 - scan and parseable execution discovery
 - metadata validation using existing SimBoard parser behavior
-- state-file deduplication
+- API-backed ingestion-state deduplication and archive checkpoints
 - dry-run and capped-ingest controls
 - retry/backoff and deterministic non-zero failure exits
 - service-account token authentication
@@ -80,7 +79,7 @@ Keep these parts site-specific:
 
 - scheduler: Jenkins, GitLab, cron, or site-native runner
 - module/Python setup
-- archive root and state path
+- archive root
 - secret storage and token rotation workflow
 - network/proxy/egress setup
 - local filesystem permissions
@@ -148,8 +147,9 @@ Risks and unknowns:
 Assumptions:
 
 - Anvil is out of scope for this plan.
-- Existing SimBoard `/ingestions/from-path` and `/ingestions/from-upload` APIs
-  are sufficient for initial rollout planning.
+- Existing SimBoard `/ingestions/from-path` and
+  `/ingestions/from-hpc-upload` APIs are sufficient for initial rollout
+  planning. Browser-oriented uploads use `/ingestions/from-upload` instead.
 - One service-account token should be provisioned per site.
 - Existing PACE scripts remain responsible for PACE collection/upload. SimBoard
   wrappers only bridge archived metadata into SimBoard.
@@ -165,5 +165,5 @@ Assumptions:
 5. Run Chrysalis dry-run with `DRY_RUN=true`.
 6. Run capped ingest with `MAX_CASES_PER_RUN`.
 7. Verify SimBoard created/duplicate/error counts.
-8. Verify state file prevents repeat ingestion.
+8. Verify remote ingestion state prevents repeat ingestion.
 9. Verify Jenkins marks ingestion failures as failed jobs.

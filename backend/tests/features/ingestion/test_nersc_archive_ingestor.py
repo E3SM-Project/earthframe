@@ -508,6 +508,21 @@ def test_run_ingestor_dry_run_without_api_configuration_scans_offline(
 
     assert exit_code == 0
     assert any(event == "dry_run_completed" for event, _ in logged_events)
+    startup_events = [
+        (event, fields)
+        for event, fields in logged_events
+        if event.startswith("startup_configuration_")
+    ]
+    assert startup_events[0] == ("startup_configuration_begin", {})
+    assert startup_events[1] == (
+        "startup_configuration_api",
+        {
+            "api_base_url": "",
+            "endpoint_url": "",
+            "state_endpoint_url": "",
+        },
+    )
+    assert startup_events[-1] == ("startup_configuration_end", {})
 
 
 def test_run_ingestor_without_token_returns_config_error(

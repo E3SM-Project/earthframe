@@ -126,6 +126,12 @@ def _prepare_run_state(
 ) -> tuple[dict[str, Any], set[str], str] | None:
     """Build offline dry-run state or fetch state needed for this run."""
     if config.dry_run and not config.dry_run_use_remote_state:
+        _log_startup_configuration(
+            config,
+            endpoint_url="",
+            state_endpoint_url="",
+            log_event_fn=_log_event,
+        )
         return _fresh_state(), set(), ""
 
     endpoint_url = _build_endpoint_url(config)

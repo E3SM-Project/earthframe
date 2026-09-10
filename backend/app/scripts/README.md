@@ -10,6 +10,10 @@ internal operational entry points and are not part of the public API.
 
 Before running a script:
 
+1. Set the required environment variables.
+2. Confirm that the target database or API is accessible.
+3. Activate the correct local, staging, or production environment.
+
 Scripts are organized by domain:
 
 ```text
@@ -34,7 +38,8 @@ scripts/
 │       ├── __init__.py
 │       ├── lcrc-v3.env.example
 │       ├── lcrc_v3.sh
-│       └── lcrc_v3_archive_ingestor.py
+│       ├── lcrc_v3_archive_ingestor.py
+│       └── lcrc_v3_hpss_linker.py
 ├── db/
 │   ├── seed.py
 │   ├── rollback_seed.py
@@ -239,7 +244,7 @@ The example schedules staging scans every 15 minutes and archive scans daily at
 the account that runs the scheduled job and export `SIMBOARD_API_TOKEN` when
 sourced. Keep token values out of the repository and crontab.
 
-## NERSC Archive Ingestor
+## NERSC Diagnostics Link Scanner
 
 #### When to Use It
 
@@ -259,27 +264,13 @@ backend/app/scripts/ingestion/sites/nersc-diagnostics-scanner.sh
 
 After reviewing the logs, run or schedule it with `DRY_RUN=false` and provide:
 
+- `MACHINE_NAME` (required; `perlmutter` for this wrapper)
 - `SIMBOARD_API_BASE_URL`
 - `SIMBOARD_API_TOKEN`
-- `SCAN_MODE` (`staging` or `archive`, default `staging`)
-- `PERF_ARCHIVE_ROOT` (default `/performance_archive` for `SCAN_MODE=staging`)
-- `OLD_PERF_ARCHIVE_ROOT` (default `/OLD_PERF` for `SCAN_MODE=archive`)
-- `MACHINE_NAME` (default `perlmutter`)
-- `DRY_RUN` (default `true`)
-- `DRY_RUN_USE_REMOTE_STATE` (default `true`; set `false` for offline dry runs)
-- `MAX_CASES_PER_RUN` (optional, default not set)
-- `MAX_ATTEMPTS` (optional, default not set)
-- `REQUEST_TIMEOUT_SECONDS` (optional, default 60)
-- `ARCHIVE_YEAR_START` (optional, archive mode only; accepts `YYYY` or `YYYY-MM`)
-- `ARCHIVE_YEAR_END` (optional, archive mode only; accepts `YYYY` or `YYYY-MM`)
 
-Archive notes:
-
-- Archive mode traverses only top-level `YYYY-MM` directories under `OLD_PERF_ARCHIVE_ROOT`. Other top-level directories are ignored.
-- Archive scans may include paths without a `COMPLETED/` directory. When snapshot status buckets exist, ingestor scans only `COMPLETED/` and ignores sibling directories in that snapshot bucket.
-- Archive dedupe is based on logical case identity plus `execution_id`, not the full timestamped snapshot path.
-- Direct Python entrypoints leave `ARCHIVE_YEAR_START` / `ARCHIVE_YEAR_END` unset. The site collection launcher applies each site's configured archive lower bound; callers may override either bound for a differently scoped archive scan.
-- `YYYY` values expand to full-year bounds (`START=2020` means `2020-01`; `END=2020` means `2020-12`), while `YYYY-MM` values target exact archive month buckets.
+`SIMBOARD_API_BASE_URL` defaults to the development API URL in the wrapper, but
+set it explicitly for non-development runs. The scanner reads the reviewed
+static registry rather than archive scan-mode or archive-root settings.
 
 ## One-Time Chrysalis E3SM v3 Archive Backfill
 
@@ -409,19 +400,7 @@ python -m app.scripts.ingestion.v3_data.lcrc_v3_hpss_linker
 
 After review, apply the links and rerun the dry run to confirm idempotency:
 
-- `SIMBOARD_API_BASE_URL`
-- `SIMBOARD_API_TOKEN`
-- `SCAN_MODE` (`staging` or `archive`, default `staging`)
-- `PERF_ARCHIVE_ROOT` (default `/performance_archive` for `SCAN_MODE=staging`)
-- `OLD_PERF_ARCHIVE_ROOT` (default `/OLD_PERF` for `SCAN_MODE=archive`)
-- `MACHINE_NAME` (default `perlmutter`)
-- `DRY_RUN` (default `true`)
-- `DRY_RUN_USE_REMOTE_STATE` (default `true`; set `false` for offline dry runs)
-- `MAX_CASES_PER_RUN` (optional, default not set)
-- `MAX_ATTEMPTS` (optional, default not set)
-- `REQUEST_TIMEOUT_SECONDS` (optional, default 60)
-- `ARCHIVE_YEAR_START` (optional, archive mode only; accepts `YYYY` or `YYYY-MM`)
-- `ARCHIVE_YEAR_END` (optional, archive mode only; accepts `YYYY` or `YYYY-MM`)
-
-Archive mode uses same `YYYY-MM` top-level bucket requirement described above
-for path-based ingestion.
+```bash
+python -m app.scripts.ingestion.v3_data.lcrc_v3_hpss_linker --apply
+python -m app.scripts.ingestion.v3_data.lcrc_v3_hpss_linker
+```
